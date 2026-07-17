@@ -7,9 +7,9 @@
 export const normalize = (v: unknown): string =>
   String(v ?? "")
     .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")  // remove accents
-    .replace(/['"`’‘]/g, "")          // remove quotes
-    .replace(/[-–—_]/g, " ")          // hyphens to spaces
+    .replace(/[\u0300-\u036f]/g, "") // remove accents
+    .replace(/['"`\u2018\u2019]/g, "") // remove quotes
+    .replace(/[-–—_]/g, " ") // hyphens to spaces
     .replace(/\s+/g, " ")
     .trim()
     .toUpperCase();
@@ -20,16 +20,15 @@ export const LGA_NAME_MAP: Record<string, string> = {
   // OYO - known truncations
   "ORI IRE": "ORI-IRE",
   "OGO OLUWA": "OGO-OLUW",
-  "OGO OLUW": "OGO-OLUW",      // ✅ FIX: GeoJSON truncated version
-  "OGO OLUWA": "OGO-OLUW",
+  "OGO OLUW": "OGO-OLUW",
 
   // BENUE
   "GWER EAST": "GWER EAST",
   "GWER WEST": "GWER WEST",
 
   // ABIA - truncated
-  "ISUIKWUATO": "ISUIKWUA",
-  "ISUIKWUA": "ISUIKWUA",
+  ISUIKWUATO: "ISUIKWUA",
+  ISUIKWUA: "ISUIKWUA",
 
   // Common hyphen variants
   "IBADAN NORTH EAST": "IBADAN NORTH-EAST",

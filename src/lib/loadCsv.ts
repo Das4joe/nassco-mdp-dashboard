@@ -1,26 +1,17 @@
 // src/lib/loadCsv.ts
+// ═══════════════════════════════════════════════════════════════
+// NASSCO MDP — CSV Loader
+// ═══════════════════════════════════════════════════════════════
 import Papa from "papaparse";
 
-export async function loadCsv<T = Record<string, string>>(
-  path: string
-): Promise<T[]> {
-  const res = await fetch(path);
-
-  if (!res.ok) {
-    throw new Error(
-      `Failed to load CSV: ${path} — ${res.status} ${res.statusText}`
-    );
-  }
-
-  const text = await res.text();
-
+export function loadCsv(url: string): Promise<unknown[]> {
   return new Promise((resolve, reject) => {
-    Papa.parse<T>(text, {
+    Papa.parse(url, {
+      download: true,
       header: true,
       skipEmptyLines: true,
-      transformHeader: (h) => h.trim(),   // ✅ Strip whitespace from headers
-      complete: (r) => resolve(r.data),
-      error: (err) => reject(err),
+      complete: (results) => resolve(results.data as unknown[]),
+      error: (err: unknown) => reject(err),
     });
   });
 }

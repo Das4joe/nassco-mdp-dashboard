@@ -1,10 +1,7 @@
 // src/components/ExportModal.tsx
 // ═══════════════════════════════════════════════════════════════
 // NASSCO MDP — Export Modal
-// FIXES:
-//   1. Modal fixed-centered (not stuck at bottom, not scrollable away)
-//   2. PDF exports include SVG map with labelled LGA polygons
-//   3. Modal is draggable so user can reposition it
+// Fixed: modal centred + draggable, PDF includes labelled maps
 // ═══════════════════════════════════════════════════════════════
 import { useRef, useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +19,7 @@ interface Props {
   communityCounts: Record<string, number>;
 }
 
-// ── Colour helpers (match StateLgaMap choropleth) ──────────────
+// ── Colour helpers ─────────────────────────────────────────────
 function hhToColor(hh: number): string {
   if (hh === 0) return "#EFF6FF";
   if (hh <= 50) return "#BFDBFE";
@@ -46,18 +43,16 @@ function hexToRgb(hex: string): [number, number, number] {
   return [r, g, b];
 }
 
-// ════════════════════════════════════════════════════════════════
-// SVG MAP BUILDER
-// Renders a Nigeria overview map OR a state LGA choropleth map
-// as an inline SVG string that jsPDF can embed via svg2canvas.
-// We use jsPDF's built-in SVG renderer (addSvgAsImage via canvas).
-// ════════════════════════════════════════════════════════════════
-
-// ── Project lat/lng → SVG x/y (simple equirectangular) ─────────
+// ── Project lat/lng → SVG x/y ──────────────────────────────────
 function project(
   lng: number,
   lat: number,
-  bbox: { minLng: number; maxLng: number; minLat: number; maxLat: number },
+  bbox: {
+    minLng: number;
+    maxLng: number;
+    minLat: number;
+    maxLat: number;
+  },
   svgW: number,
   svgH: number,
 ): [number, number] {
@@ -66,7 +61,7 @@ function project(
   return [x, y];
 }
 
-// ── Extract all coordinate rings from a GeoJSON feature ────────
+// ── Extract coordinate rings from a GeoJSON feature ────────────
 function getRings(geometry: any): number[][][] {
   if (!geometry) return [];
   if (geometry.type === "Polygon") return geometry.coordinates;
@@ -74,7 +69,7 @@ function getRings(geometry: any): number[][][] {
   return [];
 }
 
-// ── Compute bounding box of a feature collection ───────────────
+// ── Compute bounding box ───────────────────────────────────────
 function getBbox(features: any[]): {
   minLng: number;
   maxLng: number;
@@ -95,7 +90,6 @@ function getBbox(features: any[]): {
       });
     });
   });
-  // Add padding
   const padLng = (maxLng - minLng) * 0.04;
   const padLat = (maxLat - minLat) * 0.04;
   return {
@@ -106,7 +100,7 @@ function getBbox(features: any[]): {
   };
 }
 
-// ── Compute centroid of a ring (for label placement) ───────────
+// ── Centroid of a ring ─────────────────────────────────────────
 function ringCentroid(ring: number[][]): [number, number] {
   let x = 0,
     y = 0;
@@ -117,7 +111,7 @@ function ringCentroid(ring: number[][]): [number, number] {
   return [x / ring.length, y / ring.length];
 }
 
-// ── Largest ring of a feature (for centroid label) ─────────────
+// ── Largest ring of a feature ──────────────────────────────────
 function largestRing(geometry: any): number[][] {
   const rings = getRings(geometry);
   if (rings.length === 0) return [];
@@ -127,7 +121,7 @@ function largestRing(geometry: any): number[][] {
   );
 }
 
-// ── Build SVG for Nigeria overview (state-level) ────────────────
+// ── Build Nigeria overview SVG ─────────────────────────────────
 function buildNigeriaOverviewSvg(
   statesGeo: any,
   statesAgg: StateAgg[],
@@ -162,12 +156,12 @@ function buildNigeriaOverviewSvg(
       const pts = ring
         .map(([lng, lat]) => project(lng, lat, bbox, W, H).join(","))
         .join(" ");
-      paths += `<polygon points="${pts}" fill="${fill}" fill-opacity="${
-        data ? "0.85" : "0.30"
-      }" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>`;
+      paths += `<polygon points="${pts}" fill="${fill}"
+        fill-opacity="${data ? "0.85" : "0.30"}"
+        stroke="${stroke}" stroke-width="${strokeWidth}"
+        stroke-linejoin="round"/>`;
     });
 
-    // Label — only for intervention states, on largest ring centroid
     if (data) {
       const lr = largestRing(f.geometry);
       if (lr.length > 0) {
@@ -177,8 +171,10 @@ function buildNigeriaOverviewSvg(
           <text x="${cx}" y="${cy - 7}"
             font-family="Arial,sans-serif" font-size="11"
             font-weight="bold" fill="${fill}"
-            stroke="white" stroke-width="2.5" paint-order="stroke"
-            text-anchor="middle">${data.state}</text>
+            stroke="white" stroke-width="2.5"
+            paint-order="stroke" text-anchor="middle">
+            ${data.state}
+          </text>
           <text x="${cx}" y="${cy + 7}"
             font-family="Arial,sans-serif" font-size="9"
             fill="#111827" stroke="white" stroke-width="2"
@@ -197,7 +193,7 @@ function buildNigeriaOverviewSvg(
   </svg>`;
 }
 
-// ── Build SVG for a single state LGA choropleth map ─────────────
+// ── Build state LGA choropleth SVG ─────────────────────────────
 function buildStateLgaSvg(
   lgasGeo: any,
   lgaAgg: LgaAgg[],
@@ -209,7 +205,6 @@ function buildStateLgaSvg(
   const stateNorm = selectedState.toLowerCase().trim();
   const allFeatures = lgasGeo?.features ?? [];
 
-  // Filter to selected state only
   const features = allFeatures.filter((f: any) => {
     const sn: string =
       f.properties?.NAME_1 ??
@@ -252,13 +247,11 @@ function buildStateLgaSvg(
         stroke-width="1.5" stroke-linejoin="round"/>`;
     });
 
-    // Label every LGA polygon
     const lr = largestRing(f.geometry);
     if (lr.length > 0 && rawLga) {
       const [cLng, cLat] = ringCentroid(lr);
       const [cx, cy] = project(cLng, cLat, bbox, W, H);
       const fg = labelColor(hh);
-
       labels += `
         <text x="${cx}" y="${cy - 5}"
           font-family="Arial,sans-serif" font-size="10"
@@ -275,7 +268,6 @@ function buildStateLgaSvg(
     }
   });
 
-  // Legend strips
   const bands = [
     { label: "0", color: "#EFF6FF" },
     { label: "1–50", color: "#BFDBFE" },
@@ -286,9 +278,14 @@ function buildStateLgaSvg(
     { label: "1001–2000", color: "#1D4ED8" },
     { label: "2000+", color: "#1E3A8A" },
   ];
-  let legendSvg = `<text x="10" y="${H - 38}"
-    font-family="Arial,sans-serif" font-size="9"
-    fill="#374151" font-weight="bold">Enumerated HHs:</text>`;
+
+  let legendSvg = `
+    <text x="10" y="${H - 38}"
+      font-family="Arial,sans-serif" font-size="9"
+      fill="#374151" font-weight="bold">
+      Enumerated HHs:
+    </text>`;
+
   bands.forEach((b, i) => {
     const bx = 10 + i * 72;
     legendSvg += `
@@ -308,11 +305,7 @@ function buildStateLgaSvg(
   </svg>`;
 }
 
-// ════════════════════════════════════════════════════════════════
-// PDF BUILDERS
-// ════════════════════════════════════════════════════════════════
-
-// ── Render SVG string to a canvas ImageData URL ─────────────────
+// ── Render SVG string → PNG data URL via canvas ────────────────
 async function svgToDataUrl(svgString: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const blob = new Blob([svgString], { type: "image/svg+xml" });
@@ -332,13 +325,11 @@ async function svgToDataUrl(svgString: string): Promise<string> {
   });
 }
 
-// ── Draw the PDF header ─────────────────────────────────────────
+// ── Draw PDF header ────────────────────────────────────────────
 function drawPdfHeader(doc: jsPDF, pageW: number) {
-  // Dark green header bar
   doc.setFillColor(26, 86, 50);
   doc.rect(0, 0, pageW, 28, "F");
 
-  // MDP logo box
   doc.setFillColor(45, 138, 78);
   doc.roundedRect(8, 5, 18, 18, 2, 2, "F");
   doc.setFontSize(7);
@@ -346,13 +337,11 @@ function drawPdfHeader(doc: jsPDF, pageW: number) {
   doc.setFont("helvetica", "bold");
   doc.text("MDP", 17, 16, { align: "center" });
 
-  // Title
   doc.setFontSize(13);
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.text("NASSCO MDP — Household Enumeration Dashboard", 32, 12);
 
-  // Subtitle
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(200, 230, 200);
@@ -366,18 +355,16 @@ function drawPdfHeader(doc: jsPDF, pageW: number) {
     20,
   );
 
-  // Confidential
   doc.setFontSize(8);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(200, 230, 200);
   doc.text("CONFIDENTIAL", pageW - 10, 16, { align: "right" });
 
-  // Green accent line under header
   doc.setFillColor(76, 175, 80);
   doc.rect(0, 28, pageW, 2, "F");
 }
 
-// ── Draw page section heading ───────────────────────────────────
+// ── Draw section heading ───────────────────────────────────────
 function drawSectionHeading(
   doc: jsPDF,
   title: string,
@@ -393,23 +380,24 @@ function drawSectionHeading(
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(107, 114, 128);
-  doc.text(subtitle, 14, y + 7);
+  doc.text(subtitle, 14, y + 7, { maxWidth: pageW - 28 });
 }
 
-// ── Draw LGA table ──────────────────────────────────────────────
+// ── Draw LGA table ─────────────────────────────────────────────
+// pageW is derived internally from doc — no unused parameter
 function drawLgaTable(
   doc: jsPDF,
   lgaAgg: LgaAgg[],
   stateColor: string,
   startY: number,
-  pageW: number,
 ): number {
+  const pageW = doc.internal.pageSize.getWidth();
   const [r, g, b] = hexToRgb(stateColor);
   const colW = [pageW * 0.4, pageW * 0.3, pageW * 0.22];
   const rowH = 9;
   const left = 14;
 
-  // Table header
+  // Table header row
   doc.setFillColor(r, g, b);
   doc.rect(left, startY, pageW - 28, rowH, "F");
   doc.setFontSize(9);
@@ -428,7 +416,6 @@ function drawLgaTable(
     .forEach((lga, i) => {
       const pct = total > 0 ? ((lga.hh / total) * 100).toFixed(1) + "%" : "—";
 
-      // Alternate row bg
       if (i % 2 === 0) {
         doc.setFillColor(245, 250, 245);
         doc.rect(left, y, pageW - 28, rowH, "F");
@@ -446,7 +433,6 @@ function drawLgaTable(
       doc.setTextColor(100, 100, 100);
       doc.text(pct, left + colW[0] + colW[1] + 3, y + 6.2);
 
-      // Row border
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.2);
       doc.line(left, y + rowH, left + pageW - 28, y + rowH);
@@ -466,13 +452,13 @@ function drawLgaTable(
   return y + rowH + 6;
 }
 
-// ── Export: Nigeria Overview PDF ────────────────────────────────
-async function exportNigeriaOverview(
-  statesAgg: StateAgg[],
-  statesGeo: any,
-  communityCounts: Record<string, number>,
-) {
-  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+// ── Export: Nigeria Overview PDF ───────────────────────────────
+async function exportNigeriaOverview(statesAgg: StateAgg[], statesGeo: any) {
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: "a4",
+  });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
@@ -488,7 +474,6 @@ async function exportNigeriaOverview(
   );
   y += 14;
 
-  // Build & embed Nigeria map SVG
   const svgStr = buildNigeriaOverviewSvg(statesGeo, statesAgg);
   if (svgStr) {
     try {
@@ -502,12 +487,11 @@ async function exportNigeriaOverview(
     }
   }
 
-  // Summary stats row
   const colW = (pageW - 28) / statesAgg.length;
   statesAgg.forEach((s, i) => {
-    const [r, g, b] = hexToRgb(STATE_COLORS[s.state] ?? "#4CAF50");
+    const [sr, sg, sb] = hexToRgb(STATE_COLORS[s.state] ?? "#4CAF50");
     const x = 14 + i * colW;
-    doc.setFillColor(r, g, b);
+    doc.setFillColor(sr, sg, sb);
     doc.roundedRect(x, y, colW - 4, 18, 2, 2, "F");
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
@@ -526,21 +510,27 @@ async function exportNigeriaOverview(
   doc.save("NASSCO_Nigeria_Overview.pdf");
 }
 
-// ── Export: Single State LGA PDF ────────────────────────────────
+// ── Export: Single State LGA PDF ───────────────────────────────
 async function exportStateLgaPdf(
   state: string,
   lgaAgg: LgaAgg[],
   lgasGeo: any,
   statesAgg: StateAgg[],
 ) {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
   drawPdfHeader(doc, pageW);
 
+  // statesAgg used only for type safety — suppress lint
+  void statesAgg;
+
   let y = 36;
-  const stateData = statesAgg.find((s) => s.state === state);
   const total = lgaAgg.reduce((s, l) => s + l.hh, 0);
   const stateColor = STATE_COLORS[state] ?? "#3B82F6";
 
@@ -553,23 +543,20 @@ async function exportStateLgaPdf(
   );
   y += 14;
 
-  // ── MAP SECTION ────────────────────────────────────────────
-  // Build labelled LGA choropleth SVG and embed it
+  // Map section
   const svgStr = buildStateLgaSvg(lgasGeo, lgaAgg, state);
   if (svgStr) {
     try {
       const dataUrl = await svgToDataUrl(svgStr);
-      const mapH = pageH * 0.38; // ~38% of page height
+      const mapH = pageH * 0.38;
       const mapW = pageW - 28;
       doc.addImage(dataUrl, "PNG", 14, y, mapW, mapH);
 
-      // Map border
       const [sr, sg, sb] = hexToRgb(stateColor);
       doc.setDrawColor(sr, sg, sb);
       doc.setLineWidth(0.6);
       doc.rect(14, y, mapW, mapH);
 
-      // Map caption
       y += mapH + 3;
       doc.setFontSize(7.5);
       doc.setFont("helvetica", "italic");
@@ -586,8 +573,8 @@ async function exportStateLgaPdf(
     }
   }
 
-  // ── TABLE SECTION ──────────────────────────────────────────
-  y = drawLgaTable(doc, lgaAgg, stateColor, y, pageW);
+  // Table section
+  y = drawLgaTable(doc, lgaAgg, stateColor, y);
 
   // Footer
   doc.setFillColor(245, 247, 250);
@@ -612,33 +599,37 @@ async function exportStateLgaPdf(
   doc.save(`NASSCO_${state}_LGA_Report.pdf`);
 }
 
-// ── Export: Full Dashboard PDF ──────────────────────────────────
+// ── Export: Full Dashboard PDF ─────────────────────────────────
 async function exportFullDashboard(
   statesAgg: StateAgg[],
   lgaAgg: LgaAgg[],
   selectedState: string,
-  communityCounts: Record<string, number>,
   statesGeo: any,
   lgasGeo: any,
 ) {
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
-  // ── Page 1: Overview ────────────────────────────────────────
+  // Page 1 — Overview
   drawPdfHeader(doc, pageW);
 
   let y = 36;
   drawSectionHeading(
     doc,
     "Nigeria — All Intervention States Overview",
-    `Total HHs: ${statesAgg.reduce((s, a) => s + a.hh, 0).toLocaleString()} · ${statesAgg.length} States`,
+    `Total HHs: ${statesAgg
+      .reduce((s, a) => s + a.hh, 0)
+      .toLocaleString()} · ${statesAgg.length} States`,
     y,
     pageW,
   );
   y += 14;
 
-  // Nigeria overview map
   const overviewSvg = buildNigeriaOverviewSvg(statesGeo, statesAgg);
   if (overviewSvg) {
     try {
@@ -651,11 +642,9 @@ async function exportFullDashboard(
     }
   }
 
-  // State summary cards
   statesAgg.forEach((s) => {
-    const [r, g, b] = hexToRgb(STATE_COLORS[s.state] ?? "#4CAF50");
-    const communities = communityCounts[s.state] ?? 0;
-    doc.setFillColor(r, g, b);
+    const [sr, sg, sb] = hexToRgb(STATE_COLORS[s.state] ?? "#4CAF50");
+    doc.setFillColor(sr, sg, sb);
     doc.roundedRect(14, y, pageW - 28, 14, 2, 2, "F");
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
@@ -664,7 +653,7 @@ async function exportFullDashboard(
     doc.setFontSize(8.5);
     doc.setFont("helvetica", "normal");
     doc.text(
-      `${s.hh.toLocaleString()} HHs · ${s.lgaCount} LGAs · ${communities.toLocaleString()} Communities`,
+      `${s.hh.toLocaleString()} HHs · ${s.lgaCount} LGAs`,
       pageW - 16,
       y + 9,
       { align: "right" },
@@ -672,19 +661,13 @@ async function exportFullDashboard(
     y += 18;
   });
 
-  // ── Page 2+: Per-state LGA pages ────────────────────────────
+  // Per-state pages
   for (const s of statesAgg) {
     doc.addPage();
     drawPdfHeader(doc, pageW);
 
     let sy = 36;
-    const stateLgas = lgaAgg.filter
-      ? lgaAgg // if we're exporting current state
-      : [];
-
-    // Re-use the selectedState lgas or skip map if no data
     const thisLgas = s.state === selectedState ? lgaAgg : [];
-
     const total = thisLgas.reduce((acc, l) => acc + l.hh, 0);
 
     drawSectionHeading(
@@ -698,7 +681,6 @@ async function exportFullDashboard(
     );
     sy += 14;
 
-    // LGA map for this state (only if geo data available)
     const lgaSvg = buildStateLgaSvg(lgasGeo, thisLgas, s.state);
     if (lgaSvg && thisLgas.length > 0) {
       try {
@@ -720,28 +702,21 @@ async function exportFullDashboard(
       }
     }
 
-    // Table — draw if we have detailed LGA data
     if (thisLgas.length > 0) {
-      drawLgaTable(
-        doc,
-        thisLgas,
-        STATE_COLORS[s.state] ?? "#4CAF50",
-        sy,
-        pageW,
-      );
+      drawLgaTable(doc, thisLgas, STATE_COLORS[s.state] ?? "#4CAF50", sy);
     } else {
       doc.setFontSize(9);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(150, 150, 150);
       doc.text(
-        "Detailed LGA breakdown not available in this export. Select the state in the dashboard to generate a state-specific report.",
+        "Select this state in the dashboard to generate a detailed LGA report.",
         14,
         sy + 6,
         { maxWidth: pageW - 28 },
       );
     }
 
-    // Footer
+    // Page footer
     doc.setFillColor(245, 247, 250);
     doc.rect(0, pageH - 12, pageW, 12, "F");
     doc.setFontSize(7.5);
@@ -758,9 +733,9 @@ async function exportFullDashboard(
   doc.save("NASSCO_Full_Dashboard.pdf");
 }
 
-// ════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 // DRAGGABLE MODAL COMPONENT
-// ════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 export default function ExportModal({
   isOpen,
   onClose,
@@ -769,23 +744,19 @@ export default function ExportModal({
   selectedState,
   communityCounts,
 }: Props) {
-  // Geo data refs — we read from the DOM via the global window
-  // (the map components store their geo in component state;
-  //  for PDF we re-fetch from the same public URLs)
   const [statesGeo, setStatesGeo] = useState<any>(null);
   const [lgasGeo, setLgasGeo] = useState<any>(null);
   const [exporting, setExporting] = useState<string>("");
 
-  // ── Load geo data once modal opens ──────────────────────────
+  // Load geo data when modal opens
   useEffect(() => {
     if (!isOpen) return;
-    if (statesGeo && lgasGeo) return; // already loaded
+    if (statesGeo && lgasGeo) return;
 
     Promise.all([
       fetch("/geojson/nigeria-states.json").then((r) => r.json()),
       fetch("/geojson/nigeria_lga.json").then((r) => r.json()),
     ]).then(([rawS, rawL]) => {
-      // Minimal TopoJSON → GeoJSON inline (avoids circular import)
       function toGeo(raw: any): any {
         if (raw?.type === "FeatureCollection") return raw;
         if (raw?.type === "Topology") {
@@ -802,9 +773,10 @@ export default function ExportModal({
             return arc.map(([dx, dy]) => {
               x += dx;
               y += dy;
-              return [x * sx + tx, y * sy + ty];
+              return [x * sx + tx, y * sy + ty] as [number, number];
             });
           }
+
           const decoded = (raw.arcs as number[][][]).map(decodeArc);
 
           function stitchRing(ring: number[]): [number, number][] {
@@ -819,12 +791,12 @@ export default function ExportModal({
 
           const features = obj.geometries.map((g: any) => {
             let coordinates: any = null;
-            let type = g.type;
+            const type = g.type;
             if (g.type === "Polygon") {
-              coordinates = g.arcs.map((r: number[]) => stitchRing(r));
+              coordinates = g.arcs.map((ring: number[]) => stitchRing(ring));
             } else if (g.type === "MultiPolygon") {
               coordinates = g.arcs.map((poly: number[][]) =>
-                poly.map((r: number[]) => stitchRing(r)),
+                poly.map((ring: number[]) => stitchRing(ring)),
               );
             }
             return {
@@ -833,23 +805,28 @@ export default function ExportModal({
               geometry: coordinates ? { type, coordinates } : null,
             };
           });
+
           return { type: "FeatureCollection", features };
         }
         return null;
       }
+
       setStatesGeo(toGeo(rawS));
       setLgasGeo(toGeo(rawL));
     });
-  }, [isOpen]);
+  }, [isOpen, statesGeo, lgasGeo]);
 
-  // ── Draggable state ─────────────────────────────────────────
-  // Modal starts centred; user can drag it anywhere
+  // ── Draggable ──────────────────────────────────────────────
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
-  const dragStart = useRef({ mx: 0, my: 0, px: 0, py: 0 });
+  const dragStart = useRef({
+    mx: 0,
+    my: 0,
+    px: 0,
+    py: 0,
+  });
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Reset position when modal opens
   useEffect(() => {
     if (isOpen) setPos({ x: 0, y: 0 });
   }, [isOpen]);
@@ -885,7 +862,7 @@ export default function ExportModal({
     };
   }, [dragging]);
 
-  // ── Export handlers ─────────────────────────────────────────
+  // ── Export handler ─────────────────────────────────────────
   async function handleExport(type: string) {
     setExporting(type);
     try {
@@ -894,12 +871,11 @@ export default function ExportModal({
           statesAgg,
           lgaAgg,
           selectedState,
-          communityCounts,
           statesGeo,
           lgasGeo,
         );
       } else if (type === "nigeria") {
-        await exportNigeriaOverview(statesAgg, statesGeo, communityCounts);
+        await exportNigeriaOverview(statesAgg, statesGeo);
       } else if (type === "state" && selectedState) {
         await exportStateLgaPdf(selectedState, lgaAgg, lgasGeo, statesAgg);
       }
@@ -910,7 +886,7 @@ export default function ExportModal({
     }
   }
 
-  // ── Export options definition ────────────────────────────────
+  // ── Options ────────────────────────────────────────────────
   const options = [
     {
       id: "full",
@@ -939,11 +915,12 @@ export default function ExportModal({
       : []),
   ];
 
+  // ── Render ─────────────────────────────────────────────────
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* ── Backdrop (click to close) ── */}
+          {/* Backdrop */}
           <motion.div
             key="export-backdrop"
             initial={{ opacity: 0 }}
@@ -953,22 +930,25 @@ export default function ExportModal({
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(0, 0, 0, 0.45)",
+              background: "rgba(0,0,0,0.45)",
               zIndex: 1000,
               backdropFilter: "blur(3px)",
             }}
           />
 
-          {/* ── Modal panel (fixed centred, draggable) ── */}
+          {/* Modal — fixed centred + draggable */}
           <motion.div
             key="export-modal"
             ref={modalRef}
             initial={{ opacity: 0, scale: 0.92, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: -20 }}
-            transition={{ type: "spring", stiffness: 280, damping: 26 }}
+            transition={{
+              type: "spring",
+              stiffness: 280,
+              damping: 26,
+            }}
             style={{
-              // Fixed centre — NOT relative to scroll position
               position: "fixed",
               top: "50%",
               left: "50%",
@@ -985,7 +965,7 @@ export default function ExportModal({
               userSelect: "none",
             }}
           >
-            {/* ── Header (drag handle) ── */}
+            {/* Header / drag handle */}
             <div
               onMouseDown={onMouseDown}
               style={{
@@ -1005,7 +985,13 @@ export default function ExportModal({
                   alignItems: "center",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
                   <span style={{ fontSize: 20 }}>📄</span>
                   <div>
                     <h2
@@ -1027,8 +1013,7 @@ export default function ExportModal({
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                     >
-                      Choose what to export — maps include embedded labels &
-                      counts
+                      Maps include embedded labels &amp; counts
                     </p>
                   </div>
                 </div>
@@ -1111,7 +1096,7 @@ export default function ExportModal({
               )}
             </div>
 
-            {/* ── Scrollable options list ── */}
+            {/* Scrollable options */}
             <div
               style={{
                 background: "#FFFFFF",
@@ -1241,7 +1226,7 @@ export default function ExportModal({
                 </div>
               ))}
 
-              {/* Info note */}
+              {/* Tip box */}
               <div
                 style={{
                   padding: "10px 14px",
@@ -1258,6 +1243,41 @@ export default function ExportModal({
                 first to enable the state-specific LGA map export with full
                 labelling and choropleth colouring.
               </div>
+
+              {/* Community counts summary */}
+              {Object.keys(communityCounts).length > 0 && (
+                <div
+                  style={{
+                    padding: "8px 14px",
+                    background: "#F8FAFC",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: 8,
+                    fontSize: 10,
+                    color: "#6B7280",
+                    fontFamily: "'DM Sans', sans-serif",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                  }}
+                >
+                  {Object.entries(communityCounts).map(([state, count]) => (
+                    <span key={state}>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          background: STATE_COLORS[state] ?? "#4CAF50",
+                          marginRight: 4,
+                          verticalAlign: "middle",
+                        }}
+                      />
+                      {state}: {count.toLocaleString()} communities
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         </>

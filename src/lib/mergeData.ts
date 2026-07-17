@@ -1,3 +1,7 @@
+// src/lib/mergeData.ts
+// ═══════════════════════════════════════════════════════════════
+// NASSCO MDP — Data Merge Utility
+// ═══════════════════════════════════════════════════════════════
 import { communityKey } from "./normalize";
 
 const num = (v: any) => {
@@ -5,7 +9,8 @@ const num = (v: any) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-export function mergeAll(pre: any[], mob: any[], eng: any[]) {
+// _pre and _mob are intentionally unused — kept for API compatibility
+export function mergeAll(_pre: any[], _mob: any[], eng: any[]) {
   const map = new Map<string, any>();
 
   const ensure = (r: any) => {
