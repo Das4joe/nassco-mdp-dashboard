@@ -1,384 +1,120 @@
-/* ═══════════════════════════════════════════════════════════
-   NASSCO MDP — Global Styles
-   Base resets + typography + map styles + chip labels
-═══════════════════════════════════════════════════════════ */
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "leaflet/dist/leaflet.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ── Google Font import ──────────────────────────────────── */
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap");
-
-/* ── CSS Reset ───────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
+:root {
+  color-scheme: light;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-feature-settings:
+    "tnum" 1,
+    "cv02" 1,
+    "cv03" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
 }
 
 body {
-  font-family: "DM Sans", Arial, sans-serif;
-  background: #f1f5f9;
-  color: #111827;
-  line-height: 1.5;
-  min-height: 100vh;
+  @apply bg-surface-page text-ink-primary transition-colors duration-200;
 }
 
-/* ── Scrollbar ───────────────────────────────────────────── */
+html.dark body {
+  @apply bg-surface-darker text-ink-onDark;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* ── Dark mode base ──────────────────────────────────────── */
-[data-theme="dark"] body {
-  background: #0d1f14;
-  color: #f9fafb;
-}
-
-/* ── Button base reset ───────────────────────────────────── */
-button {
-  font-family: "DM Sans", Arial, sans-serif;
-  cursor: pointer;
-  border: none;
-  background: none;
-  outline: none;
-}
-button:focus-visible {
-  outline: 2px solid #4caf50;
-  outline-offset: 2px;
-}
-
-/* ── Input / select base ─────────────────────────────────── */
-select,
-input {
-  font-family: "DM Sans", Arial, sans-serif;
-  outline: none;
-}
-
-/* ── Recharts tooltip polish ─────────────────────────────── */
-.recharts-tooltip-wrapper {
-  border-radius: 10px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
-}
-.recharts-default-tooltip {
-  border-radius: 10px !important;
-  border: 1px solid #e5e7eb !important;
-  font-family: "DM Sans", sans-serif !important;
-  font-size: 12px !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MAP GRID — two side-by-side maps on overview
-═══════════════════════════════════════════════════════════ */
-.maps-side-by-side {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-@media (max-width: 900px) {
-  .maps-side-by-side {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LEAFLET GLOBAL POLISH
-═══════════════════════════════════════════════════════════ */
-.leaflet-container {
-  background: #eff6ff !important;
-  font-family: "DM Sans", sans-serif !important;
-}
-
-.leaflet-control-zoom {
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.leaflet-control-zoom a {
-  background: rgba(255, 255, 255, 0.97) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  color: #1a5632 !important;
-  font-weight: 700 !important;
-  width: 28px !important;
-  height: 28px !important;
-  line-height: 28px !important;
-  font-size: 16px !important;
-}
-
-.leaflet-control-zoom a:hover {
-  background: #f0fdf4 !important;
-  color: #1a5632 !important;
-}
-
-/* Remove the thin default Leaflet map border */
-.leaflet-container .leaflet-tile-pane {
-  opacity: 1;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   STATE CHIP — permanent labels on overview maps
-   Shown on the single LARGEST polygon per intervention state.
-   Always white background → text always dark → readable in
-   both light and dark app themes.
-═══════════════════════════════════════════════════════════ */
-
-/* Strip every scrap of Leaflet tooltip chrome */
-.nassco-chip-wrapper,
-.nassco-chip-wrapper.leaflet-tooltip {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  pointer-events: none !important;
-  margin: 0 !important;
-}
-
-.nassco-chip-wrapper::before,
-.nassco-chip-wrapper::after,
-.nassco-chip-wrapper.leaflet-tooltip-top::before,
-.nassco-chip-wrapper.leaflet-tooltip-bottom::before,
-.nassco-chip-wrapper.leaflet-tooltip-left::before,
-.nassco-chip-wrapper.leaflet-tooltip-right::before {
-  display: none !important;
-}
-
-/* The visual white card */
-.nassco-state-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 13px 7px;
-  background: rgba(255, 255, 255, 0.98);
-  border: 2px solid #4caf50; /* overridden inline per state color */
-  border-radius: 10px;
-  box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.15),
-    0 0 0 3px rgba(255, 255, 255, 0.55);
-  white-space: nowrap;
-  text-align: center;
-  min-width: 88px;
-  line-height: 1.35;
-}
-
-/* State name — uses inline color for brand tint, but always
-   has enough contrast because background is always white */
-.chip-name {
-  font-family: "DM Sans", Arial, sans-serif !important;
-  font-size: 12.5px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.15px !important;
-  display: block;
-  /* color injected inline — e.g. color:#E67E22 for Oyo */
-}
-
-/* Data rows — always dark grey on white → readable everywhere */
-.chip-row {
-  font-family: "DM Sans", Arial, sans-serif !important;
-  font-size: 10px !important;
-  font-weight: 400 !important;
-  color: #374151 !important;
-  line-height: 1.3 !important;
-  display: block;
-}
-
-.chip-row strong {
-  font-weight: 700 !important;
-  color: #111827 !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LGA CHIP — permanent centred labels on the drill-down map
-   Text color injected inline via JS (white for dark fills,
-   near-black for light fills). Text-shadow ensures readability
-   regardless of the choropleth shade behind it.
-═══════════════════════════════════════════════════════════ */
-
-/* Strip Leaflet chrome */
-.nassco-lga-chip-wrapper,
-.nassco-lga-chip-wrapper.leaflet-tooltip {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  pointer-events: none !important;
-  margin: 0 !important;
-}
-
-.nassco-lga-chip-wrapper::before,
-.nassco-lga-chip-wrapper::after,
-.nassco-lga-chip-wrapper.leaflet-tooltip-top::before,
-.nassco-lga-chip-wrapper.leaflet-tooltip-bottom::before,
-.nassco-lga-chip-wrapper.leaflet-tooltip-left::before,
-.nassco-lga-chip-wrapper.leaflet-tooltip-right::before {
-  display: none !important;
-}
-
-/* Transparent container — purely for layout */
-.nassco-lga-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 2px 6px 3px;
-  background: transparent;
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* LGA name line — color set inline */
-.lga-chip-name {
-  font-family: "DM Sans", Arial, sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.08px !important;
-  display: block;
-  /* Dual shadow: dark shadow + light halo — readable on ANY fill */
-  text-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.55),
-    0 0 6px rgba(0, 0, 0, 0.25),
-    0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* HH count sub-label */
-.lga-chip-hh {
-  font-family: "DM Sans", Arial, sans-serif !important;
-  font-size: 9.5px !important;
-  font-weight: 500 !important;
-  display: block;
-  text-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.45),
-    0 0 4px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HOVER TOOLTIP — non-intervention states + smaller polygons
-   Always white bg → always dark text → theme-safe.
-═══════════════════════════════════════════════════════════ */
-.nassco-hover-tip,
-.nassco-hover-tip.leaflet-tooltip {
-  background: rgba(255, 255, 255, 0.98) !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
-  padding: 5px 12px !important;
-  font-family: "DM Sans", sans-serif !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #111827 !important;
-  pointer-events: none !important;
-  white-space: nowrap !important;
-}
-
-.nassco-hover-tip::before,
-.nassco-hover-tip::after,
-.nassco-hover-tip.leaflet-tooltip-top::before,
-.nassco-hover-tip.leaflet-tooltip-bottom::before,
-.nassco-hover-tip.leaflet-tooltip-left::before,
-.nassco-hover-tip.leaflet-tooltip-right::before {
-  display: none !important;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   DYNAMIC LEGEND (inside StateLgaMap — below drill-down map)
-═══════════════════════════════════════════════════════════ */
-.nassco-legend {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-top: 12px;
-  border: 1.5px solid #e2e8f0;
-}
-
-.nassco-legend-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.nassco-legend-dot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
 }
 
-.nassco-legend-title {
-  font-family: "DM Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  color: #111827;
+.leaflet-container {
+  background: #f0f2f5 !important;
+  font-family: "Inter", sans-serif;
+}
+html.dark .leaflet-container {
+  background: #0a1613 !important;
+}
+.leaflet-control-zoom a {
+  border-radius: 8px !important;
+  border: 1px solid #e9edef !important;
+  background: #ffffff !important;
+  color: #075e54 !important;
+  font-weight: 600 !important;
+}
+html.dark .leaflet-control-zoom a {
+  background: #0f1f1b !important;
+  border-color: #1f3d33 !important;
+  color: #25d366 !important;
+}
+.leaflet-control-zoom a:hover {
+  background: #f0f2f5 !important;
+}
+html.dark .leaflet-control-zoom a:hover {
+  background: #1f3d33 !important;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px -4px rgba(0, 0, 0, 0.15) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-tip {
+  display: none !important;
 }
 
-.nassco-legend-total {
-  margin-left: auto;
-  font-family: "DM Sans", sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  color: #6b7280;
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04) 25%,
+    rgba(0, 0, 0, 0.08) 50%,
+    rgba(0, 0, 0, 0.04) 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite;
 }
-
-.nassco-legend-bands {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  align-items: center;
-}
-
-.nassco-legend-band {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.nassco-legend-swatch {
-  display: inline-block;
-  width: 18px;
-  height: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-
-.nassco-legend-label {
-  font-family: "DM Sans", sans-serif;
-  font-size: 10px;
-  color: #374151;
-  white-space: nowrap;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   UTILITY CLASSES
-═══════════════════════════════════════════════════════════ */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+html.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 1000px 100%;
 }

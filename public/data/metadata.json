@@ -1,1 +1,123 @@
-{"generated_at":"2026-07-17T23:11:28.853280","source_file":"UNICEF_SUSI_Batch1.csv","source_rows":138676,"total_households":41512,"total_members":138676,"states":["ABIA","BENUE","OYO","SOKOTO"],"lga_count":29,"ward_count":116,"community_count":561,"mdp_states":["BENUE","OYO","SOKOTO","ABIA"],"data_modes":["nsr","update"],"update_note":"Update activity data not yet available in Batch1"}
+{
+  "generated_at": "2026-08-08T06:53:41.743866+00:00",
+  "source_csv": "UNICEF_SUSI_Batch1.csv",
+  "row_count": 138676,
+  "household_count": 41512,
+  "state_count": 4,
+  "lga_count": 29,
+  "ward_count": 116,
+  "community_count": 568,
+  "aggregator_version": "3.5",
+  "source_file": "UNICEF_SUSI_Batch1.csv",
+  "source_rows": 138676,
+  "total_households": 41512,
+  "total_members": 138676,
+  "states": [
+    "ABIA",
+    "BENUE",
+    "OYO",
+    "SOKOTO"
+  ],
+  "mdp_states": [
+    "ABIA",
+    "BENUE",
+    "OYO",
+    "SOKOTO"
+  ],
+  "data_modes": [
+    "nsr",
+    "update"
+  ],
+  "unicef_indicators_available": [
+    "primary_attendance",
+    "lower_sec_attendance",
+    "upper_sec_attendance",
+    "out_of_school",
+    "under5_wasting"
+  ],
+  "unicef_indicators_pending_source": [
+    "improved_water",
+    "improved_sanitation",
+    "improved_shelter",
+    "improved_cooking_fuel",
+    "improved_lighting",
+    "housing_density",
+    "child_labour",
+    "hazardous_work",
+    "informal_employment",
+    "shock_exposure",
+    "food_insecurity",
+    "coping_severity",
+    "assistance_dependence",
+    "under5_stunting",
+    "under5_underweight",
+    "iycf_practices",
+    "full_immunization",
+    "skilled_birth_attendant",
+    "antenatal_visits",
+    "postnatal_check",
+    "modern_contraception",
+    "vitamin_a",
+    "deworming",
+    "child_illness_treatment",
+    "insecticide_net_use",
+    "pre_primary_attendance",
+    "learning_materials",
+    "early_stimulation",
+    "child_discipline",
+    "violent_discipline",
+    "child_marriage"
+  ],
+  "code_maps": {
+    "disability": {
+      "1": "Blind / vision impaired",
+      "2": "Deaf / hearing impaired",
+      "3": "Physical disability",
+      "4": "Mental illness",
+      "5": "Epilepsy",
+      "6": "Speech impaired",
+      "7": "Autism",
+      "8": "Other"
+    },
+    "chronic_ill": {
+      "1": "Cancer",
+      "2": "Diabetes",
+      "3": "Tuberculosis",
+      "4": "HIV/AIDS",
+      "5": "Heart disease",
+      "6": "Hepatitis",
+      "7": "Leprosy",
+      "8": "Other chronic illness"
+    },
+    "livelihood": {
+      "1": "Dependant / not economically active",
+      "2": "Livelihood type 2",
+      "3": "Livelihood type 3",
+      "4": "Livelihood type 4",
+      "5": "Livelihood type 5",
+      "6": "Livelihood type 6",
+      "7": "Livelihood type 7",
+      "8": "Livelihood type 8"
+    },
+    "decile": {
+      "1st": 1,
+      "2nd": 2,
+      "3rd": 3,
+      "4th": 4,
+      "5th": 5,
+      "6th": 6,
+      "7th": 7,
+      "8th": 8,
+      "9th": 9,
+      "10th": 10
+    }
+  },
+  "notes": {
+    "out_of_school": "v3.1+ reports 29.18%. v2.1's 31.80% could not be reproduced from the current CSV.",
+    "female_primary_respondent": "Renamed from 'female_headed_hh'. Captures who answered the enumerator, NOT DHS-comparable head-of-household. National ~50.7% (Sokoto 28% -> Oyo 59%).",
+    "hh_dedup": "v3.2 fixed Head-selection. All non-Head aggregations remain correct: HH-level fields verified identical across rows.",
+    "livelihood_codes": "Codes 2-8 are labelled provisionally as 'Livelihood type N' pending the questionnaire codebook.",
+    "unicef_additions_v34": "age_bands_unicef, children_in_pvhh (#5), children_in_risk_hh (#26), oos_by_band (#12, #25), no_health_insurance (#16) added per Indicator List for Review.",
+    "decile_fix_v35": "CSV stores decile as ordinal strings ('1st'..'10th'). v3.5 normalises them to integers 1-10 in load_and_clean(). Prior to v3.5, all decile-derived numbers (poorest_pct, decile_distribution, vulnerability_index, children_in_pvhh) were silently zero."
+  }
+}

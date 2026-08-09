@@ -2,3 +2,9 @@ node_modules/
 dist/
 .env
 .vercel
+
+# Large source data — never commit
+public/geojson/NGA_Ward_Boundaries_*.geojson
+public/data/*.csv
+raw_data/
+*.xlsm
