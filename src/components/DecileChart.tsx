@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import type { DecileBar } from "../lib/insights";
 import { formatNumber } from "../lib/formatters";
 

@@ -1,6 +1,7 @@
 /**
  * ChildProtection domain view — v4
  * Added labelStyle/itemStyle to every <Tooltip>.
+ * v4.1 — removed unused kFmt constant (TS6133 fix for Vercel build).
  */
 
 import type { FC } from "react";
@@ -52,8 +53,6 @@ const STATE_COLORS: Record<string, string> = {
 
 const fmtInt = (n: number) => n.toLocaleString();
 const fmtPct = (n: number) => `${n.toFixed(1)}%`;
-const kFmt = (v: number) =>
-  v >= 1000 ? `${Math.round(v / 1000)}k` : String(v);
 const toTitle = (s: string) =>
   s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 

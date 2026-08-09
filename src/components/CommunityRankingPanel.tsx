@@ -75,6 +75,8 @@ export default function CommunityRankingPanel({
     );
   };
 
+  const mdpStates = data.metadata.mdp_states ?? [];
+
   return (
     <div className="space-y-4">
       {/* Controls row */}
@@ -93,7 +95,7 @@ export default function CommunityRankingPanel({
                          text-ink-primary dark:text-ink-onDark text-sm"
             >
               <option value="ALL">All 4 MDP States</option>
-              {data.metadata.mdp_states.map((s) => (
+              {mdpStates.map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>

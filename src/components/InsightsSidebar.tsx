@@ -1,10 +1,10 @@
 import { AlertTriangle, Trophy, BarChart3 } from "lucide-react";
 import { generateInsights, topLgas, decileBars } from "../lib/insights";
 import { THEME } from "../theme";
-import type { DashboardData, DashboardMode, DrilldownPath } from "../lib/types";
+import type { DashboardMode, DrilldownPath, GeoRecord } from "../lib/types";
+import type { DashboardData } from "../lib/loadData";
 import StatusDot from "./StatusDot";
 import DecileChart from "./DecileChart";
-import clsx from "clsx";
 
 interface InsightsSidebarProps {
   data: DashboardData;
@@ -28,8 +28,9 @@ export default function InsightsSidebar({
   );
   const topList = topLgas(data.lgas, path, mode, 5);
 
-  const currentRecord = path.state
-    ? data.states.find((s) => s.state === path.state) || data.national
+  const currentRecord: GeoRecord = path.state
+    ? (data.states.find((s: GeoRecord) => s.state === path.state) ??
+      data.national)
     : data.national;
 
   const deciles = decileBars(currentRecord, currentRecord.nsr.total_households);

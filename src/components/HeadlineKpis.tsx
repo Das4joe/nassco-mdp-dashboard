@@ -26,6 +26,7 @@ export default function HeadlineKpis({
 }: HeadlineKpisProps) {
   const n = record.nsr;
   const v = record.vulnerability;
+  const mdpStates = meta.mdp_states ?? [];
 
   if (mode === "nsr") {
     return (
@@ -33,7 +34,7 @@ export default function HeadlineKpis({
         <KpiCard
           label="Households"
           value={formatNumber(n.total_households)}
-          sub={`${meta.mdp_states.length} MDP States`}
+          sub={`${mdpStates.length} MDP States`}
           icon={<Home size={16} />}
           accent={THEME.brand.primary}
         />

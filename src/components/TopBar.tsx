@@ -15,6 +15,9 @@ export default function TopBar({
   onToggleDark,
   onExport,
 }: TopBarProps) {
+  const mdpStates = meta.mdp_states ?? [];
+  const totalHouseholds = meta.total_households ?? 0;
+
   return (
     <header className="sticky top-0 z-40 bg-brand-600 dark:bg-brand-950 text-white shadow-md">
       <div className="max-w-[1600px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
@@ -27,8 +30,8 @@ export default function TopBar({
               NASSCO Multi-Dimensional Poverty
             </h1>
             <p className="text-2xs text-white/70 truncate">
-              {meta.mdp_states.length} MDP States ·{" "}
-              {formatNumber(meta.total_households)} Households
+              {mdpStates.length} MDP States · {formatNumber(totalHouseholds)}{" "}
+              Households
             </p>
           </div>
         </div>
