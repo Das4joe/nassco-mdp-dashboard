@@ -1,0 +1,1785 @@
+{
+  "nsr": {
+    "total_households": 41512,
+    "total_individuals": 138676,
+    "total_female": 68364,
+    "total_male": 70312,
+    "children_under5": 11313,
+    "children_under18": 57688,
+    "elderly": 7568,
+    "pwd": 1376,
+    "orphans": 2629,
+    "avg_household_size": 3.3,
+    "gender_parity": 49.3,
+    "nin_verified": 40528,
+    "nin_eligible_adults": 87566,
+    "nin_total_members": 138676,
+    "nin_verification_rate": 46.28,
+    "nin_coverage_all": 29.22,
+    "urban_households": 3011,
+    "rural_households": 38501,
+    "urban_pct": 7.25
+  },
+  "update": {
+    "update_visits": 0,
+    "updated_hh": 0,
+    "new_entrants": 0,
+    "exits": 0,
+    "update_rate": 0.0,
+    "net_change": 0
+  },
+  "vulnerability": {
+    "pmt_mean": 11.99,
+    "pmt_median": 12.05,
+    "decile_distribution": {
+      "d1": 1409,
+      "d2": 2011,
+      "d3": 2406,
+      "d4": 2714,
+      "d5": 4227,
+      "d6": 7047,
+      "d7": 9891,
+      "d8": 7750,
+      "d9": 3389,
+      "d10": 668
+    },
+    "poorest_households": 5826,
+    "poorest_pct": 14.03,
+    "vulnerability_index": 19.64,
+    "improved_roof_pct": 28.57,
+    "improved_floor_pct": 0.0,
+    "improved_toilet_pct": 1.22,
+    "improved_water_pct": 21.4
+  },
+  "unicef": {
+    "primary_age_attendance_pct": 68.2,
+    "lower_secondary_attendance_pct": 75.21,
+    "upper_secondary_attendance_pct": 72.29,
+    "out_of_school_rate_pct": 29.18,
+    "under5_wasting_pct": 28.26,
+    "under5_sam_pct": 8.82,
+    "under5_mam_pct": 19.45,
+    "denominators": {
+      "children_6_11": 22407,
+      "children_12_14": 9959,
+      "children_15_17": 10139,
+      "children_answered_6_11": 22407,
+      "children_answered_12_14": 9959,
+      "children_answered_15_17": 10139,
+      "under5_total": 11313,
+      "under5_screened": 11138
+    },
+    "coverage": {
+      "education_response_pct": 100.0,
+      "muac_screening_pct": 98.45
+    }
+  },
+  "extended": {
+    "age_sex_pyramid": [
+      {
+        "band": "0-4",
+        "male": 6053,
+        "female": 5260,
+        "total": 11313
+      },
+      {
+        "band": "5-11",
+        "male": 14361,
+        "female": 11916,
+        "total": 26277
+      },
+      {
+        "band": "12-17",
+        "male": 10750,
+        "female": 9348,
+        "total": 20098
+      },
+      {
+        "band": "18-24",
+        "male": 9266,
+        "female": 9746,
+        "total": 19012
+      },
+      {
+        "band": "25-49",
+        "male": 21585,
+        "female": 23871,
+        "total": 45456
+      },
+      {
+        "band": "50-64",
+        "male": 5819,
+        "female": 5814,
+        "total": 11633
+      },
+      {
+        "band": "65+",
+        "male": 2478,
+        "female": 2409,
+        "total": 4887
+      }
+    ],
+    "marital_status": [
+      {
+        "label": "Married",
+        "count": 50384,
+        "pct": 56.49
+      },
+      {
+        "label": "Never Married",
+        "count": 29370,
+        "pct": 32.93
+      },
+      {
+        "label": "Widowed",
+        "count": 5464,
+        "pct": 6.13
+      },
+      {
+        "label": "Seperated",
+        "count": 3051,
+        "pct": 3.42
+      },
+      {
+        "label": "Dirvorced",
+        "count": 925,
+        "pct": 1.04
+      }
+    ],
+    "female_primary_respondent": {
+      "n": 21055,
+      "d": 41512,
+      "pct": 50.72,
+      "note": "Primary respondent / head of household per survey methodology."
+    },
+    "birth_cert": {
+      "under_5": {
+        "n": 2750,
+        "d": 15183,
+        "pct": 18.11
+      },
+      "age_6_17": {
+        "n": 7207,
+        "d": 42505,
+        "pct": 16.96
+      },
+      "all_children": {
+        "n": 9957,
+        "d": 57688,
+        "pct": 17.26
+      }
+    },
+    "individual_nin": {
+      "children": {
+        "n": 1505,
+        "d": 57688,
+        "pct": 2.61
+      },
+      "adults": {
+        "n": 39696,
+        "d": 80988,
+        "pct": 49.01
+      },
+      "all": {
+        "n": 41201,
+        "d": 138676,
+        "pct": 29.71
+      }
+    },
+    "disability": {
+      "rate": {
+        "n": 1376,
+        "d": 138676,
+        "pct": 0.99
+      },
+      "types": [
+        {
+          "label": "3",
+          "count": 778,
+          "pct": 56.54
+        },
+        {
+          "label": "1",
+          "count": 198,
+          "pct": 14.39
+        },
+        {
+          "label": "2",
+          "count": 143,
+          "pct": 10.39
+        },
+        {
+          "label": "8",
+          "count": 82,
+          "pct": 5.96
+        },
+        {
+          "label": "4",
+          "count": 60,
+          "pct": 4.36
+        },
+        {
+          "label": "6",
+          "count": 31,
+          "pct": 2.25
+        },
+        {
+          "label": "7",
+          "count": 18,
+          "pct": 1.31
+        },
+        {
+          "label": "5",
+          "count": 7,
+          "pct": 0.51
+        }
+      ]
+    },
+    "chronic_illness": {
+      "rate": {
+        "n": 1231,
+        "d": 138676,
+        "pct": 0.89
+      },
+      "types": [
+        {
+          "label": ".",
+          "count": 6541,
+          "pct": 84.16
+        },
+        {
+          "label": "8",
+          "count": 388,
+          "pct": 4.99
+        },
+        {
+          "label": "2",
+          "count": 380,
+          "pct": 4.89
+        },
+        {
+          "label": "2 5",
+          "count": 90,
+          "pct": 1.16
+        },
+        {
+          "label": "5",
+          "count": 89,
+          "pct": 1.15
+        },
+        {
+          "label": "1",
+          "count": 88,
+          "pct": 1.13
+        },
+        {
+          "label": "6",
+          "count": 64,
+          "pct": 0.82
+        },
+        {
+          "label": "3",
+          "count": 28,
+          "pct": 0.36
+        }
+      ]
+    },
+    "housing": {
+      "roof": [
+        {
+          "label": "Wood",
+          "count": 11838,
+          "pct": 28.52
+        },
+        {
+          "label": "Corrugated Iron Sheet",
+          "count": 11052,
+          "pct": 26.62
+        },
+        {
+          "label": "Palm Leaves/Raffia/Thatch",
+          "count": 10628,
+          "pct": 25.6
+        },
+        {
+          "label": "Other",
+          "count": 4289,
+          "pct": 10.33
+        },
+        {
+          "label": "Cement/Concrete",
+          "count": 1904,
+          "pct": 4.59
+        },
+        {
+          "label": "Bamboo",
+          "count": 992,
+          "pct": 2.39
+        },
+        {
+          "label": "Roofing Tiles",
+          "count": 809,
+          "pct": 1.95
+        }
+      ],
+      "floor": [
+        {
+          "label": "Earth/Mud",
+          "count": 21386,
+          "pct": 51.52
+        },
+        {
+          "label": "Concrete",
+          "count": 13115,
+          "pct": 31.59
+        },
+        {
+          "label": "Wood/Tile",
+          "count": 5271,
+          "pct": 12.7
+        },
+        {
+          "label": "Plank",
+          "count": 1173,
+          "pct": 2.83
+        },
+        {
+          "label": "Straw",
+          "count": 567,
+          "pct": 1.37
+        }
+      ],
+      "toilet": [
+        {
+          "label": "No Facilities/Bush/Field",
+          "count": 20214,
+          "pct": 48.69
+        },
+        {
+          "label": "Pit Laterine without Slab",
+          "count": 6878,
+          "pct": 16.57
+        },
+        {
+          "label": "Pit Laterine with Slab",
+          "count": 4715,
+          "pct": 11.36
+        },
+        {
+          "label": "Bucket",
+          "count": 2067,
+          "pct": 4.98
+        },
+        {
+          "label": "Flush to Pit Laterine",
+          "count": 1955,
+          "pct": 4.71
+        },
+        {
+          "label": "Composting Toilet",
+          "count": 1583,
+          "pct": 3.81
+        },
+        {
+          "label": "Flush to Somewhere else",
+          "count": 1218,
+          "pct": 2.93
+        },
+        {
+          "label": "Flush to Septic Tank",
+          "count": 648,
+          "pct": 1.56
+        },
+        {
+          "label": "Hangin/Floating Toilet/Laterine",
+          "count": 621,
+          "pct": 1.5
+        },
+        {
+          "label": "Flush to Unknown Place",
+          "count": 566,
+          "pct": 1.36
+        },
+        {
+          "label": "Flush to Piped Sewer System",
+          "count": 540,
+          "pct": 1.3
+        },
+        {
+          "label": "VIP Laterine",
+          "count": 507,
+          "pct": 1.22
+        }
+      ],
+      "water": [
+        {
+          "label": "River/Streem/Pond",
+          "count": 14265,
+          "pct": 34.36
+        },
+        {
+          "label": "Protected Dug Well",
+          "count": 8275,
+          "pct": 19.93
+        },
+        {
+          "label": "Unprotected Dug Well",
+          "count": 7995,
+          "pct": 19.26
+        },
+        {
+          "label": "Public Tap",
+          "count": 3929,
+          "pct": 9.46
+        },
+        {
+          "label": "Tube Well/Borehole",
+          "count": 2082,
+          "pct": 5.02
+        },
+        {
+          "label": "Unprotected Spring",
+          "count": 1672,
+          "pct": 4.03
+        },
+        {
+          "label": "Rain Water",
+          "count": 1553,
+          "pct": 3.74
+        },
+        {
+          "label": "Protected Spring",
+          "count": 607,
+          "pct": 1.46
+        },
+        {
+          "label": "Surface Water",
+          "count": 436,
+          "pct": 1.05
+        },
+        {
+          "label": "Piped into Dwelling",
+          "count": 262,
+          "pct": 0.63
+        },
+        {
+          "label": "Piped into Yard",
+          "count": 163,
+          "pct": 0.39
+        },
+        {
+          "label": "Sachet Water",
+          "count": 108,
+          "pct": 0.26
+        },
+        {
+          "label": "Tanker Truck",
+          "count": 95,
+          "pct": 0.23
+        },
+        {
+          "label": "Bottled Water",
+          "count": 41,
+          "pct": 0.1
+        },
+        {
+          "label": "With Small Cart/Drum",
+          "count": 29,
+          "pct": 0.07
+        }
+      ],
+      "light": [
+        {
+          "label": "Battery",
+          "count": 18359,
+          "pct": 44.23
+        },
+        {
+          "label": "Firewood",
+          "count": 9204,
+          "pct": 22.17
+        },
+        {
+          "label": "Kerosene",
+          "count": 4759,
+          "pct": 11.46
+        },
+        {
+          "label": "Electricity",
+          "count": 3750,
+          "pct": 9.03
+        },
+        {
+          "label": "Cadle",
+          "count": 3158,
+          "pct": 7.61
+        },
+        {
+          "label": "Solar Panel",
+          "count": 1861,
+          "pct": 4.48
+        },
+        {
+          "label": "Generator",
+          "count": 279,
+          "pct": 0.67
+        },
+        {
+          "label": "Gas",
+          "count": 142,
+          "pct": 0.34
+        }
+      ],
+      "cook": [
+        {
+          "label": "Firewood",
+          "count": 34612,
+          "pct": 83.38
+        },
+        {
+          "label": "Charcoal",
+          "count": 5700,
+          "pct": 13.73
+        },
+        {
+          "label": "Kerosene",
+          "count": 612,
+          "pct": 1.47
+        },
+        {
+          "label": "Liguidfied Petroleum Gas (LPG)",
+          "count": 261,
+          "pct": 0.63
+        },
+        {
+          "label": "Bio-Gas",
+          "count": 123,
+          "pct": 0.3
+        },
+        {
+          "label": "Coal/Lignite",
+          "count": 115,
+          "pct": 0.28
+        },
+        {
+          "label": "Electricity",
+          "count": 89,
+          "pct": 0.21
+        }
+      ]
+    },
+    "healthcare_access": {
+      "benefits_pct": {
+        "n": 18710,
+        "d": 138676,
+        "pct": 13.49
+      },
+      "distance_dist": [
+        {
+          "label": "Far off (>2km)",
+          "count": 7545,
+          "pct": 40.33
+        },
+        {
+          "label": "Within (<=100m)",
+          "count": 6355,
+          "pct": 33.97
+        },
+        {
+          "label": "Close by(1-2km)",
+          "count": 4810,
+          "pct": 25.71
+        }
+      ],
+      "distance_coverage_pct": 13.49
+    },
+    "livelihoods": {
+      "labour_status": [
+        {
+          "label": "Self-employed (in Agric)",
+          "count": 42393,
+          "pct": 33.29
+        },
+        {
+          "label": "Pupil/student",
+          "count": 35916,
+          "pct": 28.2
+        },
+        {
+          "label": "Unemployed",
+          "count": 27006,
+          "pct": 21.2
+        },
+        {
+          "label": "Self-employed (Non Agric)",
+          "count": 11276,
+          "pct": 8.85
+        },
+        {
+          "label": "Housewife/family help",
+          "count": 5235,
+          "pct": 4.11
+        },
+        {
+          "label": "Apprentice/Intern",
+          "count": 2659,
+          "pct": 2.09
+        },
+        {
+          "label": "Dependant",
+          "count": 1320,
+          "pct": 1.04
+        },
+        {
+          "label": "Employee (Private Sector/NGO)",
+          "count": 482,
+          "pct": 0.38
+        },
+        {
+          "label": "Employee (Government)",
+          "count": 357,
+          "pct": 0.28
+        },
+        {
+          "label": "Employer",
+          "count": 263,
+          "pct": 0.21
+        },
+        {
+          "label": "Domestice employee (house help)",
+          "count": 193,
+          "pct": 0.15
+        },
+        {
+          "label": "Unpaid family worker",
+          "count": 139,
+          "pct": 0.11
+        },
+        {
+          "label": "Pensioner",
+          "count": 124,
+          "pct": 0.1
+        }
+      ],
+      "industry": [
+        {
+          "label": "Agriculture, forestry and fishing",
+          "count": 31744,
+          "pct": 72.02
+        },
+        {
+          "label": "Other service activities",
+          "count": 7960,
+          "pct": 18.06
+        },
+        {
+          "label": "Wholesale and Retail trade; Repair of Motor Vehicles and Motorcycles",
+          "count": 1606,
+          "pct": 3.64
+        },
+        {
+          "label": "Manufacturing",
+          "count": 841,
+          "pct": 1.91
+        },
+        {
+          "label": "Arts, Entertainment and Recreation",
+          "count": 345,
+          "pct": 0.78
+        },
+        {
+          "label": "Construction",
+          "count": 275,
+          "pct": 0.62
+        },
+        {
+          "label": "Education",
+          "count": 220,
+          "pct": 0.5
+        },
+        {
+          "label": "Professional, Scientific and Technical activities",
+          "count": 210,
+          "pct": 0.48
+        },
+        {
+          "label": "Mining and quarrying",
+          "count": 198,
+          "pct": 0.45
+        },
+        {
+          "label": "Transportation and Storage",
+          "count": 188,
+          "pct": 0.43
+        },
+        {
+          "label": "Human health and social work activities",
+          "count": 160,
+          "pct": 0.36
+        },
+        {
+          "label": "Accommodation and Food service activities",
+          "count": 140,
+          "pct": 0.32
+        },
+        {
+          "label": "Electricity, Gas, Steam and Air Conditioning supply",
+          "count": 51,
+          "pct": 0.12
+        },
+        {
+          "label": "Water supply; Sewerage, Waste Management and Remediation activities",
+          "count": 50,
+          "pct": 0.11
+        },
+        {
+          "label": "Public administration and Defence; compulsory social security",
+          "count": 28,
+          "pct": 0.06
+        },
+        {
+          "label": "Administrative and support service activities",
+          "count": 23,
+          "pct": 0.05
+        },
+        {
+          "label": "Information and Communication",
+          "count": 17,
+          "pct": 0.04
+        },
+        {
+          "label": "Financial and insurance activities",
+          "count": 10,
+          "pct": 0.02
+        },
+        {
+          "label": "Real Estate activities",
+          "count": 10,
+          "pct": 0.02
+        }
+      ],
+      "code_dist": [
+        {
+          "label": "1",
+          "count": 31852,
+          "pct": 76.73
+        },
+        {
+          "label": "5",
+          "count": 3776,
+          "pct": 9.1
+        },
+        {
+          "label": "2",
+          "count": 1929,
+          "pct": 4.65
+        },
+        {
+          "label": "3",
+          "count": 1698,
+          "pct": 4.09
+        },
+        {
+          "label": "8",
+          "count": 1392,
+          "pct": 3.35
+        },
+        {
+          "label": "4",
+          "count": 538,
+          "pct": 1.3
+        },
+        {
+          "label": "6",
+          "count": 181,
+          "pct": 0.44
+        },
+        {
+          "label": "7",
+          "count": 146,
+          "pct": 0.35
+        }
+      ]
+    },
+    "shocks": {
+      "exposure_pct": {
+        "n": 4409,
+        "d": 41512,
+        "pct": 10.62
+      },
+      "types": [
+        {
+          "type": "conflict",
+          "count": 1604,
+          "pct": 36.38
+        },
+        {
+          "type": "flood",
+          "count": 1594,
+          "pct": 36.15
+        },
+        {
+          "type": "fire",
+          "count": 292,
+          "pct": 6.62
+        },
+        {
+          "type": "drought",
+          "count": 280,
+          "pct": 6.35
+        },
+        {
+          "type": "landslide",
+          "count": 178,
+          "pct": 4.04
+        },
+        {
+          "type": "other",
+          "count": 160,
+          "pct": 3.63
+        },
+        {
+          "type": "epidemic",
+          "count": 133,
+          "pct": 3.02
+        },
+        {
+          "type": "storm",
+          "count": 113,
+          "pct": 2.56
+        }
+      ],
+      "years": [
+        {
+          "label": "2025.0",
+          "count": 2108,
+          "pct": 48.42
+        },
+        {
+          "label": "2024.0",
+          "count": 933,
+          "pct": 21.43
+        },
+        {
+          "label": "2023.0",
+          "count": 916,
+          "pct": 21.04
+        },
+        {
+          "label": "2026.0",
+          "count": 397,
+          "pct": 9.12
+        }
+      ]
+    },
+    "coping": {
+      "mechanisms": [
+        {
+          "label": "Sale of livestock",
+          "count": 1120,
+          "pct": 26.0
+        },
+        {
+          "label": "Sale of other property",
+          "count": 485,
+          "pct": 11.26
+        },
+        {
+          "label": "Sold harvest in advance",
+          "count": 445,
+          "pct": 10.33
+        },
+        {
+          "label": "Sale of land",
+          "count": 428,
+          "pct": 9.94
+        },
+        {
+          "label": "Reduced food consumption",
+          "count": 285,
+          "pct": 6.62
+        },
+        {
+          "label": "Sent children to live with friends",
+          "count": 269,
+          "pct": 6.25
+        },
+        {
+          "label": "Withdrew children from school",
+          "count": 264,
+          "pct": 6.13
+        },
+        {
+          "label": "Borrowed from friends and family",
+          "count": 221,
+          "pct": 5.13
+        }
+      ],
+      "coverage_pct": 97.69,
+      "shock_exposed_hh": 4409
+    },
+    "assistance_awareness": {
+      "asked_n": 48886,
+      "rutf_yes_pct": 7.88,
+      "food_yes_pct": 6.05,
+      "cash_yes_pct": 4.46,
+      "dontknow_yes_pct": 85.82
+    },
+    "plw": {
+      "women_repro_age": 38394,
+      "pregnant": {
+        "n": 2483,
+        "d": 38394,
+        "pct": 6.47
+      },
+      "lactating": {
+        "n": 718,
+        "d": 38394,
+        "pct": 1.87
+      }
+    },
+    "muac_distribution": {
+      "categories": {
+        "Green": 7990,
+        "Yellow": 2166,
+        "Red": 982
+      },
+      "measured_n": 11138
+    },
+    "age_bands_unicef": [
+      {
+        "band": "0-5",
+        "total": 15183
+      },
+      {
+        "band": "6-14",
+        "total": 32366
+      },
+      {
+        "band": "15-17",
+        "total": 10139
+      }
+    ],
+    "children_in_pvhh": {
+      "n": 12848,
+      "d": 57688,
+      "pct": 22.27
+    },
+    "children_in_risk_hh": {
+      "n": 6692,
+      "d": 57688,
+      "pct": 11.6
+    },
+    "oos_by_band": {
+      "age_6_14": {
+        "total": 32366,
+        "answered": 32366,
+        "enrolled": 22772,
+        "oos": 9594,
+        "oos_pct": 29.64,
+        "oos_pct_of_total": 29.64,
+        "male": {
+          "total": 17632,
+          "answered": 17632,
+          "enrolled": 11989,
+          "oos": 5643,
+          "oos_pct": 32.0,
+          "oos_pct_of_total": 32.0
+        },
+        "female": {
+          "total": 14734,
+          "answered": 14734,
+          "enrolled": 10783,
+          "oos": 3951,
+          "oos_pct": 26.82,
+          "oos_pct_of_total": 26.82
+        }
+      },
+      "age_15_17": {
+        "total": 10139,
+        "answered": 10139,
+        "enrolled": 7329,
+        "oos": 2810,
+        "oos_pct": 27.71,
+        "oos_pct_of_total": 27.71,
+        "male": {
+          "total": 5362,
+          "answered": 5362,
+          "enrolled": 3819,
+          "oos": 1543,
+          "oos_pct": 28.78,
+          "oos_pct_of_total": 28.78
+        },
+        "female": {
+          "total": 4777,
+          "answered": 4777,
+          "enrolled": 3510,
+          "oos": 1267,
+          "oos_pct": 26.52,
+          "oos_pct_of_total": 26.52
+        }
+      },
+      "combined_6_17": {
+        "total": 42505,
+        "answered": 42505,
+        "enrolled": 30101,
+        "oos": 12404,
+        "oos_pct": 29.18,
+        "oos_pct_of_total": 29.18,
+        "male": {
+          "total": 22994,
+          "answered": 22994,
+          "enrolled": 15808,
+          "oos": 7186,
+          "oos_pct": 31.25,
+          "oos_pct_of_total": 31.25
+        },
+        "female": {
+          "total": 19511,
+          "answered": 19511,
+          "enrolled": 14293,
+          "oos": 5218,
+          "oos_pct": 26.74,
+          "oos_pct_of_total": 26.74
+        }
+      }
+    },
+    "no_health_insurance": {
+      "n": 41512,
+      "d": 41512,
+      "pct": 100.0,
+      "status": "not_collected",
+      "note": "Data not collected in survey wave"
+    },
+    "age_bands_v2": {
+      "0-3": {
+        "total": 8195,
+        "male": 4321,
+        "female": 3874
+      },
+      "0-5": {
+        "total": 15183,
+        "male": 8170,
+        "female": 7013
+      },
+      "0-7": {
+        "total": 22960,
+        "male": 12429,
+        "female": 10531
+      },
+      "0-17": {
+        "total": 57688,
+        "male": 31164,
+        "female": 26524
+      },
+      "6-9": {
+        "total": 15414,
+        "male": 8451,
+        "female": 6963
+      },
+      "6-17": {
+        "total": 42505,
+        "male": 22994,
+        "female": 19511
+      },
+      "10-14": {
+        "total": 16952,
+        "male": 9181,
+        "female": 7771
+      },
+      "15-17": {
+        "total": 10139,
+        "male": 5362,
+        "female": 4777
+      },
+      "18-24": {
+        "total": 19012,
+        "male": 9266,
+        "female": 9746
+      },
+      "18+": {
+        "total": 80988,
+        "male": 39148,
+        "female": 41840
+      }
+    },
+    "civil_registration": {
+      "children_0_17": {
+        "total": 57688,
+        "birth_cert_yes": 9957,
+        "birth_cert_no": 47731,
+        "birth_cert_pct": 17.26,
+        "nin_yes": 1505,
+        "nin_no": 56183,
+        "nin_pct": 2.61,
+        "both": 421,
+        "both_pct": 0.73,
+        "cert_only": 9536,
+        "cert_only_pct": 16.53,
+        "nin_only": 1084,
+        "nin_only_pct": 1.88,
+        "neither": 46647,
+        "neither_pct": 80.86,
+        "by_gender": {
+          "male": {
+            "total": 31164,
+            "birth_cert_yes": 5408,
+            "nin_yes": 701,
+            "birth_cert_pct": 17.35,
+            "nin_pct": 2.25
+          },
+          "female": {
+            "total": 26524,
+            "birth_cert_yes": 4549,
+            "nin_yes": 804,
+            "birth_cert_pct": 17.15,
+            "nin_pct": 3.03
+          }
+        }
+      },
+      "children_0_5": {
+        "total": 15183,
+        "birth_cert_yes": 2750,
+        "birth_cert_no": 12433,
+        "birth_cert_pct": 18.11,
+        "nin_yes": 33,
+        "nin_no": 15150,
+        "nin_pct": 0.22,
+        "both": 7,
+        "both_pct": 0.05,
+        "cert_only": 2743,
+        "cert_only_pct": 18.07,
+        "nin_only": 26,
+        "nin_only_pct": 0.17,
+        "neither": 12407,
+        "neither_pct": 81.72,
+        "by_gender": {
+          "male": {
+            "total": 8170,
+            "birth_cert_yes": 1517,
+            "nin_yes": 14,
+            "birth_cert_pct": 18.57,
+            "nin_pct": 0.17
+          },
+          "female": {
+            "total": 7013,
+            "birth_cert_yes": 1233,
+            "nin_yes": 19,
+            "birth_cert_pct": 17.58,
+            "nin_pct": 0.27
+          }
+        }
+      },
+      "children_6_17": {
+        "total": 42505,
+        "birth_cert_yes": 7207,
+        "birth_cert_no": 35298,
+        "birth_cert_pct": 16.96,
+        "nin_yes": 1472,
+        "nin_no": 41033,
+        "nin_pct": 3.46,
+        "both": 414,
+        "both_pct": 0.97,
+        "cert_only": 6793,
+        "cert_only_pct": 15.98,
+        "nin_only": 1058,
+        "nin_only_pct": 2.49,
+        "neither": 34240,
+        "neither_pct": 80.56,
+        "by_gender": {
+          "male": {
+            "total": 22994,
+            "birth_cert_yes": 3891,
+            "nin_yes": 687,
+            "birth_cert_pct": 16.92,
+            "nin_pct": 2.99
+          },
+          "female": {
+            "total": 19511,
+            "birth_cert_yes": 3316,
+            "nin_yes": 785,
+            "birth_cert_pct": 17.0,
+            "nin_pct": 4.02
+          }
+        }
+      },
+      "adults": {
+        "total": 80988,
+        "birth_cert_yes": 12849,
+        "birth_cert_no": 68139,
+        "birth_cert_pct": 15.87,
+        "nin_yes": 39696,
+        "nin_no": 41292,
+        "nin_pct": 49.01,
+        "both": 8368,
+        "both_pct": 10.33,
+        "cert_only": 4481,
+        "cert_only_pct": 5.53,
+        "nin_only": 31328,
+        "nin_only_pct": 38.68,
+        "neither": 36811,
+        "neither_pct": 45.45,
+        "by_gender": {
+          "male": {
+            "total": 39148,
+            "birth_cert_yes": 6266,
+            "nin_yes": 18515,
+            "birth_cert_pct": 16.01,
+            "nin_pct": 47.29
+          },
+          "female": {
+            "total": 41840,
+            "birth_cert_yes": 6583,
+            "nin_yes": 21181,
+            "birth_cert_pct": 15.73,
+            "nin_pct": 50.62
+          }
+        }
+      }
+    },
+    "education_v2": {
+      "oos_6_17": {
+        "total": 42505,
+        "answered": 42505,
+        "enrolled": 30101,
+        "oos": 12404,
+        "oos_pct": 29.18,
+        "oos_pct_of_total": 29.18,
+        "male": {
+          "total": 22994,
+          "answered": 22994,
+          "enrolled": 15808,
+          "oos": 7186,
+          "oos_pct": 31.25,
+          "oos_pct_of_total": 31.25
+        },
+        "female": {
+          "total": 19511,
+          "answered": 19511,
+          "enrolled": 14293,
+          "oos": 5218,
+          "oos_pct": 26.74,
+          "oos_pct_of_total": 26.74
+        }
+      },
+      "oos_6_9": {
+        "total": 15414,
+        "answered": 15414,
+        "enrolled": 10149,
+        "oos": 5265,
+        "oos_pct": 34.16,
+        "oos_pct_of_total": 34.16,
+        "male": {
+          "total": 8451,
+          "answered": 8451,
+          "enrolled": 5400,
+          "oos": 3051,
+          "oos_pct": 36.1,
+          "oos_pct_of_total": 36.1
+        },
+        "female": {
+          "total": 6963,
+          "answered": 6963,
+          "enrolled": 4749,
+          "oos": 2214,
+          "oos_pct": 31.8,
+          "oos_pct_of_total": 31.8
+        }
+      },
+      "oos_10_14": {
+        "total": 16952,
+        "answered": 16952,
+        "enrolled": 12623,
+        "oos": 4329,
+        "oos_pct": 25.54,
+        "oos_pct_of_total": 25.54,
+        "male": {
+          "total": 9181,
+          "answered": 9181,
+          "enrolled": 6589,
+          "oos": 2592,
+          "oos_pct": 28.23,
+          "oos_pct_of_total": 28.23
+        },
+        "female": {
+          "total": 7771,
+          "answered": 7771,
+          "enrolled": 6034,
+          "oos": 1737,
+          "oos_pct": 22.35,
+          "oos_pct_of_total": 22.35
+        }
+      },
+      "oos_15_17": {
+        "total": 10139,
+        "answered": 10139,
+        "enrolled": 7329,
+        "oos": 2810,
+        "oos_pct": 27.71,
+        "oos_pct_of_total": 27.71,
+        "male": {
+          "total": 5362,
+          "answered": 5362,
+          "enrolled": 3819,
+          "oos": 1543,
+          "oos_pct": 28.78,
+          "oos_pct_of_total": 28.78
+        },
+        "female": {
+          "total": 4777,
+          "answered": 4777,
+          "enrolled": 3510,
+          "oos": 1267,
+          "oos_pct": 26.52,
+          "oos_pct_of_total": 26.52
+        }
+      },
+      "oos_6_14": {
+        "total": 32366,
+        "answered": 32366,
+        "enrolled": 22772,
+        "oos": 9594,
+        "oos_pct": 29.64,
+        "oos_pct_of_total": 29.64,
+        "male": {
+          "total": 17632,
+          "answered": 17632,
+          "enrolled": 11989,
+          "oos": 5643,
+          "oos_pct": 32.0,
+          "oos_pct_of_total": 32.0
+        },
+        "female": {
+          "total": 14734,
+          "answered": 14734,
+          "enrolled": 10783,
+          "oos": 3951,
+          "oos_pct": 26.82,
+          "oos_pct_of_total": 26.82
+        }
+      },
+      "disabled_children": {
+        "total": 161,
+        "answered": 161,
+        "enrolled": 70,
+        "oos": 91,
+        "oos_pct": 56.52,
+        "oos_pct_of_total": 56.52
+      },
+      "grade_distribution": [
+        {
+          "label": "JSS3",
+          "count": 12734,
+          "pct": 42.3
+        },
+        {
+          "label": "P2",
+          "count": 12669,
+          "pct": 42.09
+        },
+        {
+          "label": "SSS2",
+          "count": 4698,
+          "pct": 15.61
+        }
+      ],
+      "oos_grade_distribution": [
+        {
+          "label": "Never-Enrolled",
+          "count": 6528,
+          "pct": 52.63
+        },
+        {
+          "label": "SSS 1",
+          "count": 2137,
+          "pct": 17.23
+        },
+        {
+          "label": "JSS 1",
+          "count": 1665,
+          "pct": 13.42
+        },
+        {
+          "label": "SSS 2",
+          "count": 594,
+          "pct": 4.79
+        },
+        {
+          "label": "Pre-school",
+          "count": 381,
+          "pct": 3.07
+        },
+        {
+          "label": "Primary 1",
+          "count": 370,
+          "pct": 2.98
+        },
+        {
+          "label": "JSS 2",
+          "count": 275,
+          "pct": 2.22
+        },
+        {
+          "label": "JSS 3",
+          "count": 127,
+          "pct": 1.02
+        }
+      ],
+      "dropout_period": [
+        {
+          "label": "2025.0",
+          "count": 2154,
+          "pct": 36.26
+        },
+        {
+          "label": "2024.0",
+          "count": 1478,
+          "pct": 24.88
+        },
+        {
+          "label": "2023.0",
+          "count": 761,
+          "pct": 12.81
+        },
+        {
+          "label": "2022.0",
+          "count": 419,
+          "pct": 7.05
+        },
+        {
+          "label": "2021.0",
+          "count": 300,
+          "pct": 5.05
+        },
+        {
+          "label": "2020.0",
+          "count": 299,
+          "pct": 5.03
+        }
+      ]
+    },
+    "nutrition_v2": {
+      "eligible_under5": 11138,
+      "sam_count": 982,
+      "mam_count": 2166,
+      "normal_count": 7990,
+      "wasted_count": 3148,
+      "sam_pct": 8.82,
+      "mam_pct": 19.45,
+      "normal_pct": 71.74,
+      "wasting_pct": 28.26,
+      "by_gender": {
+        "male": {
+          "total": 5958,
+          "sam": 571,
+          "mam": 1131,
+          "normal": 4256,
+          "sam_pct": 9.58,
+          "mam_pct": 18.98,
+          "normal_pct": 71.43,
+          "wasting_pct": 28.57
+        },
+        "female": {
+          "total": 5180,
+          "sam": 411,
+          "mam": 1035,
+          "normal": 3734,
+          "sam_pct": 7.93,
+          "mam_pct": 19.98,
+          "normal_pct": 72.08,
+          "wasting_pct": 27.92
+        }
+      },
+      "placeholders": {
+        "pregnant_enrolled_fn": {
+          "status": "not_collected",
+          "label": "Pregnant women enrolled in F&N programme"
+        },
+        "malnourished_children_enrolled_fn": {
+          "status": "not_collected",
+          "label": "Children with malnutrition enrolled in F&N programme"
+        }
+      }
+    },
+    "health_v2": {
+      "pregnant_total": 2483,
+      "pregnant_caveat": "High survey non-response (63.1% missing in instrument)",
+      "pregnant_by_age": {
+        "under_18": 114,
+        "18_24": 838,
+        "25_34": 1219,
+        "35_plus": 312
+      },
+      "lactating_total": 718,
+      "lactating_caveat": "High survey non-response (89.7% missing in instrument)",
+      "plwd_total": 1376,
+      "plwd_male": 788,
+      "plwd_female": 588,
+      "plwd_pct": 0.99,
+      "children_plwd": 221,
+      "children_plwd_pct": 0.38,
+      "placeholders": {
+        "hhs_with_health_insurance": {
+          "status": "not_collected",
+          "label": "HHs with Health Insurance"
+        },
+        "health_insurance_type": {
+          "status": "not_collected",
+          "label": "Health Insurance Type"
+        },
+        "hhs_with_no_health_insurance": {
+          "status": "not_collected",
+          "label": "HHs with No Health Insurance"
+        },
+        "children_0_7_covered_insurance": {
+          "status": "not_collected",
+          "label": "Children 0-7 in HH covered by insurance"
+        },
+        "children_0_5_covered_insurance": {
+          "status": "not_collected",
+          "label": "Children 0-5 in HH covered by insurance"
+        }
+      }
+    },
+    "youth": {
+      "total": 19012,
+      "answered": 19012,
+      "not_stated": 0,
+      "employed": 8222,
+      "unemployed": 4672,
+      "student": 6118,
+      "unemployment_rate": 24.57,
+      "labour_breakdown": [
+        {
+          "label": "Pupil/student",
+          "count": 6118,
+          "pct": 32.18
+        },
+        {
+          "label": "Self-employed (in Agric)",
+          "count": 4514,
+          "pct": 23.74
+        },
+        {
+          "label": "Unemployed",
+          "count": 4450,
+          "pct": 23.41
+        },
+        {
+          "label": "Housewife/family help",
+          "count": 1214,
+          "pct": 6.39
+        },
+        {
+          "label": "Self-employed (Non Agric)",
+          "count": 1200,
+          "pct": 6.31
+        },
+        {
+          "label": "Apprentice/Intern",
+          "count": 1116,
+          "pct": 5.87
+        },
+        {
+          "label": "Dependant",
+          "count": 222,
+          "pct": 1.17
+        },
+        {
+          "label": "Employee (Private Sector/NGO)",
+          "count": 42,
+          "pct": 0.22
+        },
+        {
+          "label": "Domestice employee (house help)",
+          "count": 41,
+          "pct": 0.22
+        },
+        {
+          "label": "Unpaid family worker",
+          "count": 33,
+          "pct": 0.17
+        },
+        {
+          "label": "Employer",
+          "count": 32,
+          "pct": 0.17
+        },
+        {
+          "label": "Employee (Government)",
+          "count": 30,
+          "pct": 0.16
+        }
+      ],
+      "by_gender": {
+        "male": {
+          "total": 9266,
+          "answered": 9266,
+          "not_stated": 0,
+          "employed": 3604,
+          "unemployed": 2424,
+          "student": 3238,
+          "unemployment_rate": 26.16
+        },
+        "female": {
+          "total": 9746,
+          "answered": 9746,
+          "not_stated": 0,
+          "employed": 4618,
+          "unemployed": 2248,
+          "student": 2880,
+          "unemployment_rate": 23.07
+        }
+      }
+    },
+    "livelihoods_resilience_v2": {
+      "livelihoods": [
+        {
+          "label": "1",
+          "count": 31852,
+          "pct": 76.73
+        },
+        {
+          "label": "5",
+          "count": 3776,
+          "pct": 9.1
+        },
+        {
+          "label": "2",
+          "count": 1929,
+          "pct": 4.65
+        },
+        {
+          "label": "3",
+          "count": 1698,
+          "pct": 4.09
+        },
+        {
+          "label": "8",
+          "count": 1392,
+          "pct": 3.35
+        },
+        {
+          "label": "4",
+          "count": 538,
+          "pct": 1.3
+        },
+        {
+          "label": "6",
+          "count": 181,
+          "pct": 0.44
+        },
+        {
+          "label": "7",
+          "count": 146,
+          "pct": 0.35
+        }
+      ],
+      "large_households": {
+        "count": 738,
+        "pct": 1.78
+      },
+      "multi_vulnerable_households": {
+        "count": 2035,
+        "pct": 4.9
+      },
+      "hh_with_disability": {
+        "count": 1285,
+        "pct": 3.1
+      },
+      "pvhh_households": {
+        "count": 5826,
+        "pct": 14.03
+      },
+      "shock_exposure": {
+        "shock_hh_count": 4409,
+        "shock_hh_pct": 10.62,
+        "types": [
+          {
+            "type": "conflict",
+            "count": 1604,
+            "pct": 36.38
+          },
+          {
+            "type": "flood",
+            "count": 1594,
+            "pct": 36.15
+          },
+          {
+            "type": "fire",
+            "count": 292,
+            "pct": 6.62
+          },
+          {
+            "type": "drought",
+            "count": 280,
+            "pct": 6.35
+          },
+          {
+            "type": "landslide",
+            "count": 178,
+            "pct": 4.04
+          },
+          {
+            "type": "other",
+            "count": 160,
+            "pct": 3.63
+          },
+          {
+            "type": "epidemic",
+            "count": 133,
+            "pct": 3.02
+          },
+          {
+            "type": "storm",
+            "count": 113,
+            "pct": 2.56
+          }
+        ],
+        "coping_mechanisms": [
+          {
+            "label": "Sale of livestock",
+            "count": 1120,
+            "pct": 26.0
+          },
+          {
+            "label": "Sale of other property",
+            "count": 485,
+            "pct": 11.26
+          },
+          {
+            "label": "Sold harvest in advance",
+            "count": 445,
+            "pct": 10.33
+          },
+          {
+            "label": "Sale of land",
+            "count": 428,
+            "pct": 9.94
+          },
+          {
+            "label": "Reduced food consumption",
+            "count": 285,
+            "pct": 6.62
+          },
+          {
+            "label": "Sent children to live with friends",
+            "count": 269,
+            "pct": 6.25
+          },
+          {
+            "label": "Withdrew children from school",
+            "count": 264,
+            "pct": 6.13
+          },
+          {
+            "label": "Borrowed from friends and family",
+            "count": 221,
+            "pct": 5.13
+          }
+        ]
+      }
+    }
+  },
+  "level": "national"
+}

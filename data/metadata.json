@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-09-21T12:00:13.749441+00:00",
+  "source_csv": "UNICEF_SUSI_Batch1.csv",
+  "source_rows": 138676,
+  "total_households": 41512,
+  "total_members": 138676,
+  "states_count": 4,
+  "lga_count": 29,
+  "ward_count": 116,
+  "community_count": 568,
+  "mdp_states": [
+    "ABIA",
+    "BENUE",
+    "OYO",
+    "SOKOTO"
+  ],
+  "data_modes": [
+    "nsr",
+    "update"
+  ],
+  "aggregator_version": "4.0.1-unicef-revamp",
+  "code_maps": {
+    "disability": {
+      "1": "Blind / vision impaired",
+      "2": "Deaf / hearing impaired",
+      "3": "Physical disability",
+      "4": "Mental illness",
+      "5": "Epilepsy",
+      "6": "Speech impaired",
+      "7": "Autism",
+      "8": "Other"
+    },
+    "chronic_ill": {
+      "1": "Cancer",
+      "2": "Diabetes",
+      "3": "Tuberculosis",
+      "4": "HIV/AIDS",
+      "5": "Heart disease",
+      "6": "Hepatitis",
+      "7": "Leprosy",
+      "8": "Other chronic illness"
+    },
+    "livelihood": {
+      "1": "Agriculture / Crop Farming",
+      "2": "Livestock / Pastoralism",
+      "3": "Fisheries / Aquaculture",
+      "4": "Trading / Commerce",
+      "5": "Artisan / Craftsmanship",
+      "6": "Wage Labor / Formal",
+      "7": "Informal Labor / Services",
+      "8": "Other / Remittances"
+    },
+    "shock_types": {
+      "1": "Flooding",
+      "2": "Drought / Water Scarcity",
+      "3": "Severe Storm / Wind",
+      "4": "Conflict / Violence",
+      "5": "Epidemic / Disease Outbreak",
+      "6": "Landslide / Erosion",
+      "7": "Fire Outbreak",
+      "8": "Economic / Other Shock"
+    },
+    "decile": {
+      "1st": 1,
+      "2nd": 2,
+      "3rd": 3,
+      "4th": 4,
+      "5th": 5,
+      "6th": 6,
+      "7th": 7,
+      "8th": 8,
+      "9th": 9,
+      "10th": 10
+    }
+  }
+}
