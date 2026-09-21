@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
 import { feature } from "topojson-client";
 import type { FeatureCollection } from "geojson";
@@ -49,10 +49,6 @@ function normUpper(s: string): string {
   return (s || "").trim().toUpperCase();
 }
 
-function normLower(s: string): string {
-  return (s || "").trim().toLowerCase();
-}
-
 function getColorForRatio(ratio: number, inverted: boolean = false): string {
   const t = Math.max(0, Math.min(1, ratio));
   const biased = Math.pow(t, 0.75);
@@ -75,7 +71,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "vulnerability",
     label: "Vulnerability Index",
     unit: "pts",
-    getValue: (r) => r.vulnerability.vulnerability_index,
+    getValue: (r) => r.vulnerability?.vulnerability_index ?? 0,
     format: (v) => `${v.toFixed(1)} pts`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -83,17 +79,16 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "poorest_pct",
     label: "Poverty Rate (Decile 1-3)",
     unit: "%",
-    getValue: (r) => r.vulnerability.poorest_pct,
+    getValue: (r) => r.vulnerability?.poorest_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
   birth_cert: {
     key: "birth_cert",
-    label: "Birth Registration Coverage (0-17)",
+    label: "Birth Registration (0-17)",
     unit: "%",
     getValue: (r) =>
-      r.extended.civil_registration?.children_0_17.birth_cert_pct ??
-      r.extended.birth_cert.all_children.pct,
+      r.extended?.civil_registration?.children_0_17.birth_cert_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, true),
   },
@@ -101,9 +96,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "nin",
     label: "NIN Coverage (0-17)",
     unit: "%",
-    getValue: (r) =>
-      r.extended.civil_registration?.children_0_17.nin_pct ??
-      r.extended.individual_nin.children.pct,
+    getValue: (r) => r.extended?.civil_registration?.children_0_17.nin_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, true),
   },
@@ -111,18 +104,15 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "out_of_school",
     label: "Out-of-School Children Rate (6-17)",
     unit: "%",
-    getValue: (r) =>
-      r.extended.education_v2?.oos_6_17.oos_pct ??
-      r.unicef.out_of_school_rate_pct,
+    getValue: (r) => r.extended?.education_v2?.oos_6_17.oos_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
   wasting: {
     key: "wasting",
-    label: "Under-5 Acute Malnutrition (Wasting)",
+    label: "Under-5 Wasting Rate",
     unit: "%",
-    getValue: (r) =>
-      r.extended.nutrition_v2?.wasting_pct ?? r.unicef.under5_wasting_pct,
+    getValue: (r) => r.extended?.nutrition_v2?.wasting_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -131,8 +121,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     label: "Shock Exposure Rate",
     unit: "%",
     getValue: (r) =>
-      r.extended.livelihoods_resilience_v2?.shock_exposure.shock_hh_pct ??
-      r.extended.shocks.exposure_pct.pct,
+      r.extended?.livelihoods_resilience_v2?.shock_exposure.shock_hh_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -140,7 +129,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "female_head",
     label: "Female Primary Respondent Rate",
     unit: "%",
-    getValue: (r) => r.extended.female_primary_respondent.pct,
+    getValue: (r) => r.extended?.female_primary_respondent?.pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -178,6 +167,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   onPathChange,
   selectedStateFilter,
   metric = "vulnerability",
+  isDark = false,
   height = "420px",
 }) => {
   const handleNav = (newPath: DrilldownPath) => {
@@ -187,6 +177,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
 
   const [statesGeoJson, setStatesGeoJson] = useState<any>(null);
   const [lgasGeoJson, setLgasGeoJson] = useState<any>(null);
+  const [wardsGeoJson, setWardsGeoJson] = useState<any>(null);
   const [mapBounds, setMapBounds] = useState<L.LatLngBoundsExpression | null>(
     null,
   );
@@ -198,14 +189,14 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     : path.state
       ? normUpper(path.state)
       : undefined;
+  const activeLga = path.lga ? normUpper(path.lga) : undefined;
 
   useEffect(() => {
     fetch("/geojson/nigeria-states.json")
       .then((res) => res.json())
       .then((topoData) => {
-        if (topoData.objects && topoData.objects.NGA_adm1) {
-          const geo = feature(topoData, topoData.objects.NGA_adm1);
-          setStatesGeoJson(geo);
+        if (topoData.objects?.NGA_adm1) {
+          setStatesGeoJson(feature(topoData, topoData.objects.NGA_adm1));
         }
       })
       .catch((err) => console.error("Failed loading states TopoJSON:", err));
@@ -222,6 +213,17 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     }
   }, [activeState]);
 
+  useEffect(() => {
+    if (activeState && activeLga) {
+      fetch("/geojson/nigeria_ward.json")
+        .then((res) => res.json())
+        .then((geoData) => setWardsGeoJson(geoData))
+        .catch((err) => console.error("Failed loading Ward GeoJSON:", err));
+    } else {
+      setWardsGeoJson(null);
+    }
+  }, [activeState, activeLga]);
+
   const stateRecordsMap = useMemo(() => {
     const map = new Map<string, GeoRecord>();
     data.states.forEach((rec) => {
@@ -234,280 +236,350 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     const map = new Map<string, GeoRecord>();
     data.lgas.forEach((rec) => {
       if (rec.state && rec.lga) {
-        const key = `${normUpper(rec.state)}|${normLower(rec.lga)}`;
-        map.set(key, rec);
+        map.set(`${normUpper(rec.state)}||${normUpper(rec.lga)}`, rec);
       }
     });
     return map;
   }, [data.lgas]);
 
-  const metricBounds = useMemo(() => {
-    let min = Infinity;
-    let max = -Infinity;
+  const wardRecordsMap = useMemo(() => {
+    const map = new Map<string, GeoRecord>();
+    data.wards.forEach((rec) => {
+      if (rec.state && rec.lga && rec.ward) {
+        map.set(
+          `${normUpper(rec.state)}||${normUpper(rec.lga)}||${normUpper(rec.ward)}`,
+          rec,
+        );
+      }
+    });
+    return map;
+  }, [data.wards]);
 
-    if (!activeState) {
-      stateRecordsMap.forEach((rec) => {
-        const val = activeMetric.getValue(rec);
-        if (val < min) min = val;
-        if (val > max) max = val;
+  const filteredGeoJson = useMemo(() => {
+    if (activeState && activeLga && wardsGeoJson) {
+      const features = (wardsGeoJson.features || []).filter((f: any) => {
+        const fState =
+          f.properties?.state_name ||
+          f.properties?.state ||
+          f.properties?.NAME_1;
+        const fLga =
+          f.properties?.lga_name || f.properties?.lga || f.properties?.NAME_2;
+        return (
+          normUpper(fState) === activeState && normUpper(fLga) === activeLga
+        );
       });
-    } else {
-      lgaRecordsMap.forEach((rec, key) => {
-        if (key.startsWith(`${activeState}|`)) {
-          const val = activeMetric.getValue(rec);
-          if (val < min) min = val;
-          if (val > max) max = val;
-        }
+      return { type: "FeatureCollection", features } as FeatureCollection;
+    }
+
+    if (activeState && lgasGeoJson) {
+      const features = (lgasGeoJson.features || []).filter((f: any) => {
+        const fState =
+          f.properties?.NAME_1 ||
+          f.properties?.state_name ||
+          f.properties?.state;
+        return normUpper(fState) === activeState;
       });
+      return { type: "FeatureCollection", features } as FeatureCollection;
     }
 
-    if (min === Infinity) min = 0;
-    if (max === -Infinity || max === min) max = min + 1;
-    return { min, max };
-  }, [activeState, stateRecordsMap, lgaRecordsMap, activeMetric]);
-
-  const onEachState = (featureItem: any, layer: L.Layer) => {
-    const stateName =
-      featureItem.properties.NAME_1 || featureItem.properties.name || "";
-    const stateUpper = normUpper(stateName);
-
-    if (stateName === "WATER BODY") return;
-
-    const isMdp = MDP_STATES.has(stateUpper);
-    const rec = stateRecordsMap.get(stateUpper);
-
-    let popupContent = `<div class="p-2 text-xs font-sans">
-      <div class="font-bold text-sm text-slate-900">${stateName}</div>`;
-
-    if (!isMdp || !rec) {
-      popupContent += `<div class="text-slate-500 italic mt-1">Not in MDP scope</div></div>`;
-    } else {
-      const val = activeMetric.getValue(rec);
-      popupContent += `
-        <div class="mt-1 text-slate-700">
-          <div><span class="font-medium">Households:</span> ${rec.nsr.total_households.toLocaleString()}</div>
-          <div><span class="font-medium">Individuals:</span> ${rec.nsr.total_individuals.toLocaleString()}</div>
-          <div class="mt-1 font-bold text-teal-700 dark:text-teal-400">
-            ${activeMetric.label}: ${activeMetric.format(val)}
-          </div>
-        </div>
-      </div>`;
-    }
-
-    layer.bindTooltip(popupContent, { sticky: true, direction: "auto" });
-
-    layer.on({
-      mouseover: (e) => {
-        const l = e.target;
-        l.setStyle({ weight: 3, color: "#075E54", fillOpacity: 0.85 });
-      },
-      mouseout: (e) => {
-        const l = e.target;
-        l.setStyle({
-          weight: isMdp ? 1.5 : 0.5,
-          color: activeState === stateUpper ? "#075E54" : "#64748B",
-          fillOpacity: activeState === stateUpper ? 0.75 : isMdp ? 0.6 : 0.15,
-        });
-      },
-      click: () => {
-        if (isMdp) {
-          handleNav({ state: stateName });
-        }
-      },
-    });
-  };
-
-  const stateStyle = (featureItem: any) => {
-    const stateName =
-      featureItem.properties.NAME_1 || featureItem.properties.name || "";
-    const stateUpper = normUpper(stateName);
-    const isMdp = MDP_STATES.has(stateUpper);
-    const rec = stateRecordsMap.get(stateUpper);
-
-    if (!isMdp || !rec) {
-      return {
-        fillColor: "#94A3B8",
-        fillOpacity: 0.15,
-        weight: 0.5,
-        color: "#CBD5E1",
-      };
-    }
-
-    const val = activeMetric.getValue(rec);
-    const ratio =
-      (val - metricBounds.min) / (metricBounds.max - metricBounds.min);
-    const fillColor = activeMetric.colorScale(ratio);
-
-    return {
-      fillColor,
-      fillOpacity: activeState === stateUpper ? 0.85 : 0.65,
-      weight: activeState === stateUpper ? 2.5 : 1,
-      color: activeState === stateUpper ? "#075E54" : "#FFFFFF",
-    };
-  };
-
-  const filteredLgaFeatures = useMemo<FeatureCollection | null>(() => {
-    if (!lgasGeoJson || !activeState) return null;
-    const features = lgasGeoJson.features.filter((f: any) => {
-      const st = normUpper(f.properties.state || f.properties.STATE || "");
-      return st === activeState;
-    });
-    return { type: "FeatureCollection", features };
-  }, [lgasGeoJson, activeState]);
-
-  const onEachLga = (featureItem: any, layer: L.Layer) => {
-    const lgaName =
-      featureItem.properties.lga ||
-      featureItem.properties.LGA ||
-      fName(featureItem);
-    const lgaKey = `${activeState}|${normLower(lgaName)}`;
-    const rec = lgaRecordsMap.get(lgaKey);
-
-    let popupContent = `<div class="p-2 text-xs font-sans">
-      <div class="font-bold text-sm text-slate-900">${lgaName}</div>
-      <div class="text-slate-500 font-medium">${activeState} State</div>`;
-
-    if (!rec) {
-      popupContent += `<div class="text-slate-500 italic mt-1">No survey records</div></div>`;
-    } else {
-      const val = activeMetric.getValue(rec);
-      popupContent += `
-        <div class="mt-1 text-slate-700">
-          <div><span class="font-medium">Households:</span> ${rec.nsr.total_households.toLocaleString()}</div>
-          <div><span class="font-medium">Individuals:</span> ${rec.nsr.total_individuals.toLocaleString()}</div>
-          <div class="mt-1 font-bold text-teal-700 dark:text-teal-400">
-            ${activeMetric.label}: ${activeMetric.format(val)}
-          </div>
-        </div>
-      </div>`;
-    }
-
-    layer.bindTooltip(popupContent, { sticky: true, direction: "auto" });
-
-    layer.on({
-      mouseover: (e) => {
-        e.target.setStyle({ weight: 2.5, color: "#075E54", fillOpacity: 0.9 });
-      },
-      mouseout: (e) => {
-        e.target.setStyle({ weight: 1, color: "#FFFFFF", fillOpacity: 0.7 });
-      },
-      click: () => {
-        if (rec) {
-          handleNav({ state: activeState, lga: lgaName });
-        }
-      },
-    });
-  };
-
-  const lgaStyle = (featureItem: any) => {
-    const lgaName =
-      featureItem.properties.lga ||
-      featureItem.properties.LGA ||
-      fName(featureItem);
-    const lgaKey = `${activeState}|${normLower(lgaName)}`;
-    const rec = lgaRecordsMap.get(lgaKey);
-
-    if (!rec) {
-      return {
-        fillColor: "#CBD5E1",
-        fillOpacity: 0.2,
-        weight: 0.5,
-        color: "#94A3B8",
-      };
-    }
-
-    const val = activeMetric.getValue(rec);
-    const ratio =
-      (val - metricBounds.min) / (metricBounds.max - metricBounds.min);
-    const fillColor = activeMetric.colorScale(ratio);
-
-    return {
-      fillColor,
-      fillOpacity: 0.75,
-      weight: 1,
-      color: "#FFFFFF",
-    };
-  };
+    return statesGeoJson;
+  }, [statesGeoJson, lgasGeoJson, wardsGeoJson, activeState, activeLga]);
 
   useEffect(() => {
     if (
-      activeState &&
-      filteredLgaFeatures &&
-      filteredLgaFeatures.features.length > 0
+      filteredGeoJson &&
+      filteredGeoJson.features &&
+      filteredGeoJson.features.length > 0
     ) {
-      const geoLayer = L.geoJSON(filteredLgaFeatures);
-      setMapBounds(geoLayer.getBounds());
+      try {
+        const tempLayer = L.geoJSON(filteredGeoJson);
+        const bounds = tempLayer.getBounds();
+        if (bounds.isValid()) {
+          setMapBounds(bounds);
+        }
+      } catch (e) {
+        console.error("Error calculating map bounds:", e);
+      }
     } else {
       setMapBounds(NIGERIA_BOUNDS);
     }
-  }, [activeState, filteredLgaFeatures]);
+  }, [filteredGeoJson]);
+
+  const valueRange = useMemo(() => {
+    if (!filteredGeoJson || !filteredGeoJson.features)
+      return { min: 0, max: 100 };
+    const values: number[] = [];
+    filteredGeoJson.features.forEach((f: any) => {
+      let rec: GeoRecord | undefined;
+      const fState =
+        f.properties?.state_name ||
+        f.properties?.state ||
+        f.properties?.NAME_1 ||
+        f.properties?.admin1Name;
+      const fLga =
+        f.properties?.lga_name ||
+        f.properties?.lga ||
+        f.properties?.NAME_2 ||
+        f.properties?.local_gov_;
+      const fWard =
+        f.properties?.ward_name || f.properties?.ward || f.properties?.NAME_3;
+
+      if (activeState && activeLga && wardsGeoJson) {
+        rec = wardRecordsMap.get(
+          `${normUpper(fState)}||${normUpper(fLga)}||${normUpper(fWard)}`,
+        );
+      } else if (activeState && lgasGeoJson) {
+        rec = lgaRecordsMap.get(`${normUpper(fState)}||${normUpper(fLga)}`);
+      } else {
+        if (MDP_STATES.has(normUpper(fState))) {
+          rec = stateRecordsMap.get(normUpper(fState));
+        }
+      }
+      if (rec) {
+        values.push(activeMetric.getValue(rec));
+      }
+    });
+
+    if (values.length === 0) return { min: 0, max: 100 };
+    return { min: Math.min(...values), max: Math.max(...values) };
+  }, [
+    filteredGeoJson,
+    activeState,
+    activeLga,
+    activeMetric,
+    stateRecordsMap,
+    lgaRecordsMap,
+    wardRecordsMap,
+    lgasGeoJson,
+    wardsGeoJson,
+  ]);
+
+  const getFeatureStyle = (f: any) => {
+    const fState =
+      f.properties?.state_name ||
+      f.properties?.state ||
+      f.properties?.NAME_1 ||
+      f.properties?.admin1Name;
+    const sUpper = normUpper(fState);
+
+    if (!activeState) {
+      if (!MDP_STATES.has(sUpper)) {
+        return {
+          fillColor: isDark ? "#2D3748" : "#E2E8F0",
+          fillOpacity: 0.6,
+          color: isDark ? "#4A5568" : "#CBD5E0",
+          weight: 1,
+        };
+      }
+    }
+
+    let rec: GeoRecord | undefined;
+    const fLga =
+      f.properties?.lga_name ||
+      f.properties?.lga ||
+      f.properties?.NAME_2 ||
+      f.properties?.local_gov_;
+    const fWard =
+      f.properties?.ward_name || f.properties?.ward || f.properties?.NAME_3;
+
+    if (activeState && activeLga && wardsGeoJson) {
+      rec = wardRecordsMap.get(
+        `${normUpper(fState)}||${normUpper(fLga)}||${normUpper(fWard)}`,
+      );
+    } else if (activeState && lgasGeoJson) {
+      rec = lgaRecordsMap.get(`${normUpper(fState)}||${normUpper(fLga)}`);
+    } else {
+      rec = stateRecordsMap.get(sUpper);
+    }
+
+    if (!rec) {
+      return {
+        fillColor: isDark ? "#1A202C" : "#F7FAFC",
+        fillOpacity: 0.4,
+        color: isDark ? "#4A5568" : "#E2E8F0",
+        weight: 1.5,
+      };
+    }
+
+    const val = activeMetric.getValue(rec);
+    const range = valueRange.max - valueRange.min;
+    const ratio = range > 0 ? (val - valueRange.min) / range : 0.5;
+    const fillColor = activeMetric.colorScale(ratio);
+
+    return {
+      fillColor,
+      fillOpacity: 0.85,
+      color: isDark ? "#1A202C" : "#FFFFFF",
+      weight: 1.5,
+    };
+  };
+
+  const onEachFeature = (f: any, layer: L.Layer) => {
+    const fState =
+      f.properties?.state_name ||
+      f.properties?.state ||
+      f.properties?.NAME_1 ||
+      f.properties?.admin1Name;
+    const sUpper = normUpper(fState);
+
+    let rec: GeoRecord | undefined;
+    const fLga =
+      f.properties?.lga_name ||
+      f.properties?.lga ||
+      f.properties?.NAME_2 ||
+      f.properties?.local_gov_;
+    const fWard =
+      f.properties?.ward_name || f.properties?.ward || f.properties?.NAME_3;
+
+    let displayName = fState;
+
+    if (activeState && activeLga && wardsGeoJson) {
+      rec = wardRecordsMap.get(
+        `${normUpper(fState)}||${normUpper(fLga)}||${normUpper(fWard)}`,
+      );
+      displayName = `Ward: ${fWard}`;
+    } else if (activeState && lgasGeoJson) {
+      rec = lgaRecordsMap.get(`${normUpper(fState)}||${normUpper(fLga)}`);
+      displayName = `LGA: ${fLga}`;
+    } else {
+      rec = stateRecordsMap.get(sUpper);
+      displayName = `State: ${fState}`;
+    }
+
+    let tooltipContent = `<div style="font-weight:600; font-size:12px;">${displayName}</div>`;
+
+    if (!activeState && !MDP_STATES.has(sUpper)) {
+      tooltipContent += `<div style="color:gray; font-size:11px; margin-top:2px;">Non-Pilot State</div>`;
+    } else if (rec) {
+      const val = activeMetric.getValue(rec);
+      tooltipContent += `<div style="margin-top:4px; font-size:11px;">
+        <span style="color:#718096;">${activeMetric.label}:</span> 
+        <strong style="color:${isDark ? "#FFF" : "#1A202C"};">${activeMetric.format(val)}</strong>
+      </div>`;
+    } else {
+      tooltipContent += `<div style="color:gray; font-size:11px; margin-top:2px;">No Data Available</div>`;
+    }
+
+    layer.bindTooltip(tooltipContent, {
+      sticky: true,
+      direction: "auto",
+      className: "custom-map-tooltip",
+    });
+
+    layer.on({
+      mouseover: (e) => {
+        const l = e.target;
+        l.setStyle({
+          fillOpacity: 0.95,
+          weight: 2.5,
+          color: "#128C7E",
+        });
+      },
+      mouseout: (e) => {
+        const l = e.target;
+        l.setStyle(getFeatureStyle(f));
+      },
+      click: () => {
+        if (!activeState) {
+          if (MDP_STATES.has(sUpper)) {
+            handleNav({ state: fState });
+          }
+        } else if (!activeLga) {
+          handleNav({ state: path.state || fState, lga: fLga });
+        } else {
+          handleNav({ state: path.state, lga: path.lga, ward: fWard });
+        }
+      },
+    });
+  };
+
+  const handleReset = (level: "national" | "state") => {
+    if (level === "national") {
+      handleNav({});
+    } else if (level === "state") {
+      handleNav({ state: path.state });
+    }
+  };
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-line-light dark:border-line-dark shadow-sm bg-surface-light dark:bg-surface-dark">
-      <div className="absolute top-3 right-3 z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2.5 rounded-lg border border-line-light dark:border-line-dark shadow-md text-xs font-medium max-w-[220px]">
-        <div className="text-ink-primary dark:text-ink-onDark font-bold mb-1 truncate">
-          {activeMetric.label}
+    <div className="space-y-2">
+      <style>{`
+        .custom-map-tooltip {
+          background: ${isDark ? "#1F2937" : "#FFFFFF"} !important;
+          color: ${isDark ? "#F9FAFB" : "#111827"} !important;
+          border: 1px solid ${isDark ? "#374151" : "#E5E7EB"} !important;
+          border-radius: 0.375rem !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          padding: 8px 12px !important;
+          font-family: inherit !important;
+        }
+        .leaflet-container {
+          background: transparent !important;
+        }
+      `}</style>
+
+      <div className="flex items-center justify-between text-xs font-semibold py-1">
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={() => handleReset("national")}
+            className={`hover:underline ${!path.state ? "text-brand-600 font-bold" : "text-ink-muted"}`}
+          >
+            National
+          </button>
+          {path.state && (
+            <>
+              <span className="text-ink-muted">/</span>
+              <button
+                onClick={() => handleReset("state")}
+                className={`hover:underline ${!path.lga ? "text-brand-600 font-bold" : "text-ink-muted"}`}
+              >
+                {path.state}
+              </button>
+            </>
+          )}
+          {path.lga && (
+            <>
+              <span className="text-ink-muted">/</span>
+              <span className="text-brand-600 font-bold">{path.lga}</span>
+            </>
+          )}
         </div>
-        <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-[10px] text-ink-muted dark:text-ink-onDarkMuted">
-            {activeMetric.format(metricBounds.min)}
-          </span>
-          <div
-            className="h-2.5 flex-1 rounded-full"
-            style={{
-              background: `linear-gradient(to right, ${activeMetric.colorScale(0)}, ${activeMetric.colorScale(0.5)}, ${activeMetric.colorScale(1)})`,
-            }}
-          />
-          <span className="text-[10px] text-ink-muted dark:text-ink-onDarkMuted">
-            {activeMetric.format(metricBounds.max)}
-          </span>
+        <div className="text-[11px] text-ink-muted italic font-normal">
+          Click map to drill down
         </div>
       </div>
 
-      <div style={{ height }}>
-        <MapContainer
-          bounds={NIGERIA_BOUNDS}
-          zoom={6}
-          scrollWheelZoom={false}
-          className="w-full h-full z-0"
-        >
-          <InvalidateOnMount />
-          <MapBoundsController bounds={mapBounds} />
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          />
-
-          {statesGeoJson && !activeState && (
+      <div
+        style={{ height, width: "100%", position: "relative" }}
+        className="rounded-xl border border-line-light dark:border-line-dark overflow-hidden bg-slate-50 dark:bg-[#0f172a]"
+      >
+        {filteredGeoJson ? (
+          <MapContainer
+            bounds={mapBounds || NIGERIA_BOUNDS}
+            zoomControl={false}
+            scrollWheelZoom={true}
+            doubleClickZoom={false}
+            dragging={true}
+            style={{ height: "100%", width: "100%" }}
+            attributionControl={false}
+          >
+            <MapBoundsController bounds={mapBounds} />
+            <InvalidateOnMount />
             <GeoJSON
-              key={`states-${metric}`}
-              data={statesGeoJson}
-              style={stateStyle}
-              onEachFeature={onEachState}
+              key={`${metric}-${activeState || "national"}-${activeLga || "lga"}-${filteredGeoJson.features?.length || 0}`}
+              data={filteredGeoJson}
+              style={getFeatureStyle}
+              onEachFeature={onEachFeature}
             />
-          )}
-
-          {activeState && filteredLgaFeatures && (
-            <GeoJSON
-              key={`lgas-${activeState}-${metric}`}
-              data={filteredLgaFeatures}
-              style={lgaStyle}
-              onEachFeature={onEachLga}
-            />
-          )}
-        </MapContainer>
+          </MapContainer>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-xs text-ink-muted">
+            Loading geographical boundary vectors...
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-function fName(featureItem: any): string {
-  return (
-    featureItem.properties.NAME_2 ||
-    featureItem.properties.lga_name ||
-    featureItem.properties.NAME_1 ||
-    "Unknown"
-  );
-}
 
 export default DrilldownMap;

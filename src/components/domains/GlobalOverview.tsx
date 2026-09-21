@@ -32,23 +32,25 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
   stateFilter,
 }) => {
   const theme = useChartTheme();
+  const labelProps = {
+    position: "top" as const,
+    fill: theme.axisTick,
+    fontSize: 11,
+    formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
+  };
+  const hLabelProps = { ...labelProps, position: "right" as const };
 
   const ageBands = record.extended.age_bands_v2 || {
     "0-3": { total: 0, male: 0, female: 0 },
-    "0-5": {
-      total: record.extended.birth_cert?.under_5?.d || 0,
-      male: 0,
-      female: 0,
-    },
+    "0-5": { total: 0, male: 0, female: 0 },
     "0-7": { total: 0, male: 0, female: 0 },
-    "0-17": { total: record.nsr.children_under18 || 0, male: 0, female: 0 },
+    "0-17": { total: 0, male: 0, female: 0 },
     "6-9": { total: 0, male: 0, female: 0 },
     "10-14": { total: 0, male: 0, female: 0 },
     "15-17": { total: 0, male: 0, female: 0 },
     "18-24": { total: 0, male: 0, female: 0 },
   };
 
-  // 1. Age band distribution x Gender
   const ageGroupData = [
     {
       band: "0–3 yrs",
@@ -76,13 +78,12 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
       Female: ageBands["15-17"].female,
     },
     {
-      band: "18–24 (Youth)",
+      band: "18–24",
       Male: ageBands["18-24"].male,
       Female: ageBands["18-24"].female,
     },
   ];
 
-  // 2. Focused 0–24 Population Pyramid
   const pyramid024Data = record.extended.age_sex_pyramid
     .filter((p) => ["0-4", "5-11", "12-17", "18-24"].includes(p.band))
     .map((p) => ({
@@ -90,14 +91,11 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
       Male: -p.male,
       Female: p.female,
       rawMale: p.male,
-      rawFemale: p.female,
     }));
 
-  // 3. State-level comparison for Total HHs & Female Headed %
   const stateComparisonData = data.states.map((s) => ({
     state: s.state,
     Households: s.nsr.total_households,
-    "Female Head %": s.extended.female_primary_respondent.pct,
     "PVHH Count": s.vulnerability.poorest_households,
   }));
 
@@ -109,56 +107,39 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             Global / Overview
           </h2>
           <p className="text-xs text-ink-muted dark:text-ink-onDarkMuted mt-0.5">
-            Core population demographics, household registrations, and poverty
-            vulnerability
+            Core population demographics and household registrations
           </p>
         </div>
-        <div className="text-xs text-ink-muted dark:text-ink-onDarkMuted bg-surface-page dark:bg-surface-darker px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark">
-          Data as of:{" "}
-          <span className="font-semibold text-brand-600 dark:text-brand-400">
-            September 2026
-          </span>
-        </div>
       </div>
-
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Total Households Registered"
+          label="Total Households"
           value={record.nsr.total_households.toLocaleString()}
-          sub={`Across ${record.level === "national" ? "4 Pilot States" : record.state}`}
           icon={<Home size={18} />}
           accent="#075E54"
         />
         <KpiCard
           label="Total Individuals"
           value={record.nsr.total_individuals.toLocaleString()}
-          sub={`Avg HH Size: ${record.nsr.avg_household_size}`}
           icon={<Users size={18} />}
           accent="#128C7E"
         />
         <KpiCard
-          label="Female Primary Respondent %"
+          label="Female Head %"
           value={`${record.extended.female_primary_respondent.pct}%`}
-          sub={`${record.extended.female_primary_respondent.n.toLocaleString()} female respondents`}
           icon={<UserCheck size={18} />}
           accent="#E67E22"
         />
         <KpiCard
-          label="Children in PVHH (Deciles 1-3)"
+          label="Children in PVHH"
           value={`${record.extended.children_in_pvhh.pct}%`}
-          sub={`${record.extended.children_in_pvhh.n.toLocaleString()} children under 18`}
           icon={<ShieldAlert size={18} />}
           accent="#DC2626"
         />
       </div>
-
-      {/* Overview Map */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-line-light dark:border-line-dark">
-          <span className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
-            Multi-Dimensional Poverty & Registration Map
-          </span>
+        <div className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
+          Multi-Dimensional Poverty Map
         </div>
         <DrilldownMap
           data={data}
@@ -169,18 +150,12 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
           height={400}
         />
       </div>
-
-      {/* Charts Row 1: Age Bands x Gender & Population Pyramid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Demographic Age Bands by Gender"
-          takeaway="Child (0-3, 0-5, 6-9, 10-14, 15-17) and Youth (18-24) breakdowns"
-          height={320}
-        >
+        <ChartCard title="Demographic Age Bands by Gender" height={320}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={ageGroupData}
-              margin={{ top: 16, right: 12, left: -8, bottom: 4 }}
+              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
             >
               <XAxis
                 dataKey="band"
@@ -197,54 +172,35 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                 contentStyle={theme.tooltip}
                 labelStyle={theme.tooltipLabel}
                 itemStyle={theme.tooltipItem}
-                formatter={(val: number) => [
-                  `${val.toLocaleString()} persons`,
-                  "",
-                ]}
               />
-              <Legend
-                verticalAlign="top"
-                align="right"
-                formatter={(v) => (
-                  <span className="text-xs text-ink-primary dark:text-ink-onDark">
-                    {v}
-                  </span>
-                )}
-              />
+              <Legend verticalAlign="top" align="right" />
               <Bar
                 dataKey="Male"
                 fill="#075E54"
                 radius={[4, 4, 0, 0]}
-                barSize={22}
+                label={labelProps}
               />
               <Bar
                 dataKey="Female"
                 fill="#E67E22"
                 radius={[4, 4, 0, 0]}
-                barSize={22}
+                label={labelProps}
               />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-
-        <ChartCard
-          title="Youth & Child Population Pyramid (0–24 Years)"
-          takeaway="Male (left) vs Female (right) age distribution for young demographics"
-          height={320}
-        >
+        <ChartCard title="Youth & Child Population Pyramid" height={320}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={pyramid024Data}
               layout="vertical"
-              margin={{ top: 16, right: 20, left: 10, bottom: 4 }}
+              margin={{ top: 16, right: 30, left: 10, bottom: 4 }}
             >
               <XAxis
                 tick={{ fill: theme.axisTick, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v: string | number) =>
-                  Math.abs(Number(v)).toString()
-                }
+                tickFormatter={(v) => Math.abs(Number(v)).toString()}
               />
               <YAxis
                 dataKey="band"
@@ -262,42 +218,33 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   name,
                 ]}
               />
-              <Legend
-                verticalAlign="top"
-                align="right"
-                formatter={(v) => (
-                  <span className="text-xs text-ink-primary dark:text-ink-onDark">
-                    {v}
-                  </span>
-                )}
-              />
+              <Legend verticalAlign="top" align="right" />
               <Bar
                 dataKey="Male"
                 fill="#075E54"
                 radius={[4, 0, 0, 4]}
-                barSize={20}
+                label={{
+                  ...labelProps,
+                  position: "left",
+                  formatter: (v: number) =>
+                    v < 0 ? Math.abs(v).toLocaleString() : "",
+                }}
               />
               <Bar
                 dataKey="Female"
                 fill="#E67E22"
                 radius={[0, 4, 4, 0]}
-                barSize={20}
+                label={hLabelProps}
               />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>
-
-      {/* State-Level Comparisons */}
-      <ChartCard
-        title="State Household Registration & Poverty Vulnerability"
-        takeaway="Total registered households and poverty counts across the pilot states"
-        height={280}
-      >
+      <ChartCard title="State Household Registration & Poverty" height={280}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={stateComparisonData}
-            margin={{ top: 16, right: 12, left: -8, bottom: 4 }}
+            margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
           >
             <XAxis
               dataKey="state"
@@ -314,31 +261,19 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
               contentStyle={theme.tooltip}
               labelStyle={theme.tooltipLabel}
               itemStyle={theme.tooltipItem}
-              formatter={(val: number, name: string) => [
-                val.toLocaleString(),
-                name,
-              ]}
             />
-            <Legend
-              verticalAlign="top"
-              align="right"
-              formatter={(v) => (
-                <span className="text-xs text-ink-primary dark:text-ink-onDark">
-                  {v}
-                </span>
-              )}
-            />
+            <Legend verticalAlign="top" align="right" />
             <Bar
               dataKey="Households"
               fill="#075E54"
               radius={[4, 4, 0, 0]}
-              barSize={28}
+              label={labelProps}
             />
             <Bar
               dataKey="PVHH Count"
               fill="#DC2626"
               radius={[4, 4, 0, 0]}
-              barSize={28}
+              label={labelProps}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -346,5 +281,4 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
     </div>
   );
 };
-
 export default GlobalOverview;

@@ -1,8 +1,3 @@
-/**
- * Civil Registration — UNICEF page (was Child Protection & Documentation)
- * Dedicated map coloured by birth cert / NIN coverage.
- */
-
 import { useState, type FC } from "react";
 import {
   BarChart,
@@ -25,20 +20,14 @@ import KpiCard from "../KpiCard";
 import DrilldownMap from "../maps/DrilldownMap";
 import type { MapMetric } from "../maps/DrilldownMap";
 
-const BRAND = "#075E54";
-const NSR = "#128C7E";
-const UPD = "#E67E22";
-const DANGER = "#DC2626";
-const SKY = "#0284C7";
-const AMBER = "#D97706";
-const EMERALD = "#059669";
-
 interface CivilRegistrationProps {
   data: DashboardData;
   record: GeoRecord;
   path: DrilldownPath;
   onPathChange: (path: DrilldownPath) => void;
   stateFilter?: string;
+  states?: GeoRecord[];
+  national?: GeoRecord;
 }
 
 export const CivilRegistration: FC<CivilRegistrationProps> = ({
@@ -51,15 +40,30 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
   const theme = useChartTheme();
   const [mapMetric, setMapMetric] = useState<MapMetric>("birth_cert");
 
+  const pctFormatter = (v: number) => (v > 0 ? `${v.toFixed(1)}%` : "");
+  const valFormatter = (v: number) => (v > 0 ? v.toLocaleString() : "");
+  const labelPct = {
+    position: "top" as const,
+    fill: theme.axisTick,
+    fontSize: 11,
+    formatter: pctFormatter,
+  };
+  const labelValH = {
+    position: "right" as const,
+    fill: theme.axisTick,
+    fontSize: 11,
+    formatter: valFormatter,
+  };
+
   const civil = record.extended.civil_registration;
   const c017 = civil?.children_0_17 ?? {
-    total: record.extended.birth_cert?.all_children?.d ?? 0,
-    birth_cert_yes: record.extended.birth_cert?.all_children?.n ?? 0,
+    total: 1,
+    birth_cert_yes: 0,
     birth_cert_no: 0,
-    birth_cert_pct: record.extended.birth_cert?.all_children?.pct ?? 0,
-    nin_yes: record.extended.individual_nin?.children?.n ?? 0,
+    birth_cert_pct: 0,
+    nin_yes: 0,
     nin_no: 0,
-    nin_pct: record.extended.individual_nin?.children?.pct ?? 0,
+    nin_pct: 0,
     both: 0,
     both_pct: 0,
     cert_only: 0,
@@ -86,10 +90,10 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
     },
   };
   const c05 = civil?.children_0_5 ?? {
-    total: record.extended.birth_cert?.under_5?.d ?? 0,
-    birth_cert_yes: record.extended.birth_cert?.under_5?.n ?? 0,
+    total: 1,
+    birth_cert_yes: 0,
     birth_cert_no: 0,
-    birth_cert_pct: record.extended.birth_cert?.under_5?.pct ?? 0,
+    birth_cert_pct: 0,
     nin_yes: 0,
     nin_no: 0,
     nin_pct: 0,
@@ -120,29 +124,24 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
   };
 
   const crossTabData = [
+    { name: "Both", value: c017.both, pct: c017.both_pct, color: "#059669" },
     {
-      name: "Both (Cert + NIN)",
-      value: c017.both,
-      pct: c017.both_pct,
-      color: EMERALD,
-    },
-    {
-      name: "Birth Cert Only",
+      name: "Cert Only",
       value: c017.cert_only,
       pct: c017.cert_only_pct,
-      color: SKY,
+      color: "#0284C7",
     },
     {
       name: "NIN Only",
       value: c017.nin_only,
       pct: c017.nin_only_pct,
-      color: AMBER,
+      color: "#D97706",
     },
     {
       name: "Neither",
       value: c017.neither,
       pct: c017.neither_pct,
-      color: DANGER,
+      color: "#DC2626",
     },
   ];
 
@@ -177,8 +176,7 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
     },
     {
       name: "Without birth certificate",
-      count:
-        c017.birth_cert_no || Math.max(0, c017.total - c017.birth_cert_yes),
+      count: c017.birth_cert_no,
       pct: Math.round((100 - c017.birth_cert_pct) * 10) / 10,
     },
   ];
@@ -187,7 +185,7 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
     { name: "With registered NIN", count: c017.nin_yes, pct: c017.nin_pct },
     {
       name: "Without registered NIN",
-      count: c017.nin_no || Math.max(0, c017.total - c017.nin_yes),
+      count: c017.nin_no,
       pct: Math.round((100 - c017.nin_pct) * 10) / 10,
     },
   ];
@@ -203,76 +201,55 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
             Birth certificate and NIN coverage by age band and gender
           </p>
         </div>
-        <div className="text-xs text-ink-muted dark:text-ink-onDarkMuted bg-surface-page dark:bg-surface-darker px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark">
-          Data as of:{" "}
-          <span className="font-semibold text-brand-600 dark:text-brand-400">
-            September 2026
-          </span>
-        </div>
       </div>
-
-      {/* KPIs — KpiCard uses label / value / sub / icon as ReactNode */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Birth certificate (0–17)"
+          label="Birth cert (0–17)"
           value={`${c017.birth_cert_pct}%`}
-          sub={`${c017.birth_cert_yes.toLocaleString()} of ${c017.total.toLocaleString()} children`}
           icon={<FileCheck size={18} />}
-          accent={BRAND}
+          accent="#075E54"
         />
         <KpiCard
-          label="NIN registration (0–17)"
+          label="NIN reg (0–17)"
           value={`${c017.nin_pct}%`}
-          sub={`${c017.nin_yes.toLocaleString()} children with NIN`}
           icon={<CreditCard size={18} />}
-          accent={NSR}
+          accent="#128C7E"
         />
         <KpiCard
-          label="Dual documented (both)"
+          label="Dual documented"
           value={`${c017.both_pct}%`}
-          sub={`${c017.both.toLocaleString()} with cert + NIN`}
           icon={<CheckCircle2 size={18} />}
-          accent={EMERALD}
+          accent="#059669"
         />
         <KpiCard
-          label="Unregistered (neither)"
+          label="Unregistered"
           value={`${c017.neither_pct}%`}
-          sub={`${c017.neither.toLocaleString()} lacking both documents`}
           icon={<ShieldAlert size={18} />}
-          accent={UPD}
+          accent="#E67E22"
         />
       </div>
-
-      {/* Dedicated page map */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-line-light dark:border-line-dark">
-          <span className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
-            Civil Registration map
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setMapMetric("birth_cert")}
-              className={
-                mapMetric === "birth_cert"
-                  ? "px-3 py-1 text-xs font-medium rounded-lg bg-brand-600 text-white shadow-sm"
-                  : "px-3 py-1 text-xs font-medium rounded-lg text-ink-muted dark:text-ink-onDarkMuted hover:bg-black/5 dark:hover:bg-white/5"
-              }
-            >
-              Birth cert %
-            </button>
-            <button
-              type="button"
-              onClick={() => setMapMetric("nin")}
-              className={
-                mapMetric === "nin"
-                  ? "px-3 py-1 text-xs font-medium rounded-lg bg-brand-600 text-white shadow-sm"
-                  : "px-3 py-1 text-xs font-medium rounded-lg text-ink-muted dark:text-ink-onDarkMuted hover:bg-black/5 dark:hover:bg-white/5"
-              }
-            >
-              NIN %
-            </button>
-          </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setMapMetric("birth_cert")}
+            className={
+              mapMetric === "birth_cert"
+                ? "px-3 py-1 bg-brand-600 text-white rounded text-xs"
+                : "px-3 py-1 text-ink-muted rounded text-xs border"
+            }
+          >
+            Birth cert %
+          </button>
+          <button
+            onClick={() => setMapMetric("nin")}
+            className={
+              mapMetric === "nin"
+                ? "px-3 py-1 bg-brand-600 text-white rounded text-xs"
+                : "px-3 py-1 text-ink-muted rounded text-xs border"
+            }
+          >
+            NIN %
+          </button>
         </div>
         <DrilldownMap
           data={data}
@@ -283,15 +260,8 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
           height={400}
         />
       </div>
-
-      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Documentation status (children 0–17)"
-          takeaway="4-way cross-tab: both · cert only · NIN only · neither"
-          height={320}
-          accent={c017.neither_pct > 50 ? "bad" : "neutral"}
-        >
+        <ChartCard title="Documentation status (children 0–17)" height={320}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -311,35 +281,16 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
                 contentStyle={theme.tooltip}
                 labelStyle={theme.tooltipLabel}
                 itemStyle={theme.tooltipItem}
-                formatter={(val: number, _n, item) => {
-                  const p = (item as { payload?: { pct?: number } })?.payload;
-                  return [
-                    `${Number(val).toLocaleString()} (${p?.pct ?? 0}%)`,
-                    "",
-                  ];
-                }}
               />
-              <Legend
-                verticalAlign="bottom"
-                formatter={(v) => (
-                  <span className="text-xs text-ink-primary dark:text-ink-onDark">
-                    {v}
-                  </span>
-                )}
-              />
+              <Legend verticalAlign="bottom" />
             </PieChart>
           </ResponsiveContainer>
         </ChartCard>
-
-        <ChartCard
-          title="Coverage by gender and age"
-          takeaway="Birth certificate and NIN rates for boys and girls, 0–5 and 0–17"
-          height={320}
-        >
+        <ChartCard title="Coverage by gender and age" height={320}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={genderData}
-              margin={{ top: 16, right: 12, left: -8, bottom: 4 }}
+              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
             >
               <XAxis
                 dataKey="group"
@@ -349,7 +300,6 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
               />
               <YAxis
                 unit="%"
-                domain={[0, 100]}
                 tick={{ fill: theme.axisTick, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
@@ -358,53 +308,33 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
                 contentStyle={theme.tooltip}
                 labelStyle={theme.tooltipLabel}
                 itemStyle={theme.tooltipItem}
-                formatter={(val: number) => [`${val}%`, ""]}
               />
-              <Legend
-                verticalAlign="top"
-                align="right"
-                formatter={(v) => (
-                  <span className="text-xs text-ink-primary dark:text-ink-onDark">
-                    {v}
-                  </span>
-                )}
-              />
+              <Legend verticalAlign="top" align="right" />
               <Bar
                 dataKey="Birth Cert %"
-                fill={BRAND}
+                fill="#075E54"
                 radius={[4, 4, 0, 0]}
-                barSize={22}
+                label={labelPct}
               />
               <Bar
                 dataKey="NIN %"
-                fill={NSR}
+                fill="#128C7E"
                 radius={[4, 4, 0, 0]}
-                barSize={22}
+                label={labelPct}
               />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Birth certificate — with vs without (0–17)"
-          takeaway="Explicit count of children without a birth certificate"
-          height={280}
-          accent="warn"
-        >
+        <ChartCard title="Birth certificate — with vs without" height={280}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={certAbsence}
               layout="vertical"
-              margin={{ top: 8, right: 24, left: 8, bottom: 4 }}
+              margin={{ top: 8, right: 35, left: 8, bottom: 4 }}
             >
-              <XAxis
-                type="number"
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
+              <XAxis type="number" hide />
               <YAxis
                 dataKey="name"
                 type="category"
@@ -417,40 +347,26 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
                 contentStyle={theme.tooltip}
                 labelStyle={theme.tooltipLabel}
                 itemStyle={theme.tooltipItem}
-                formatter={(val: number, _n, item) => {
-                  const p = (item as { payload?: { pct?: number } })?.payload;
-                  return [
-                    `${Number(val).toLocaleString()} (${p?.pct ?? 0}%)`,
-                    "",
-                  ];
-                }}
               />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={26}>
-                <Cell fill={EMERALD} />
-                <Cell fill={DANGER} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} label={labelValH}>
+                {certAbsence.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={index === 0 ? "#059669" : "#DC2626"}
+                  />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-
-        <ChartCard
-          title="NIN — with vs without (0–17)"
-          takeaway="Explicit count of children without a registered NIN"
-          height={280}
-          accent="warn"
-        >
+        <ChartCard title="NIN — with vs without" height={280}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={ninAbsence}
               layout="vertical"
-              margin={{ top: 8, right: 24, left: 8, bottom: 4 }}
+              margin={{ top: 8, right: 35, left: 8, bottom: 4 }}
             >
-              <XAxis
-                type="number"
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
+              <XAxis type="number" hide />
               <YAxis
                 dataKey="name"
                 type="category"
@@ -463,17 +379,14 @@ export const CivilRegistration: FC<CivilRegistrationProps> = ({
                 contentStyle={theme.tooltip}
                 labelStyle={theme.tooltipLabel}
                 itemStyle={theme.tooltipItem}
-                formatter={(val: number, _n, item) => {
-                  const p = (item as { payload?: { pct?: number } })?.payload;
-                  return [
-                    `${Number(val).toLocaleString()} (${p?.pct ?? 0}%)`,
-                    "",
-                  ];
-                }}
               />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={26}>
-                <Cell fill={SKY} />
-                <Cell fill={AMBER} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} label={labelValH}>
+                {ninAbsence.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={index === 0 ? "#0284C7" : "#D97706"}
+                  />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
