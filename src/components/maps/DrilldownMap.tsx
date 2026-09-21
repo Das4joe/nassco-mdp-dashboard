@@ -1,507 +1,513 @@
-// src/components/maps/DrilldownMap.tsx
-import { useEffect, useMemo, useState } from "react";
-import { MapContainer, GeoJSON, useMap } from "react-leaflet";
+import React, { useEffect, useState, useMemo } from "react";
+import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
-import { feature as topoFeature } from "topojson-client";
-
+import { feature } from "topojson-client";
 import type { FeatureCollection } from "geojson";
+import type { GeoRecord, DrilldownPath, DashboardMode } from "../../lib/types";
 import type { DashboardData } from "../../lib/loadData";
-import type { DashboardMode, DrilldownPath, GeoRecord } from "../../lib/types";
-import { THEME, modeScale } from "../../theme";
-import { formatNumber, formatPercent } from "../../lib/formatters";
+import "leaflet/dist/leaflet.css";
 
-type AnyFC = FeatureCollection<any, any>;
+export type MapMetric =
+  | "vulnerability"
+  | "poorest_pct"
+  | "birth_cert"
+  | "nin"
+  | "out_of_school"
+  | "wasting"
+  | "shocks"
+  | "female_head";
 
-let STATES_CACHE: AnyFC | null = null;
-let LGA_CACHE: AnyFC | null = null;
-
-function normUpper(v: unknown): string {
-  return String(v ?? "")
-    .trim()
-    .toUpperCase();
+export interface DrilldownMapProps {
+  data: DashboardData;
+  path: DrilldownPath;
+  onNavigate?: (path: DrilldownPath) => void;
+  onPathChange?: (path: any) => void;
+  selectedStateFilter?: string;
+  metric?: MapMetric;
+  mode?: DashboardMode;
+  isDark?: boolean;
+  height?: number | string;
 }
-function normLower(v: unknown): string {
-  return String(v ?? "")
-    .trim()
-    .toLowerCase();
+
+interface MetricConfig {
+  key: MapMetric;
+  label: string;
+  unit: string;
+  getValue: (rec: GeoRecord) => number;
+  format: (val: number) => string;
+  colorScale: (pct: number) => string;
 }
 
-function metricValue(rec: GeoRecord, mode: DashboardMode): number {
-  if (mode === "nsr") return Number(rec.nsr.nin_verification_rate ?? 0);
-  return Number(rec.vulnerability.poorest_pct ?? 0);
+const NIGERIA_BOUNDS: L.LatLngBoundsExpression = [
+  [4.2, 2.6],
+  [13.9, 14.7],
+];
+
+const MDP_STATES = new Set(["ABIA", "BENUE", "OYO", "SOKOTO"]);
+
+function normUpper(s: string): string {
+  return (s || "").trim().toUpperCase();
 }
 
-function metricLabel(rec: GeoRecord, mode: DashboardMode): string {
-  if (mode === "nsr") {
-    return `NIN Verified: <b>${formatPercent(rec.nsr.nin_verification_rate)}</b>`;
+function normLower(s: string): string {
+  return (s || "").trim().toLowerCase();
+}
+
+function getColorForRatio(ratio: number, inverted: boolean = false): string {
+  const t = Math.max(0, Math.min(1, ratio));
+  const biased = Math.pow(t, 0.75);
+
+  if (inverted) {
+    const r = Math.round(220 - biased * 180);
+    const g = Math.round(80 + biased * 120);
+    const b = Math.round(80 + biased * 60);
+    return `rgb(${r}, ${g}, ${b})`;
+  } else {
+    const r = Math.round(20 + biased * 215);
+    const g = Math.round(150 - biased * 110);
+    const b = Math.round(130 - biased * 100);
+    return `rgb(${r}, ${g}, ${b})`;
   }
-  return `Poorest (D1–D3): <b>${formatPercent(rec.vulnerability.poorest_pct)}</b>`;
 }
 
-/**
- * Vivid color mapping.
- * We stretch a 0-100 metric across the 8-step scale but bias upward so
- * mid-range values (e.g. NIN 50%) don't land on the almost-white steps.
- * Anything at or below 10 uses step 1; anything at/above 80 uses top step.
- */
-function colorFor(value: number, mode: DashboardMode): string {
-  const scale = modeScale(mode);
-  const v = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
-  const t = Math.pow(v / 100, 0.75);
-  const idx = Math.min(
-    scale.length - 1,
-    Math.max(1, Math.floor(t * scale.length)),
-  );
-  return scale[idx];
-}
+const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
+  vulnerability: {
+    key: "vulnerability",
+    label: "Vulnerability Index",
+    unit: "pts",
+    getValue: (r) => r.vulnerability.vulnerability_index,
+    format: (v) => `${v.toFixed(1)} pts`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+  poorest_pct: {
+    key: "poorest_pct",
+    label: "Poverty Rate (Decile 1-3)",
+    unit: "%",
+    getValue: (r) => r.vulnerability.poorest_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+  birth_cert: {
+    key: "birth_cert",
+    label: "Birth Registration Coverage (0-17)",
+    unit: "%",
+    getValue: (r) =>
+      r.extended.civil_registration?.children_0_17.birth_cert_pct ??
+      r.extended.birth_cert.all_children.pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, true),
+  },
+  nin: {
+    key: "nin",
+    label: "NIN Coverage (0-17)",
+    unit: "%",
+    getValue: (r) =>
+      r.extended.civil_registration?.children_0_17.nin_pct ??
+      r.extended.individual_nin.children.pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, true),
+  },
+  out_of_school: {
+    key: "out_of_school",
+    label: "Out-of-School Children Rate (6-17)",
+    unit: "%",
+    getValue: (r) =>
+      r.extended.education_v2?.oos_6_17.oos_pct ??
+      r.unicef.out_of_school_rate_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+  wasting: {
+    key: "wasting",
+    label: "Under-5 Acute Malnutrition (Wasting)",
+    unit: "%",
+    getValue: (r) =>
+      r.extended.nutrition_v2?.wasting_pct ?? r.unicef.under5_wasting_pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+  shocks: {
+    key: "shocks",
+    label: "Shock Exposure Rate",
+    unit: "%",
+    getValue: (r) =>
+      r.extended.livelihoods_resilience_v2?.shock_exposure.shock_hh_pct ??
+      r.extended.shocks.exposure_pct.pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+  female_head: {
+    key: "female_head",
+    label: "Female Primary Respondent Rate",
+    unit: "%",
+    getValue: (r) => r.extended.female_primary_respondent.pct,
+    format: (v) => `${v.toFixed(1)}%`,
+    colorScale: (ratio) => getColorForRatio(ratio, false),
+  },
+};
 
-async function loadStates(): Promise<AnyFC> {
-  if (STATES_CACHE) return STATES_CACHE;
-  const res = await fetch("/geojson/nigeria-states.json");
-  if (!res.ok) throw new Error(`Failed to load nigeria-states.json`);
-  const topo = (await res.json()) as any;
-  const obj = topo?.objects?.NGA_adm1;
-  if (!obj) {
-    throw new Error(
-      `nigeria-states.json is TopoJSON but objects.NGA_adm1 not found`,
-    );
-  }
-  const fc = topoFeature(topo, obj) as unknown as AnyFC;
-  STATES_CACHE = fc;
-  return fc;
-}
-
-async function loadLgas(): Promise<AnyFC> {
-  if (LGA_CACHE) return LGA_CACHE;
-  const res = await fetch("/geojson/nigeria_lga.json");
-  if (!res.ok) throw new Error(`Failed to load nigeria_lga.json`);
-  const fc = (await res.json()) as AnyFC;
-  LGA_CACHE = fc;
-  return fc;
-}
-
-function FitBounds({ geo }: { geo: AnyFC | null }) {
+function MapBoundsController({
+  bounds,
+}: {
+  bounds: L.LatLngBoundsExpression | null;
+}) {
   const map = useMap();
   useEffect(() => {
-    if (!geo) return;
-    const bounds = L.geoJSON(geo as any).getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [24, 24] });
+    if (bounds) {
+      map.fitBounds(bounds, { padding: [20, 20], maxZoom: 12 });
     }
-  }, [geo, map]);
+  }, [map, bounds]);
   return null;
 }
 
 function InvalidateOnMount() {
   const map = useMap();
   useEffect(() => {
-    const t = setTimeout(() => map.invalidateSize(), 100);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+    return () => clearTimeout(timer);
   }, [map]);
   return null;
 }
 
-/** Shared tooltip HTML builder — used at both state and LGA level */
-function buildTooltip(opts: {
-  title: string;
-  households: number | null;
-  individuals: number | null;
-  metricHtml: string | null;
-  note?: string;
-}): string {
-  const { title, households, individuals, metricHtml, note } = opts;
-
-  const hhLine =
-    households !== null
-      ? `<div style="margin-top:4px;">
-           <span style="color:#667781;">Households:</span>
-           <b style="margin-left:4px;">${formatNumber(households)}</b>
-         </div>`
-      : "";
-
-  const indLine =
-    individuals !== null
-      ? `<div>
-           <span style="color:#667781;">Individuals:</span>
-           <b style="margin-left:4px;">${formatNumber(individuals)}</b>
-         </div>`
-      : "";
-
-  const metricLine = metricHtml
-    ? `<div style="margin-top:5px; padding-top:5px; border-top:1px solid #E9EDEF;">
-         ${metricHtml}
-       </div>`
-    : "";
-
-  const noteLine = note
-    ? `<div style="margin-top:4px; font-size:11px; color:#8696A0;">${note}</div>`
-    : "";
-
-  return `
-    <div style="
-      font-family: inherit;
-      padding: 10px 12px;
-      min-width: 190px;
-      max-width: 240px;
-      line-height: 1.5;
-    ">
-      <div style="font-weight:700; font-size:13px; margin-bottom:2px;">${title}</div>
-      ${hhLine}
-      ${indLine}
-      ${metricLine}
-      ${noteLine}
-    </div>
-  `;
-}
-
-interface DrilldownMapProps {
-  data: DashboardData;
-  path: DrilldownPath;
-  mode: DashboardMode;
-  isDark: boolean;
-  onPathChange: (next: DrilldownPath) => void;
-}
-
-export default function DrilldownMap({
+export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   data,
   path,
-  mode,
-  isDark,
+  onNavigate,
   onPathChange,
-}: DrilldownMapProps) {
-  const [statesFc, setStatesFc] = useState<AnyFC | null>(null);
-  const [lgaFc, setLgaFc] = useState<AnyFC | null>(null);
-  const [geoError, setGeoError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    Promise.all([loadStates(), loadLgas()])
-      .then(([s, l]) => {
-        if (!mounted) return;
-        setStatesFc(s);
-        setLgaFc(l);
-      })
-      .catch((e) => {
-        if (!mounted) return;
-        setGeoError(String(e));
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const mdpStates = useMemo(() => {
-    return new Set((data.metadata.mdp_states ?? []).map((s) => normUpper(s)));
-  }, [data.metadata.mdp_states]);
-
-  const stateIndex = useMemo(() => {
-    const m = new Map<string, GeoRecord>();
-    for (const r of data.states) m.set(normUpper(r.state), r);
-    return m;
-  }, [data.states]);
-
-  const lgaIndex = useMemo(() => {
-    const m = new Map<string, GeoRecord>();
-    for (const r of data.lgas) {
-      const k = `${normUpper(r.state)}|${normLower(r.lga)}`;
-      m.set(k, r);
-    }
-    return m;
-  }, [data.lgas]);
-
-  const level: "national" | "state" = path.state ? "state" : "national";
-
-  const viewGeo: AnyFC | null = useMemo(() => {
-    if (!statesFc) return null;
-    if (level === "national") return statesFc;
-    if (!lgaFc) return null;
-    const s = normUpper(path.state);
-    const filtered = {
-      ...lgaFc,
-      features: lgaFc.features.filter(
-        (f: any) => normUpper(f?.properties?.NAME_1) === s,
-      ),
-    } as AnyFC;
-    return filtered;
-  }, [statesFc, lgaFc, level, path.state]);
-
-  const border = isDark ? "#2A4A40" : "#B5C3BF";
-  const nonMdpFill = isDark ? "#243530" : "#D5DDD9";
-
-  const geoStyle = (feat: any) => {
-    if (!feat?.properties) {
-      return {
-        color: border,
-        weight: 1,
-        fillOpacity: 1,
-        fillColor: nonMdpFill,
-      };
-    }
-
-    if (level === "national") {
-      const name = feat.properties.NAME_1;
-      const key = normUpper(name);
-      if (key === "WATER BODY") return { opacity: 0, fillOpacity: 0 };
-
-      const isMdp = mdpStates.has(key);
-      const rec = stateIndex.get(key);
-      const selected = path.state && normUpper(path.state) === key;
-
-      if (!isMdp || !rec) {
-        return {
-          color: border,
-          weight: selected ? 2.5 : 0.8,
-          fillOpacity: 1,
-          fillColor: nonMdpFill,
-        };
-      }
-
-      const val = metricValue(rec, mode);
-      return {
-        color: selected ? THEME.brand.primaryLight : border,
-        weight: selected ? 2.5 : 1,
-        fillOpacity: 1,
-        fillColor: colorFor(val, mode),
-      };
-    }
-
-    // LGA-level view
-    const lgaName = feat.properties.NAME_2;
-    const s = normUpper(path.state);
-    const k = `${s}|${normLower(lgaName)}`;
-    const rec = lgaIndex.get(k);
-    const selected = path.lga && normLower(path.lga) === normLower(lgaName);
-
-    if (!rec) {
-      return {
-        color: border,
-        weight: selected ? 2.5 : 0.8,
-        fillOpacity: 1,
-        fillColor: nonMdpFill,
-      };
-    }
-
-    const val = metricValue(rec, mode);
-    return {
-      color: selected ? THEME.brand.primaryLight : border,
-      weight: selected ? 2.5 : 1,
-      fillOpacity: 1,
-      fillColor: colorFor(val, mode),
-    };
+  selectedStateFilter,
+  metric = "vulnerability",
+  height = "420px",
+}) => {
+  const handleNav = (newPath: DrilldownPath) => {
+    if (onNavigate) onNavigate(newPath);
+    if (onPathChange) onPathChange(newPath);
   };
 
-  const onEach = (feat: any, layer: L.Layer) => {
-    const l = layer as L.Path;
+  const [statesGeoJson, setStatesGeoJson] = useState<any>(null);
+  const [lgasGeoJson, setLgasGeoJson] = useState<any>(null);
+  const [mapBounds, setMapBounds] = useState<L.LatLngBoundsExpression | null>(
+    null,
+  );
 
-    if (level === "national") {
-      const name = feat?.properties?.NAME_1;
-      const key = normUpper(name);
-      if (key === "WATER BODY") return;
+  const activeMetric = METRIC_CONFIGS[metric] || METRIC_CONFIGS.vulnerability;
 
-      const isMdp = mdpStates.has(key);
-      const rec = stateIndex.get(key);
+  const activeState = selectedStateFilter
+    ? normUpper(selectedStateFilter)
+    : path.state
+      ? normUpper(path.state)
+      : undefined;
 
-      if (!isMdp || !rec) {
-        // Non-MDP state — show name + "Not in MDP scope", no counts
-        l.bindTooltip(
-          buildTooltip({
-            title: String(name ?? "Unknown"),
-            households: null,
-            individuals: null,
-            metricHtml: null,
-            note: "Not in MDP scope",
-          }),
-          { sticky: true, direction: "top", opacity: 0.97 },
-        );
-        return;
+  useEffect(() => {
+    fetch("/geojson/nigeria-states.json")
+      .then((res) => res.json())
+      .then((topoData) => {
+        if (topoData.objects && topoData.objects.NGA_adm1) {
+          const geo = feature(topoData, topoData.objects.NGA_adm1);
+          setStatesGeoJson(geo);
+        }
+      })
+      .catch((err) => console.error("Failed loading states TopoJSON:", err));
+  }, []);
+
+  useEffect(() => {
+    if (activeState) {
+      fetch("/geojson/nigeria_lga.json")
+        .then((res) => res.json())
+        .then((geoData) => setLgasGeoJson(geoData))
+        .catch((err) => console.error("Failed loading LGA GeoJSON:", err));
+    } else {
+      setLgasGeoJson(null);
+    }
+  }, [activeState]);
+
+  const stateRecordsMap = useMemo(() => {
+    const map = new Map<string, GeoRecord>();
+    data.states.forEach((rec) => {
+      if (rec.state) map.set(normUpper(rec.state), rec);
+    });
+    return map;
+  }, [data.states]);
+
+  const lgaRecordsMap = useMemo(() => {
+    const map = new Map<string, GeoRecord>();
+    data.lgas.forEach((rec) => {
+      if (rec.state && rec.lga) {
+        const key = `${normUpper(rec.state)}|${normLower(rec.lga)}`;
+        map.set(key, rec);
       }
+    });
+    return map;
+  }, [data.lgas]);
 
-      // MDP state — show full counts + metric
-      l.bindTooltip(
-        buildTooltip({
-          title: String(name ?? "Unknown"),
-          households: rec.nsr.total_households,
-          individuals: rec.nsr.total_individuals,
-          metricHtml: metricLabel(rec, mode),
-        }),
-        { sticky: true, direction: "top", opacity: 0.97 },
-      );
+  const metricBounds = useMemo(() => {
+    let min = Infinity;
+    let max = -Infinity;
 
-      l.on("click", () => {
-        onPathChange({ state: key });
+    if (!activeState) {
+      stateRecordsMap.forEach((rec) => {
+        const val = activeMetric.getValue(rec);
+        if (val < min) min = val;
+        if (val > max) max = val;
       });
-
-      return;
+    } else {
+      lgaRecordsMap.forEach((rec, key) => {
+        if (key.startsWith(`${activeState}|`)) {
+          const val = activeMetric.getValue(rec);
+          if (val < min) min = val;
+          if (val > max) max = val;
+        }
+      });
     }
 
-    // LGA level
-    const lgaName = feat?.properties?.NAME_2;
-    const stateName = feat?.properties?.NAME_1;
-    const s = normUpper(path.state ?? stateName);
-    const k = `${s}|${normLower(lgaName)}`;
-    const rec = lgaIndex.get(k);
+    if (min === Infinity) min = 0;
+    if (max === -Infinity || max === min) max = min + 1;
+    return { min, max };
+  }, [activeState, stateRecordsMap, lgaRecordsMap, activeMetric]);
 
-    if (!rec) {
-      // LGA with no survey records — show name only
-      l.bindTooltip(
-        buildTooltip({
-          title: String(lgaName ?? "Unknown"),
-          households: null,
-          individuals: null,
-          metricHtml: null,
-          note: "No survey records",
-        }),
-        { sticky: true, direction: "top", opacity: 0.97 },
-      );
-      return;
+  const onEachState = (featureItem: any, layer: L.Layer) => {
+    const stateName =
+      featureItem.properties.NAME_1 || featureItem.properties.name || "";
+    const stateUpper = normUpper(stateName);
+
+    if (stateName === "WATER BODY") return;
+
+    const isMdp = MDP_STATES.has(stateUpper);
+    const rec = stateRecordsMap.get(stateUpper);
+
+    let popupContent = `<div class="p-2 text-xs font-sans">
+      <div class="font-bold text-sm text-slate-900">${stateName}</div>`;
+
+    if (!isMdp || !rec) {
+      popupContent += `<div class="text-slate-500 italic mt-1">Not in MDP scope</div></div>`;
+    } else {
+      const val = activeMetric.getValue(rec);
+      popupContent += `
+        <div class="mt-1 text-slate-700">
+          <div><span class="font-medium">Households:</span> ${rec.nsr.total_households.toLocaleString()}</div>
+          <div><span class="font-medium">Individuals:</span> ${rec.nsr.total_individuals.toLocaleString()}</div>
+          <div class="mt-1 font-bold text-teal-700 dark:text-teal-400">
+            ${activeMetric.label}: ${activeMetric.format(val)}
+          </div>
+        </div>
+      </div>`;
     }
 
-    // LGA with survey data — full tooltip
-    l.bindTooltip(
-      buildTooltip({
-        title: `${String(lgaName ?? "Unknown")} LGA`,
-        households: rec.nsr.total_households,
-        individuals: rec.nsr.total_individuals,
-        metricHtml: metricLabel(rec, mode),
-      }),
-      { sticky: true, direction: "top", opacity: 0.97 },
-    );
+    layer.bindTooltip(popupContent, { sticky: true, direction: "auto" });
 
-    // Click popup — more detail, consistent with tooltip data
-    const popup = `
-      <div style="
-        font-family: inherit;
-        padding: 12px 14px 10px;
-        min-width: 220px;
-        line-height: 1.6;
-      ">
-        <div style="font-weight:700; font-size:14px; margin-bottom:6px;">
-          ${String(lgaName ?? "")} LGA
-        </div>
-        <div>
-          <span style="color:#667781;">Households:</span>
-          <b style="margin-left:4px;">${formatNumber(rec.nsr.total_households)}</b>
-        </div>
-        <div>
-          <span style="color:#667781;">Individuals:</span>
-          <b style="margin-left:4px;">${formatNumber(rec.nsr.total_individuals)}</b>
-        </div>
-        <div style="margin-top:8px; padding-top:8px; border-top:1px solid #E9EDEF;">
-          <div>
-            <span style="color:#667781;">NIN Verified:</span>
-            <b style="margin-left:4px;">${formatPercent(rec.nsr.nin_verification_rate)}</b>
-          </div>
-          <div>
-            <span style="color:#667781;">PMT Mean:</span>
-            <b style="margin-left:4px;">${rec.vulnerability.pmt_mean.toFixed(2)}</b>
-          </div>
-          <div>
-            <span style="color:#667781;">Poorest (D1–D3):</span>
-            <b style="margin-left:4px;">${formatPercent(rec.vulnerability.poorest_pct)}</b>
-          </div>
-        </div>
-      </div>
-    `;
-    (layer as any).bindPopup(popup, { closeButton: true });
-
-    l.on("click", () => {
-      if (!lgaName) return;
-      onPathChange({ state: s, lga: String(lgaName) });
+    layer.on({
+      mouseover: (e) => {
+        const l = e.target;
+        l.setStyle({ weight: 3, color: "#075E54", fillOpacity: 0.85 });
+      },
+      mouseout: (e) => {
+        const l = e.target;
+        l.setStyle({
+          weight: isMdp ? 1.5 : 0.5,
+          color: activeState === stateUpper ? "#075E54" : "#64748B",
+          fillOpacity: activeState === stateUpper ? 0.75 : isMdp ? 0.6 : 0.15,
+        });
+      },
+      click: () => {
+        if (isMdp) {
+          handleNav({ state: stateName });
+        }
+      },
     });
   };
 
-  const legend = useMemo(() => {
-    const scale = modeScale(mode);
-    const label =
-      mode === "nsr" ? "NIN verification rate" : "Poorest households (D1–D3)";
-    return { scale, label };
-  }, [mode]);
+  const stateStyle = (featureItem: any) => {
+    const stateName =
+      featureItem.properties.NAME_1 || featureItem.properties.name || "";
+    const stateUpper = normUpper(stateName);
+    const isMdp = MDP_STATES.has(stateUpper);
+    const rec = stateRecordsMap.get(stateUpper);
 
-  if (geoError) {
-    return (
-      <div
-        className="flex items-center justify-center text-status-danger p-6"
-        style={{ height: "100%", width: "100%" }}
-      >
-        {geoError}
-      </div>
-    );
-  }
+    if (!isMdp || !rec) {
+      return {
+        fillColor: "#94A3B8",
+        fillOpacity: 0.15,
+        weight: 0.5,
+        color: "#CBD5E1",
+      };
+    }
+
+    const val = activeMetric.getValue(rec);
+    const ratio =
+      (val - metricBounds.min) / (metricBounds.max - metricBounds.min);
+    const fillColor = activeMetric.colorScale(ratio);
+
+    return {
+      fillColor,
+      fillOpacity: activeState === stateUpper ? 0.85 : 0.65,
+      weight: activeState === stateUpper ? 2.5 : 1,
+      color: activeState === stateUpper ? "#075E54" : "#FFFFFF",
+    };
+  };
+
+  const filteredLgaFeatures = useMemo<FeatureCollection | null>(() => {
+    if (!lgasGeoJson || !activeState) return null;
+    const features = lgasGeoJson.features.filter((f: any) => {
+      const st = normUpper(f.properties.state || f.properties.STATE || "");
+      return st === activeState;
+    });
+    return { type: "FeatureCollection", features };
+  }, [lgasGeoJson, activeState]);
+
+  const onEachLga = (featureItem: any, layer: L.Layer) => {
+    const lgaName =
+      featureItem.properties.lga ||
+      featureItem.properties.LGA ||
+      fName(featureItem);
+    const lgaKey = `${activeState}|${normLower(lgaName)}`;
+    const rec = lgaRecordsMap.get(lgaKey);
+
+    let popupContent = `<div class="p-2 text-xs font-sans">
+      <div class="font-bold text-sm text-slate-900">${lgaName}</div>
+      <div class="text-slate-500 font-medium">${activeState} State</div>`;
+
+    if (!rec) {
+      popupContent += `<div class="text-slate-500 italic mt-1">No survey records</div></div>`;
+    } else {
+      const val = activeMetric.getValue(rec);
+      popupContent += `
+        <div class="mt-1 text-slate-700">
+          <div><span class="font-medium">Households:</span> ${rec.nsr.total_households.toLocaleString()}</div>
+          <div><span class="font-medium">Individuals:</span> ${rec.nsr.total_individuals.toLocaleString()}</div>
+          <div class="mt-1 font-bold text-teal-700 dark:text-teal-400">
+            ${activeMetric.label}: ${activeMetric.format(val)}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    layer.bindTooltip(popupContent, { sticky: true, direction: "auto" });
+
+    layer.on({
+      mouseover: (e) => {
+        e.target.setStyle({ weight: 2.5, color: "#075E54", fillOpacity: 0.9 });
+      },
+      mouseout: (e) => {
+        e.target.setStyle({ weight: 1, color: "#FFFFFF", fillOpacity: 0.7 });
+      },
+      click: () => {
+        if (rec) {
+          handleNav({ state: activeState, lga: lgaName });
+        }
+      },
+    });
+  };
+
+  const lgaStyle = (featureItem: any) => {
+    const lgaName =
+      featureItem.properties.lga ||
+      featureItem.properties.LGA ||
+      fName(featureItem);
+    const lgaKey = `${activeState}|${normLower(lgaName)}`;
+    const rec = lgaRecordsMap.get(lgaKey);
+
+    if (!rec) {
+      return {
+        fillColor: "#CBD5E1",
+        fillOpacity: 0.2,
+        weight: 0.5,
+        color: "#94A3B8",
+      };
+    }
+
+    const val = activeMetric.getValue(rec);
+    const ratio =
+      (val - metricBounds.min) / (metricBounds.max - metricBounds.min);
+    const fillColor = activeMetric.colorScale(ratio);
+
+    return {
+      fillColor,
+      fillOpacity: 0.75,
+      weight: 1,
+      color: "#FFFFFF",
+    };
+  };
+
+  useEffect(() => {
+    if (
+      activeState &&
+      filteredLgaFeatures &&
+      filteredLgaFeatures.features.length > 0
+    ) {
+      const geoLayer = L.geoJSON(filteredLgaFeatures);
+      setMapBounds(geoLayer.getBounds());
+    } else {
+      setMapBounds(NIGERIA_BOUNDS);
+    }
+  }, [activeState, filteredLgaFeatures]);
 
   return (
-    <div className="relative" style={{ height: "100%", width: "100%" }}>
-      {/* Back-to-Nigeria button */}
-      <div className="absolute z-[1000] top-3 left-3 flex items-center gap-2">
-        {path.state && (
-          <button
-            className="px-3 py-1.5 rounded-lg text-sm font-semibold border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card"
-            onClick={() => onPathChange({})}
-          >
-            ← Nigeria
-          </button>
-        )}
+    <div className="relative w-full rounded-xl overflow-hidden border border-line-light dark:border-line-dark shadow-sm bg-surface-light dark:bg-surface-dark">
+      <div className="absolute top-3 right-3 z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2.5 rounded-lg border border-line-light dark:border-line-dark shadow-md text-xs font-medium max-w-[220px]">
+        <div className="text-ink-primary dark:text-ink-onDark font-bold mb-1 truncate">
+          {activeMetric.label}
+        </div>
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-[10px] text-ink-muted dark:text-ink-onDarkMuted">
+            {activeMetric.format(metricBounds.min)}
+          </span>
+          <div
+            className="h-2.5 flex-1 rounded-full"
+            style={{
+              background: `linear-gradient(to right, ${activeMetric.colorScale(0)}, ${activeMetric.colorScale(0.5)}, ${activeMetric.colorScale(1)})`,
+            }}
+          />
+          <span className="text-[10px] text-ink-muted dark:text-ink-onDarkMuted">
+            {activeMetric.format(metricBounds.max)}
+          </span>
+        </div>
       </div>
 
-      {/* Legend */}
-      <div className="absolute z-[1000] bottom-3 left-3 rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card p-3">
-        <div className="text-xs font-semibold mb-2 text-ink-primary dark:text-ink-onDark">
-          {legend.label}
-        </div>
-        <div className="flex items-center gap-1">
-          {legend.scale.map((c) => (
-            <div
-              key={c}
-              style={{ background: c }}
-              className="w-6 h-3 rounded-sm"
-            />
-          ))}
-        </div>
-        <div className="flex justify-between text-[10px] mt-1 text-ink-muted dark:text-ink-onDarkMuted">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div style={{ height }}>
+        <MapContainer
+          bounds={NIGERIA_BOUNDS}
+          zoom={6}
+          scrollWheelZoom={false}
+          className="w-full h-full z-0"
+        >
+          <InvalidateOnMount />
+          <MapBoundsController bounds={mapBounds} />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          />
 
-        {path.state && !path.lga && (
-          <div className="mt-2 text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
-            Click an LGA to drill down
-          </div>
-        )}
-        {path.lga && (
-          <div className="mt-2 text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
-            Ward-level map coming next
-          </div>
-        )}
-      </div>
-
-      <MapContainer
-        center={[9.08, 8.67]}
-        zoom={6}
-        minZoom={5}
-        maxZoom={9}
-        scrollWheelZoom={false}
-        zoomControl={true}
-        attributionControl={false}
-        maxBounds={[
-          [3.0, 1.5],
-          [14.8, 15.8],
-        ]}
-        maxBoundsViscosity={1.0}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <InvalidateOnMount />
-
-        {viewGeo && (
-          <>
+          {statesGeoJson && !activeState && (
             <GeoJSON
-              key={`${level}-${path.state ?? "ng"}-${path.lga ?? ""}-${mode}`}
-              data={viewGeo as any}
-              style={geoStyle as any}
-              onEachFeature={onEach as any}
+              key={`states-${metric}`}
+              data={statesGeoJson}
+              style={stateStyle}
+              onEachFeature={onEachState}
             />
-            <FitBounds geo={viewGeo} />
-          </>
-        )}
-      </MapContainer>
+          )}
+
+          {activeState && filteredLgaFeatures && (
+            <GeoJSON
+              key={`lgas-${activeState}-${metric}`}
+              data={filteredLgaFeatures}
+              style={lgaStyle}
+              onEachFeature={onEachLga}
+            />
+          )}
+        </MapContainer>
+      </div>
     </div>
   );
+};
+
+function fName(featureItem: any): string {
+  return (
+    featureItem.properties.NAME_2 ||
+    featureItem.properties.lga_name ||
+    featureItem.properties.NAME_1 ||
+    "Unknown"
+  );
 }
+
+export default DrilldownMap;

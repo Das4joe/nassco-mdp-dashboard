@@ -9,10 +9,10 @@ import DrilldownMap from "./components/maps/DrilldownMap";
 import CommunityRankingPanel from "./components/CommunityRankingPanel";
 import { DomainNav, type DomainKey } from "./components/DomainNav";
 import { StateFilter } from "./components/StateFilter";
-import { RegistrationCoverage } from "./components/domains/RegistrationCoverage";
-import { ChildProtection } from "./components/domains/ChildProtection";
+import { CivilRegistration } from "./components/domains/CivilRegistration";
 import { Education } from "./components/domains/Education";
-import { HealthNutrition } from "./components/domains/HealthNutrition";
+import { Health } from "./components/domains/Health";
+import { Nutrition } from "./components/domains/Nutrition";
 import { LivelihoodsResilience } from "./components/domains/LivelihoodsResilience";
 import { loadAllData, type DashboardData } from "./lib/loadData";
 import type { DashboardMode, DrilldownPath, GeoRecord } from "./lib/types";
@@ -91,7 +91,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-surface-page dark:bg-surface-darker pb-12">
-      {/* Sticky wrapper — TopBar + DomainNav pinned together */}
+      {/* Sticky Top Bar & UNICEF Navigation */}
       <div className="sticky top-0 z-40 shadow-sm dark:shadow-slate-900/50">
         <TopBar
           meta={data.metadata}
@@ -101,7 +101,7 @@ export default function App() {
         <DomainNav active={domain} onChange={setDomain} />
       </div>
 
-      {/* OVERVIEW */}
+      {/* 1. GLOBAL / OVERVIEW */}
       {domain === "overview" && (
         <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -154,6 +154,7 @@ export default function App() {
                 mode={mode}
                 isDark={isDark}
                 onPathChange={setPath}
+                metric="vulnerability"
               />
             </div>
 
@@ -182,58 +183,47 @@ export default function App() {
         </main>
       )}
 
-      {/* DOMAIN VIEWS */}
+      {/* 2. DOMAIN SPECIFIC PAGES */}
       {domain !== "overview" && (
-        <>
-          <div className="max-w-[1600px] mx-auto px-4 md:px-6 pt-4">
-            <div className="flex items-center justify-between mb-2 flex-wrap gap-3">
-              <Breadcrumb
-                path={path}
-                onNavigate={(level) => {
-                  if (level === "national") setPath({});
-                  else if (level === "state") setPath({ state: path.state });
-                  else if (level === "lga")
-                    setPath({ state: path.state, lga: path.lga });
-                  else if (level === "ward")
-                    setPath({
-                      state: path.state,
-                      lga: path.lga,
-                      ward: path.ward,
-                    });
-                }}
-              />
-              <div className="flex items-center gap-3">
-                <div className="text-xs text-ink-faint dark:text-ink-onDarkMuted">
-                  Viewing:{" "}
-                  <span className="font-semibold text-ink-muted dark:text-ink-onDark">
-                    {path.community ??
-                      path.ward ??
-                      path.lga ??
-                      path.state ??
-                      "All 4 MDP States"}
-                  </span>
-                </div>
-                <StateFilter value={path.state} onChange={handleStateFilter} />
+        <main className="max-w-[1600px] mx-auto px-4 md:px-6 pt-4 pb-8 space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <Breadcrumb
+              path={path}
+              onNavigate={(level) => {
+                if (level === "national") setPath({});
+                else if (level === "state") setPath({ state: path.state });
+                else if (level === "lga")
+                  setPath({ state: path.state, lga: path.lga });
+                else if (level === "ward")
+                  setPath({
+                    state: path.state,
+                    lga: path.lga,
+                    ward: path.ward,
+                  });
+              }}
+            />
+            <div className="flex items-center gap-3">
+              <div className="text-xs text-ink-faint dark:text-ink-onDarkMuted">
+                Viewing:{" "}
+                <span className="font-semibold text-ink-muted dark:text-ink-onDark">
+                  {path.community ??
+                    path.ward ??
+                    path.lga ??
+                    path.state ??
+                    "All 4 MDP States"}
+                </span>
               </div>
+              <StateFilter value={path.state} onChange={handleStateFilter} />
             </div>
           </div>
 
-          {domain === "registration" && (
-            <RegistrationCoverage
-              data={currentRecord}
-              states={data.states}
-              national={data.national}
-              timeseries={data.timeseries}
-              stateFilter={path.state ?? null}
-            />
-          )}
-
-          {domain === "child-protection" && (
-            <ChildProtection
-              data={currentRecord}
-              states={data.states}
-              national={data.national}
-              stateFilter={path.state ?? null}
+          {domain === "civil-registration" && (
+            <CivilRegistration
+              data={data}
+              record={currentRecord}
+              path={path}
+              onPathChange={setPath}
+              stateFilter={path.state}
             />
           )}
 
@@ -246,12 +236,22 @@ export default function App() {
             />
           )}
 
-          {domain === "health-nutrition" && (
-            <HealthNutrition
+          {domain === "health" && (
+            <Health
               data={currentRecord}
               states={data.states}
               national={data.national}
               stateFilter={path.state ?? null}
+            />
+          )}
+
+          {domain === "nutrition" && (
+            <Nutrition
+              data={data}
+              record={currentRecord}
+              path={path}
+              onPathChange={setPath}
+              stateFilter={path.state}
             />
           )}
 
@@ -263,7 +263,7 @@ export default function App() {
               stateFilter={path.state ?? null}
             />
           )}
-        </>
+        </main>
       )}
     </div>
   );

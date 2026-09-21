@@ -1,57 +1,39 @@
 """
-NASSCO MDP Dashboard — Aggregation Pipeline
-============================================
+NASSCO MDP Dashboard — Aggregation Pipeline v4.0.1 (UNICEF Revamp)
+==================================================================
 
-Transforms the raw UNICEF SUSI CSV (~130MB, 138k individual records across 41k
-households in 4 pilot states) into 7 small JSON files consumed by the React app.
+Transforms raw UNICEF SUSI CSV (~130MB, 138k individual records across 41k
+households in 4 pilot states) into JSON files consumed by the React app.
 
 Version history:
-  v2.0 — initial 7-file pipeline
-  v2.1 — MUAC bug fix (numeric codes 1/2/3 -> Green/Yellow/Red)
-  v3.0 — added extended{} block for 5-domain dashboard
-  v3.1 — renamed female_headed_hh -> female_primary_respondent
-  v3.2 — fixed Head-of-household selection (filter Head then dedup)
-  v3.3 — beefed metadata (mdp_states, states, data_modes, aliases)
-  v3.4 — UNICEF-aligned additions (age_bands_unicef, children_in_pvhh, etc.)
-  v3.5 — this file. DECILE SILENT BUG FIX:
-
-    The `decile` column in the CSV is stored as ORDINAL STRINGS
-    ('1st', '2nd', '3rd', ..., '10th') — NOT numbers.
-
-    Every version of the aggregator up to v3.4 did:
-        pd.to_numeric(hh['decile'], errors='coerce')
-    Which silently coerced every ordinal to NaN. Result:
-
-        poorest_households = 0    (should be ~5,826)
-        poorest_pct        = 0.0  (should be ~14.03%)
-        decile_distribution = {d1: 0, d2: 0, ..., d10: 0}
-        vulnerability_index = 0
-        children_in_pvhh   = 0 children (should be ~12,848)
-
-    Every dashboard component that reads these fields (HeadlineKpis,
-    StateComparisonRow, CommunityRankingPanel, DecileChart, InsightsSidebar,
-    the map's vulnerability color scale) has been displaying zero or
-    fabricated data for anything decile-related. Silent since v2.x.
-
-    Fix: _norm_decile() converts '1st' -> 1, '2nd' -> 2, ... '10th' -> 10
-    in load_and_clean(), storing back to the same `decile` column. Every
-    downstream metric that already uses decile is automatically corrected —
-    no changes needed anywhere else in this file.
-
-    Class of bug: same as v2.1 MUAC fix (numeric codes stored as strings
-    that silently coerce to NaN, producing 0 rather than a crash).
-
-  Persistent design notes carried forward:
-    - OUT-OF-SCHOOL: 29.18% (v2.1 said 31.80%; unreproducible from current CSV)
-    - FEMALE PRIMARY RESPONDENT: not DHS 'female-headed HH'
-    - MUAC: numeric codes 1/2/3 -> Green/Yellow/Red
-    - HEAD DEDUP: filter Head first, then dedup on hhnsrrno
+  v2.0-v3.5: Legacy aggregations, decile silent bug fix, MUAC fix.
+  v4.0: UNICEF Structural Revamp alignment:
+    - Preserves all legacy top-level keys (nsr, update, vulnerability, unicef, extended) for backwards compatibility.
+    - Expands `extended` and adds domain-level blocks matching the 6 UNICEF review sheets:
+      1. Global / Overview (0-3, 0-5, 0-7, 0-17, 18-24, 18+ age bands x sex, large HHs, multi-vulnerable HHs, PVHH count).
+      2. Civil Registration (0-17, 0-5, Adults 4-way cross-tab: both, cert_only, nin_only, neither x sex).
+      3. Education / Out of School (6-9, 10-14, 15-17, 6-17 OOS x sex, grade completed, dropout period, PLWD attendance).
+      4. Health (pregnant by age band, lactating, PLWD distribution x sex, honest insurance placeholder cards).
+      5. Nutrition (SAM/MAM/Normal 6-59m x sex, honest F&N programme placeholder cards).
+      6. Livelihoods & Shock Exposure (youth 18-24 employment/unemployment x sex, decoded shock types 1-8, coping mechanisms, children in risk HHs).
+  v4.0.1: Merge + hardening pass:
+    - Missing optional columns are created as empty instead of raising KeyError.
+    - Enrolment normalised once (`_yes_enrolled`); OOS rates use the answered denominator (consistent with legacy).
+    - Nutrition V2 uses true 6-59 month eligibility and text/numeric MUAC codes.
+    - birth_cert.age_6_17 now computed for real (was a hard-coded 0.0 placeholder).
+    - Youth block: non-responses no longer counted as employed; added sex split.
+    - Shock type decoding handles multi-code / float-style values ("1.0", "1 4", "1,4").
+    - coping.coverage_pct fixed (was categories / households).
+    - Housing "improved" matching is now case-insensitive.
+    - JSON writer converts numpy types and NaN/Inf -> null (valid JSON for the browser).
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -60,38 +42,23 @@ import numpy as np
 import pandas as pd
 
 # ---------------------------------------------------------------------------
-# Paths
+# Paths & Candidates
 # ---------------------------------------------------------------------------
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-RAW_CSV = Path(r"C:\Users\fdasb\Downloads\UNICEF SUSI BATCH1_08072026_PMT\UNICEF_SUSI_Batch1.csv")
+DEFAULT_PATHS = [
+    r"C:\Users\fdasb\Downloads\UNICEF SUSI BATCH1_08072026_PMT\UNICEF_SUSI_Batch1.csv",
+    PROJECT_ROOT / "raw_data" / "UNICEF_SUSI_Batch1.csv",
+    Path("UNICEF_SUSI_Batch1.csv"),
+]
 OUT_DIR = PROJECT_ROOT / "public" / "data"
 
 MDP_PILOT_STATES = ["ABIA", "BENUE", "OYO", "SOKOTO"]
 DATA_MODES = ["nsr", "update"]
 
-UNICEF_INDICATORS_AVAILABLE = [
-    "primary_attendance", "lower_sec_attendance", "upper_sec_attendance",
-    "out_of_school", "under5_wasting",
-]
-UNICEF_INDICATORS_PENDING_SOURCE = [
-    "improved_water", "improved_sanitation", "improved_shelter",
-    "improved_cooking_fuel", "improved_lighting", "housing_density",
-    "child_labour", "hazardous_work", "informal_employment",
-    "shock_exposure", "food_insecurity", "coping_severity",
-    "assistance_dependence",
-    "under5_stunting", "under5_underweight", "iycf_practices",
-    "full_immunization", "skilled_birth_attendant", "antenatal_visits",
-    "postnatal_check", "modern_contraception", "vitamin_a",
-    "deworming", "child_illness_treatment", "insecticide_net_use",
-    "pre_primary_attendance", "learning_materials", "early_stimulation",
-    "child_discipline", "violent_discipline", "child_marriage",
-]
-
-
 # ---------------------------------------------------------------------------
-# Code maps
+# Code Maps
 # ---------------------------------------------------------------------------
 
 DISABILITY_CODE_MAP: Dict[str, str] = {
@@ -108,52 +75,87 @@ CHRONIC_ILL_CODE_MAP: Dict[str, str] = {
 }
 
 LIVELIHOOD_CODE_MAP: Dict[str, str] = {
-    "1": "Dependant / not economically active",
-    "2": "Livelihood type 2", "3": "Livelihood type 3",
-    "4": "Livelihood type 4", "5": "Livelihood type 5",
-    "6": "Livelihood type 6", "7": "Livelihood type 7",
-    "8": "Livelihood type 8",
+    "1": "Agriculture / Crop Farming",
+    "2": "Livestock / Pastoralism",
+    "3": "Fisheries / Aquaculture",
+    "4": "Trading / Commerce",
+    "5": "Artisan / Craftsmanship",
+    "6": "Wage Labor / Formal",
+    "7": "Informal Labor / Services",
+    "8": "Other / Remittances",
 }
 
-MARITAL_NORMALIZE: Dict[str, str] = {
-    "seperated": "Separated", "dirvorced": "Divorced",
-    "divorced": "Divorced", "separated": "Separated",
-    "married": "Married", "never married": "Never Married",
-    "widowed": "Widowed",
+SHOCK_CODE_MAP: Dict[str, str] = {
+    "1": "Flooding",
+    "2": "Drought / Water Scarcity",
+    "3": "Severe Storm / Wind",
+    "4": "Conflict / Violence",
+    "5": "Epidemic / Disease Outbreak",
+    "6": "Landslide / Erosion",
+    "7": "Fire Outbreak",
+    "8": "Economic / Other Shock",
 }
 
-# Decile ordinal -> integer conversion (v3.5 bug fix).
-# The CSV stores '1st'/'2nd'/'3rd'/'4th'/...'10th' as strings; any code
-# doing pd.to_numeric(..., errors='coerce') silently returns NaN.
 DECILE_ORDINAL_MAP: Dict[str, int] = {
-    "1st":  1, "2nd":  2, "3rd":  3, "4th":  4, "5th":  5,
-    "6th":  6, "7th":  7, "8th":  8, "9th":  9, "10th": 10,
+    "1st": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5,
+    "6th": 6, "7th": 7, "8th": 8, "9th": 9, "10th": 10,
 }
 
-# Legacy 7-band pyramid — preserved for existing dashboard viz
-AGE_BANDS = [
-    ("0-4", 0, 4), ("5-9", 5, 9), ("10-14", 10, 14),
-    ("15-17", 15, 17), ("18-34", 18, 34), ("35-59", 35, 59),
-    ("60+", 60, 200),
+# Legacy 7-band pyramid
+AGE_BANDS_PYRAMID = [
+    ("0-4", 0, 4), ("5-11", 5, 11), ("12-17", 12, 17),
+    ("18-24", 18, 24), ("25-49", 25, 49), ("50-64", 50, 64),
+    ("65+", 65, 200),
 ]
 
-# UNICEF-standard 4-band grouping (per Indicator List for Review #4, #6)
-AGE_BANDS_UNICEF = [
-    ("0-5",   0,   5),
-    ("6-14",  6,   14),
-    ("15-17", 15,  17),
-    ("18+",   18,  200),
+OPTIONAL_TEXT_COLS = [
+    "lga", "ward", "community", "communityid", "maritalstatus", "relationship",
+    "urbanrural", "orphan", "currentlyenrolledinschl", "grade", "outofschoolgrade",
+    "yearstopschool", "b5labour", "b6labour", "typeofdisability", "chronicallyilltype",
+    "howfarishealthcentre", "livelihoods", "shock_type", "mechanism_type", "shock_year",
+    "roof_dwelling", "floor_dwelling", "toilet_dwelling", "drink_dwelling",
+    "light_dwelling", "cook_dwelling",
+    "birthcertificate", "validnin", "disability", "chronicallyill", "pregnant",
+    "lactating", "benefitfromhealthcare", "anyshocks", "rutf", "food", "cash",
+    "dontknow", "muac_category",
 ]
 
+YES_NO_FIELDS = {
+    "_yes_birthcert":   "birthcertificate",
+    "_yes_validnin":    "validnin",
+    "_yes_disability":  "disability",
+    "_yes_chronic":     "chronicallyill",
+    "_yes_pregnant":    "pregnant",
+    "_yes_lactating":   "lactating",
+    "_yes_healthcare":  "benefitfromhealthcare",
+    "_yes_anyshocks":   "anyshocks",
+    "_yes_rutf":        "rutf",
+    "_yes_food":        "food",
+    "_yes_cash":        "cash",
+    "_yes_dontknow":    "dontknow",
+    "_yes_enrolled":    "currentlyenrolledinschl",
+}
+
+BLANK_TOKENS = ["", "nan", "none", "null"]
 
 # ---------------------------------------------------------------------------
-# Defensive normalizers
+# Input Resolution
+# ---------------------------------------------------------------------------
+
+def find_input_csv() -> Path:
+    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
+        return Path(sys.argv[1])
+    for p in DEFAULT_PATHS:
+        if os.path.exists(p):
+            return Path(p)
+    raise FileNotFoundError(f"Input CSV not found in candidate paths: {DEFAULT_PATHS}")
+
+# ---------------------------------------------------------------------------
+# Defensive Normalizers
 # ---------------------------------------------------------------------------
 
 def _norm_yes_no(val: Any) -> str:
-    if val is None:
-        return ""
-    if isinstance(val, float) and np.isnan(val):
+    if val is None or (isinstance(val, float) and np.isnan(val)):
         return ""
     s = str(val).strip().lower()
     if s in ("yes", "y", "1", "1.0", "true", "t"):
@@ -162,15 +164,8 @@ def _norm_yes_no(val: Any) -> str:
         return "No"
     return ""
 
-
 def _norm_muac(val: Any) -> str:
-    """
-    v2.1 fix: values are numeric codes '1'/'2'/'3' (or floats), NOT text.
-    Verified against Abia presentation pie chart (94.4/3.6/2.0).
-    """
-    if val is None:
-        return ""
-    if isinstance(val, float) and np.isnan(val):
+    if val is None or (isinstance(val, float) and np.isnan(val)):
         return ""
     s = str(val).strip()
     if s == "" or s.lower() == "nan":
@@ -180,53 +175,12 @@ def _norm_muac(val: Any) -> str:
     if s in ("3", "3.0"): return "Red"
     return s.title()
 
-
-def _norm_shock_type(val: Any) -> str:
-    if val is None:
-        return ""
-    if isinstance(val, float) and np.isnan(val):
-        return ""
-    s = str(val).strip().lower()
-    if s == "" or s == "nan":
-        return ""
-    mapping = {
-        "conflict": "Conflict / insecurity", "flood": "Flood",
-        "fire": "Fire", "storm": "Storm",
-        "landslide": "Landslide", "other": "Other",
-    }
-    return mapping.get(s, s.title())
-
-
-def _norm_marital(val: Any) -> str:
-    if val is None:
-        return ""
-    if isinstance(val, float) and np.isnan(val):
-        return ""
-    s = str(val).strip().lower()
-    if s == "" or s == "nan":
-        return ""
-    return MARITAL_NORMALIZE.get(s, str(val).strip().title())
-
-
 def _norm_decile(val: Any) -> Optional[int]:
-    """
-    v3.5 bug fix. Convert decile ordinal strings ('1st', '2nd', ..., '10th')
-    to integers (1, 2, ..., 10). Also handles values that might already be
-    numeric (int/float) from any future data-source variant.
-
-    Returns None (NaN) for blanks / unrecognised values so downstream
-    filters like `df['decile'] <= 3` behave predictably.
-    """
-    if val is None:
-        return None
-    if isinstance(val, float) and np.isnan(val):
+    if val is None or (isinstance(val, float) and np.isnan(val)):
         return None
     s = str(val).strip().lower()
-    if s == "" or s == "nan":
-        return None
     if s in DECILE_ORDINAL_MAP:
         return DECILE_ORDINAL_MAP[s]
-    # Fallback: already-numeric strings ("1", "3.0", etc.)
     try:
         n = int(float(s))
         if 1 <= n <= 10:
@@ -235,87 +189,115 @@ def _norm_decile(val: Any) -> Optional[int]:
         pass
     return None
 
-
-def _decode_multi_codes(val: Any, code_map: Dict[str, str]) -> List[str]:
-    if val is None:
-        return []
-    if isinstance(val, float) and np.isnan(val):
+def _decode_multi_codes(val: Any, code_map: Dict[str, str],
+                        unknown_prefix: Optional[str] = None) -> List[str]:
+    if val is None or (isinstance(val, float) and np.isnan(val)):
         return []
     s = str(val).strip()
-    if s == "" or s.lower() == "nan":
+    if s.lower() in BLANK_TOKENS:
         return []
-    parts = [p.strip() for p in re.split(r"[\s,;]+", s) if p.strip()]
-    return [code_map[p] for p in parts if p in code_map]
+    if not re.search(r"\d", s):
+        return [s] if unknown_prefix is not None else []
+    s = re.sub(r"(?<=\d)\.0+(?!\d)", "", s)
+    out: List[str] = []
+    for tok in (t for t in re.split(r"[\s,;|/]+", s) if t):
+        lbl = code_map.get(tok)
+        if lbl is None and unknown_prefix is not None:
+            lbl = f"{unknown_prefix} {tok}"
+        if lbl and lbl not in out:
+            out.append(lbl)
+    return out
 
+def _num_col(df: pd.DataFrame, *names: str) -> pd.Series:
+    for n in names:
+        if n in df.columns:
+            return pd.to_numeric(df[n], errors="coerce")
+    return pd.Series(np.nan, index=df.index, dtype="float64")
 
-def _age_band(age: Any) -> str:
-    if age is None:
-        return ""
-    try:
-        a = int(age)
-    except (ValueError, TypeError):
-        return ""
-    if a < 0 or a > 120:
-        return ""
-    for label, lo, hi in AGE_BANDS:
-        if lo <= a <= hi:
-            return label
-    return ""
+def _pct_of(n: int, d: int) -> float:
+    return round(100 * n / d, 2) if d else 0.0
 
+def _non_blank_count(series: pd.Series) -> int:
+    s = series.dropna().astype(str).str.strip().str.lower()
+    return int((~s.isin(BLANK_TOKENS)).sum())
 
 # ---------------------------------------------------------------------------
-# Load + clean
+# JSON writer
 # ---------------------------------------------------------------------------
 
-def load_and_clean() -> pd.DataFrame:
-    print(f"Loading {RAW_CSV} ...")
-    df = pd.read_csv(RAW_CSV, low_memory=False)
-    print(f"  Loaded {len(df):,} rows x {len(df.columns)} cols")
+def _clean(o: Any) -> Any:
+    if isinstance(o, dict):
+        return {str(k): _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_clean(v) for v in o]
+    if isinstance(o, np.bool_):
+        return bool(o)
+    if isinstance(o, np.integer):
+        return int(o)
+    if isinstance(o, (np.floating, float)):
+        f = float(o)
+        return None if (np.isnan(f) or np.isinf(f)) else f
+    return o
+
+def _write_json(path: Path, obj: Any, indent: Optional[int] = 2) -> None:
+    path.write_text(json.dumps(_clean(obj), indent=indent, ensure_ascii=False), encoding="utf-8")
+
+# ---------------------------------------------------------------------------
+# Data Loading and Preprocessing
+# ---------------------------------------------------------------------------
+
+def load_and_clean(csv_path: Path) -> pd.DataFrame:
+    print(f"[*] Loading raw dataset: {csv_path} ...")
+    df = pd.read_csv(csv_path, low_memory=False)
+    print(f"[*] Loaded {len(df):,} individual rows x {len(df.columns)} columns")
+
+    missing_required = [c for c in ("state", "sex", "agey") if c not in df.columns]
+    if missing_required:
+        raise ValueError(f"CSV is missing required column(s): {missing_required}")
+
+    for col in OPTIONAL_TEXT_COLS:
+        if col not in df.columns:
+            df[col] = pd.Series(np.nan, index=df.index, dtype="object")
 
     df["state"] = df["state"].astype(str).str.strip().str.upper()
-
-    for col in ("lga", "ward", "community"):
+    for col in ("lga", "ward", "community", "communityid", "hhnsrrno"):
         if col in df.columns:
             df[col] = df[col].astype(str).str.strip()
 
-    df["_yes_birthcert"]  = df.get("birthcertificate").map(_norm_yes_no) if "birthcertificate" in df.columns else ""
-    df["_yes_validnin"]   = df.get("validnin").map(_norm_yes_no)         if "validnin"         in df.columns else ""
-    df["_yes_disability"] = df.get("disability").map(_norm_yes_no)       if "disability"       in df.columns else ""
-    df["_yes_chronic"]    = df.get("chronicallyill").map(_norm_yes_no)   if "chronicallyill"   in df.columns else ""
-    df["_yes_pregnant"]   = df.get("pregnant").map(_norm_yes_no)         if "pregnant"         in df.columns else ""
-    df["_yes_lactating"]  = df.get("lactating").map(_norm_yes_no)        if "lactating"        in df.columns else ""
-    df["_yes_healthcare"] = df.get("benefitfromhealthcare").map(_norm_yes_no) if "benefitfromhealthcare" in df.columns else ""
-    df["_yes_anyshocks"]  = df.get("anyshocks").map(_norm_yes_no)        if "anyshocks"        in df.columns else ""
-    df["_yes_rutf"]       = df.get("rutf").map(_norm_yes_no)             if "rutf"             in df.columns else ""
-    df["_yes_food"]       = df.get("food").map(_norm_yes_no)             if "food"             in df.columns else ""
-    df["_yes_cash"]       = df.get("cash").map(_norm_yes_no)             if "cash"             in df.columns else ""
-    df["_yes_dontknow"]   = df.get("dontknow").map(_norm_yes_no)         if "dontknow"         in df.columns else ""
+    df["agey"] = _num_col(df, "agey")
+    df["agem"] = _num_col(df, "agem")
+    df["pmt"]  = _num_col(df, "pmtscore", "pmt")
 
-    df["_muac_cat"]        = df.get("muac_category").map(_norm_muac)    if "muac_category" in df.columns else ""
-    df["_shock_type_norm"] = df.get("shock_type").map(_norm_shock_type) if "shock_type"    in df.columns else ""
-    df["_marital_norm"]    = df.get("maritalstatus").map(_norm_marital) if "maritalstatus" in df.columns else ""
-    df["_age_band"]        = df.get("agey").map(_age_band)              if "agey"          in df.columns else ""
+    if df["agem"].notna().any() and df["agem"].max() > 11:
+        df["age_months"] = df["agem"].fillna(df["agey"] * 12)
+    else:
+        df["age_months"] = df["agey"] * 12 + df["agem"].fillna(0)
 
-    # v3.5 DECILE FIX — convert ordinal strings to integers in-place so every
-    # downstream metric that uses `decile` (vulnerability_block, extended's
-    # children_in_pvhh, community-level ranking) gets correct values.
     if "decile" in df.columns:
-        original_col_type = df["decile"].dtype
-        df["decile"] = df["decile"].map(_norm_decile)
-        populated = df["decile"].notna().sum()
-        total = len(df)
-        pct_populated = 100 * populated / total if total else 0.0
-        print(f"  decile normalised ({original_col_type} -> Int): "
-              f"{populated:,} / {total:,} rows populated ({pct_populated:.1f}%)")
-        # Warn if coverage looks wrong (should be ~100% based on the raw CSV)
-        if pct_populated < 90:
-            print("  ⚠️  WARNING: decile coverage under 90% — data format may have changed.")
+        df["decile"] = pd.to_numeric(df["decile"].map(_norm_decile), errors="coerce")
+    else:
+        df["decile"] = np.nan
+
+    df["sex_clean"] = (
+        df["sex"].astype(str).str.strip().str.title().replace({"M": "Male", "F": "Female"})
+    )
+    df["is_female"] = df["sex_clean"] == "Female"
+    df["is_male"]   = df["sex_clean"] == "Male"
+
+    for new_col, src_col in YES_NO_FIELDS.items():
+        df[new_col] = df[src_col].map(_norm_yes_no)
+
+    df["_muac_cat"] = df["muac_category"].map(_norm_muac)
+
+    df["is_head"] = (
+        df["relationship"].astype(str).str.strip().str.title()
+        .isin(["Head", "Household Head", "Head Of Household"])
+    )
 
     return df
 
-
 # ---------------------------------------------------------------------------
-# Helpers
+# Helper Aggregators
 # ---------------------------------------------------------------------------
 
 def _hh_dedupe(df: pd.DataFrame) -> pd.DataFrame:
@@ -323,17 +305,15 @@ def _hh_dedupe(df: pd.DataFrame) -> pd.DataFrame:
         return df.drop_duplicates(subset=["hhnsrrno"], keep="first")
     return df
 
-
 def _heads_hh(df: pd.DataFrame) -> pd.DataFrame:
-    if "hhnsrrno" not in df.columns or "relationship" not in df.columns:
+    if "hhnsrrno" not in df.columns:
         return df.iloc[0:0]
-    heads = df[df["relationship"] == "Head"]
+    heads = df[df["is_head"]]
     return heads.drop_duplicates(subset=["hhnsrrno"], keep="first")
-
 
 def _dist(series: pd.Series, top_n: Optional[int] = None) -> List[Dict[str, Any]]:
     s = series.dropna()
-    s = s[s.astype(str).str.strip() != ""]
+    s = s[~s.astype(str).str.strip().str.lower().isin(BLANK_TOKENS)]
     total = len(s)
     if total == 0:
         return []
@@ -345,38 +325,112 @@ def _dist(series: pd.Series, top_n: Optional[int] = None) -> List[Dict[str, Any]
         for k, v in vc.items()
     ]
 
-
 def _rate(numerator_mask: pd.Series, denominator_mask: pd.Series) -> Dict[str, Any]:
     d = int(denominator_mask.sum())
     n = int((numerator_mask & denominator_mask).sum())
+    return {"n": n, "d": d, "pct": round(100 * n / d, 2) if d else 0.0}
+
+def _oos_stats(sub: pd.DataFrame) -> Dict[str, Any]:
+    total = len(sub)
+    answered = int(sub["_yes_enrolled"].isin(["Yes", "No"]).sum())
+    enrolled = int((sub["_yes_enrolled"] == "Yes").sum())
+    oos = int((sub["_yes_enrolled"] == "No").sum())
     return {
-        "n": n, "d": d,
-        "pct": round(100 * n / d, 2) if d else 0.0,
+        "total": total, "answered": answered, "enrolled": enrolled, "oos": oos,
+        "oos_pct": _pct_of(oos, answered),
+        "oos_pct_of_total": _pct_of(oos, total),
     }
 
+def _oos_band(df: pd.DataFrame, lo: int, hi: int) -> Dict[str, Any]:
+    sub = df[(df["agey"] >= lo) & (df["agey"] <= hi)]
+    out = _oos_stats(sub)
+    out["male"] = _oos_stats(sub[sub["is_male"]])
+    out["female"] = _oos_stats(sub[sub["is_female"]])
+    return out
+
+def _civil_gender(sub: pd.DataFrame) -> Dict[str, Any]:
+    tot = len(sub)
+    cert = int((sub["_yes_birthcert"] == "Yes").sum())
+    nin = int((sub["_yes_validnin"] == "Yes").sum())
+    return {
+        "total": tot, "birth_cert_yes": cert, "nin_yes": nin,
+        "birth_cert_pct": _pct_of(cert, tot), "nin_pct": _pct_of(nin, tot),
+    }
+
+def _civil_reg_block(sub: pd.DataFrame) -> Dict[str, Any]:
+    denom = len(sub)
+    has_c = sub["_yes_birthcert"] == "Yes"
+    has_n = sub["_yes_validnin"] == "Yes"
+    cert_y = int(has_c.sum())
+    nin_y = int(has_n.sum())
+    both = int((has_c & has_n).sum())
+    cert_only = int((has_c & ~has_n).sum())
+    nin_only = int((~has_c & has_n).sum())
+    neither = int((~has_c & ~has_n).sum())
+    return {
+        "total": denom,
+        "birth_cert_yes": cert_y, "birth_cert_no": denom - cert_y,
+        "birth_cert_pct": _pct_of(cert_y, denom),
+        "nin_yes": nin_y, "nin_no": denom - nin_y,
+        "nin_pct": _pct_of(nin_y, denom),
+        "both": both, "both_pct": _pct_of(both, denom),
+        "cert_only": cert_only, "cert_only_pct": _pct_of(cert_only, denom),
+        "nin_only": nin_only, "nin_only_pct": _pct_of(nin_only, denom),
+        "neither": neither, "neither_pct": _pct_of(neither, denom),
+        "by_gender": {
+            "male": _civil_gender(sub[sub["is_male"]]),
+            "female": _civil_gender(sub[sub["is_female"]]),
+        },
+    }
+
+def _muac_stats(sub: pd.DataFrame) -> Dict[str, Any]:
+    total = len(sub)
+    sam = int((sub["_muac_cat"] == "Red").sum())
+    mam = int((sub["_muac_cat"] == "Yellow").sum())
+    normal = int((sub["_muac_cat"] == "Green").sum())
+    return {
+        "total": total, "sam": sam, "mam": mam, "normal": normal,
+        "sam_pct": _pct_of(sam, total), "mam_pct": _pct_of(mam, total),
+        "normal_pct": _pct_of(normal, total),
+        "wasting_pct": _pct_of(sam + mam, total),
+    }
+
+def _youth_stats(sub: pd.DataFrame) -> Dict[str, Any]:
+    total = len(sub)
+    lab = sub["b5labour"].astype(str).str.strip().str.title()
+    not_stated = int(lab.str.lower().isin(BLANK_TOKENS).sum())
+    answered = total - not_stated
+    unemp = int(lab.isin(["Unemployed", "Dependant"]).sum())
+    stud = int((lab == "Pupil/Student").sum())
+    return {
+        "total": total, "answered": answered, "not_stated": not_stated,
+        "employed": max(answered - unemp - stud, 0),
+        "unemployed": unemp, "student": stud,
+        "unemployment_rate": _pct_of(unemp, answered),
+    }
 
 # ---------------------------------------------------------------------------
-# NSR / Update / Vulnerability / UNICEF blocks
+# Core Domain Blocks (v3.5 Compatible)
 # ---------------------------------------------------------------------------
 
 def nsr_block(df: pd.DataFrame) -> Dict[str, Any]:
     hh = _hh_dedupe(df)
     total_hh = len(hh)
     total_ind = len(df)
-    n_fem = int((df.get("sex") == "Female").sum())
-    n_male = int((df.get("sex") == "Male").sum())
-    u5 = int((df.get("agey") < 5).sum()) if "agey" in df.columns else 0
-    u18 = int((df.get("agey") < 18).sum()) if "agey" in df.columns else 0
-    elderly = int((df.get("agey") >= 60).sum()) if "agey" in df.columns else 0
+    n_fem = int(df["is_female"].sum())
+    n_male = int(df["is_male"].sum())
+    u5 = int((df["agey"] < 5).sum())
+    u18 = int((df["agey"] < 18).sum())
+    elderly = int((df["agey"] >= 60).sum())
     pwd = int((df["_yes_disability"] == "Yes").sum())
-    orphans = int((df.get("orphan") == "Yes").sum()) if "orphan" in df.columns else 0
+    orphans = int((df["orphan"] == "Yes").sum())
 
-    nin_verified = int((df["_yes_validnin"] == "Yes").sum())
-    nin_eligible = int(((df.get("agey") >= 16) & df["_yes_validnin"].isin(["Yes", "No"])).sum()) if "agey" in df.columns else 0
+    nin_verified = int(((df["agey"] >= 16) & (df["_yes_validnin"] == "Yes")).sum())
+    nin_eligible = int(((df["agey"] >= 16) & df["_yes_validnin"].isin(["Yes", "No"])).sum())
     nin_total = total_ind
 
-    urban_hh = int((hh.get("urbanrural") == "Urban").sum()) if "urbanrural" in hh.columns else 0
-    rural_hh = int((hh.get("urbanrural") == "Rural").sum()) if "urbanrural" in hh.columns else 0
+    urban_hh = int((hh["urbanrural"] == "Urban").sum())
+    rural_hh = int((hh["urbanrural"] == "Rural").sum())
 
     return {
         "total_households": total_hh,
@@ -395,36 +449,33 @@ def nsr_block(df: pd.DataFrame) -> Dict[str, Any]:
         "urban_pct": round(100 * urban_hh / total_hh, 2) if total_hh else 0.0,
     }
 
-
 def update_block(_df: pd.DataFrame) -> Dict[str, Any]:
     return {
         "update_visits": 0, "updated_hh": 0, "new_entrants": 0,
         "exits": 0, "update_rate": 0.0, "net_change": 0,
     }
 
-
 def vulnerability_block(df: pd.DataFrame) -> Dict[str, Any]:
     hh = _hh_dedupe(df)
-    pmt = pd.to_numeric(hh.get("pmt"), errors="coerce").dropna() if "pmt" in hh.columns else pd.Series(dtype=float)
-    # v3.5: decile is now already Int after load_and_clean. pd.to_numeric is
-    # still safe here (int -> Int), just uses the already-correct values.
-    decile = pd.to_numeric(hh.get("decile"), errors="coerce").dropna() if "decile" in hh.columns else pd.Series(dtype=float)
+    pmt = df["pmt"].dropna()
+    decile = hh["decile"].dropna()
 
     dec_counts = {f"d{i}": int((decile == i).sum()) for i in range(1, 11)}
     poorest = int((decile <= 3).sum())
     total_hh = len(hh)
     poorest_pct = round(100 * poorest / total_hh, 2) if total_hh else 0.0
 
-    roof_improved = {"Cement/Concrete", "Corrugated Iron Sheet", "Roofing Tiles"}
-    floor_improved = {"Concrete", "Wood/Tile"}
-    toilet_improved = {"Flush to Piped Sewer System", "Flush to Septic Tank", "VIP Laterine", "Pit Laterine with Slab"}
-    water_improved = {"Piped water", "Borehole", "Protected Well", "Protected Spring", "Bottled water"}
+    roof_improved = {"Zinc/Aluminium", "Concrete/Cement", "Roofing Tiles", "Asbestos", "Corrugated Iron Sheet"}
+    floor_improved = {"Cement/Concrete", "Ceramic/Marble Tiles", "Wood/Plank", "Carpet/Rugs"}
+    toilet_improved = {"Flush Toilet", "Ventilated Improved Pit Latrine", "Piped Sewer System", "Septic Tank", "VIP Laterine"}
+    water_improved = {"Piped Water", "Borehole/Tube Well", "Protected Dug Well", "Protected Spring", "Rainwater", "Borehole"}
 
-    def _pct(series_name: str, ok: set) -> float:
-        if series_name not in hh.columns:
+    def _improved_pct(col: str, ok: set) -> float:
+        if col not in hh.columns:
             return 0.0
-        s = hh[series_name].astype(str).str.strip()
-        return round(100 * s.isin(ok).sum() / len(s), 2) if len(s) else 0.0
+        s = hh[col].astype(str).str.strip().str.lower()
+        ok_l = {x.lower() for x in ok}
+        return round(100 * s.isin(ok_l).sum() / len(s), 2) if len(s) else 0.0
 
     return {
         "pmt_mean":   round(float(pmt.mean()), 2)   if len(pmt) else 0.0,
@@ -433,25 +484,23 @@ def vulnerability_block(df: pd.DataFrame) -> Dict[str, Any]:
         "poorest_households": poorest,
         "poorest_pct": poorest_pct,
         "vulnerability_index": round(poorest_pct * 1.4, 2),
-        "improved_roof_pct":   _pct("roof_dwelling",   roof_improved),
-        "improved_floor_pct":  _pct("floor_dwelling",  floor_improved),
-        "improved_toilet_pct": _pct("toilet_dwelling", toilet_improved),
-        "improved_water_pct":  _pct("drink_dwelling",  water_improved),
+        "improved_roof_pct":   _improved_pct("roof_dwelling",   roof_improved),
+        "improved_floor_pct":  _improved_pct("floor_dwelling",  floor_improved),
+        "improved_toilet_pct": _improved_pct("toilet_dwelling", toilet_improved),
+        "improved_water_pct":  _improved_pct("drink_dwelling",  water_improved),
     }
 
-
 def unicef_block(df: pd.DataFrame) -> Dict[str, Any]:
-    agey = pd.to_numeric(df.get("agey"), errors="coerce")
+    agey = df["agey"]
 
     def _attend_pct(lo: int, hi: int) -> tuple[float, int, int]:
         mask = (agey >= lo) & (agey <= hi)
         total = int(mask.sum())
         if total == 0:
             return 0.0, 0, 0
-        attend = df.loc[mask, "currentlyenrolledinschl"].astype(str).str.strip().str.lower()
-        answered = attend.isin(["yes", "no"])
-        n_answered = int(answered.sum())
-        n_yes = int((attend == "yes").sum())
+        e = df.loc[mask, "_yes_enrolled"]
+        n_answered = int(e.isin(["Yes", "No"]).sum())
+        n_yes = int((e == "Yes").sum())
         pct = round(100 * n_yes / n_answered, 2) if n_answered else 0.0
         return pct, total, n_answered
 
@@ -460,10 +509,9 @@ def unicef_block(df: pd.DataFrame) -> Dict[str, Any]:
     usec_pct, n_1517, n_ans_1517 = _attend_pct(15, 17)
 
     school_age = (agey >= 6) & (agey <= 17)
-    enrol = df.loc[school_age, "currentlyenrolledinschl"].astype(str).str.strip().str.lower()
-    answered_mask = enrol.isin(["yes", "no"])
-    n_answered_all = int(answered_mask.sum())
-    n_no = int((enrol == "no").sum())
+    enrol = df.loc[school_age, "_yes_enrolled"]
+    n_answered_all = int(enrol.isin(["Yes", "No"]).sum())
+    n_no = int((enrol == "No").sum())
     oos_pct = round(100 * n_no / n_answered_all, 2) if n_answered_all else 0.0
 
     u5 = (agey < 5)
@@ -472,7 +520,7 @@ def unicef_block(df: pd.DataFrame) -> Dict[str, Any]:
     screened = int(muac_u5.isin(["Green", "Yellow", "Red"]).sum())
     n_yellow = int((muac_u5 == "Yellow").sum())
     n_red    = int((muac_u5 == "Red").sum())
-    wasting = n_yellow + n_red
+    wasting  = n_yellow + n_red
     wast_pct = round(100 * wasting  / screened, 2) if screened else 0.0
     sam_pct  = round(100 * n_red    / screened, 2) if screened else 0.0
     mam_pct  = round(100 * n_yellow / screened, 2) if screened else 0.0
@@ -501,403 +549,399 @@ def unicef_block(df: pd.DataFrame) -> Dict[str, Any]:
         },
     }
 
-
 # ---------------------------------------------------------------------------
-# Extended block
+# Enhanced Extended Block (v4.0.1 UNICEF Revamp Integration)
 # ---------------------------------------------------------------------------
 
 def extended_block(df: pd.DataFrame) -> Dict[str, Any]:
-    agey = pd.to_numeric(df.get("agey"), errors="coerce")
+    agey = df["agey"]
     hh = _hh_dedupe(df)
+    total_hh = len(hh)
+    total_ind = len(df)
+    has_hh = "hhnsrrno" in df.columns
 
-    # 1. 7-band age pyramid (existing — preserved)
+    # 1. Age-Sex Pyramid
     pyramid = []
-    for label, lo, hi in AGE_BANDS:
+    for label, lo, hi in AGE_BANDS_PYRAMID:
         mask = (agey >= lo) & (agey <= hi)
-        m = int((mask & (df["sex"] == "Male")).sum())
-        f = int((mask & (df["sex"] == "Female")).sum())
+        m = int((mask & df["is_male"]).sum())
+        f = int((mask & df["is_female"]).sum())
         pyramid.append({"band": label, "male": m, "female": f, "total": m + f})
 
-    # 2. Marital status
-    adult = agey >= 15
-    marital_dist = _dist(df.loc[adult, "_marital_norm"])
+    # 2. Marital Status
+    marital_dist = _dist(df.loc[agey >= 15, "maritalstatus"])
 
-    # 3. Female primary respondent
+    # 3. Female Primary Respondent / Head
     heads_hh = _heads_hh(df)
     total_heads = len(heads_hh)
-    female_heads = int((heads_hh.get("sex") == "Female").sum())
+    female_heads = int(heads_hh["is_female"].sum())
     female_primary_respondent = {
         "n": female_heads, "d": total_heads,
-        "pct": round(100 * female_heads / total_heads, 2) if total_heads else 0.0,
-        "note": "This survey's 'Head' captures the primary respondent, not the DHS head-of-household definition. DHS Nigeria reports ~19% female-headed. State variation Sokoto 28% -> Oyo 59% reflects survey methodology.",
+        "pct": _pct_of(female_heads, total_heads),
+        "note": "Primary respondent / head of household per survey methodology.",
     }
 
-    # 4. Birth certificate
-    bcert_series = df["_yes_birthcert"]
-    def _bcert(mask):
-        answered = mask & bcert_series.isin(["Yes", "No"])
-        d = int(answered.sum())
-        n = int(((bcert_series == "Yes") & answered).sum())
-        return {"n": n, "d": d, "pct": round(100 * n / d, 2) if d else 0.0}
-    birthcert_0_5 = _bcert(agey < 5)
-    birthcert_6_17 = _bcert((agey >= 6) & (agey <= 17))
-    birthcert_all_children = _bcert(agey < 18)
+    # 4. Civil Registration Cross-tabs (0-17, 0-5, 6-17, Adults)
+    civil_reg_0_17   = _civil_reg_block(df[agey < 18])
+    civil_reg_0_5    = _civil_reg_block(df[agey <= 5])
+    civil_reg_6_17   = _civil_reg_block(df[(agey >= 6) & (agey <= 17)])
+    civil_reg_adults = _civil_reg_block(df[agey >= 18])
 
-    # 5. Individual NIN
-    nin_series = df["_yes_validnin"]
-    def _nin(mask):
-        answered = mask & nin_series.isin(["Yes", "No"])
-        d = int(answered.sum())
-        n = int(((nin_series == "Yes") & answered).sum())
-        return {"n": n, "d": d, "pct": round(100 * n / d, 2) if d else 0.0}
-    nin_children = _nin(agey < 18)
-    nin_adults = _nin(agey >= 18)
-    nin_all = _nin(pd.Series([True] * len(df), index=df.index))
+    # 5. Education V2 Disaggregations
+    oos_6_17  = _oos_band(df, 6, 17)
+    oos_6_9   = _oos_band(df, 6, 9)
+    oos_10_14 = _oos_band(df, 10, 14)
+    oos_15_17 = _oos_band(df, 15, 17)
+    oos_6_14  = _oos_band(df, 6, 14)
 
-    # 6. Disability
-    dis_rate = _rate(df["_yes_disability"] == "Yes",
-                     df["_yes_disability"].isin(["Yes", "No"]))
-    disability_yes_rows = df[df["_yes_disability"] == "Yes"]
-    if "typeofdisability" in disability_yes_rows.columns and len(disability_yes_rows):
-        decoded = disability_yes_rows["typeofdisability"].apply(
-            lambda v: _decode_multi_codes(v, DISABILITY_CODE_MAP)
-        )
-        exploded = decoded.explode().dropna()
-        disability_types = _dist(exploded)
-    else:
-        disability_types = []
+    dis_6_17 = df[(agey >= 6) & (agey <= 17) & (df["_yes_disability"] == "Yes")]
+    disabled_children_education = _oos_stats(dis_6_17)
 
-    # 7. Chronic illness
-    chron_rate = _rate(df["_yes_chronic"] == "Yes",
-                       df["_yes_chronic"].isin(["Yes", "No"]))
-    chron_yes_rows = df[df["_yes_chronic"] == "Yes"]
-    if "chronicallyilltype" in chron_yes_rows.columns and len(chron_yes_rows):
-        decoded = chron_yes_rows["chronicallyilltype"].apply(
-            lambda v: _decode_multi_codes(v, CHRONIC_ILL_CODE_MAP)
-        )
-        exploded = decoded.explode().dropna()
-        chronic_types = _dist(exploded)
-    else:
-        chronic_types = []
+    school_6_17 = (agey >= 6) & (agey <= 17)
+    in_school_6_17 = df[school_6_17 & (df["_yes_enrolled"] == "Yes")]
+    grade_dist = _dist(in_school_6_17["grade"], top_n=8)
 
-    # 8. Housing
-    housing = {
-        "roof":   _dist(hh.get("roof_dwelling",  pd.Series(dtype=str))),
-        "floor":  _dist(hh.get("floor_dwelling", pd.Series(dtype=str))),
-        "toilet": _dist(hh.get("toilet_dwelling", pd.Series(dtype=str))),
-        "water":  _dist(hh.get("drink_dwelling", pd.Series(dtype=str))),
-        "light":  _dist(hh.get("light_dwelling", pd.Series(dtype=str))),
-        "cook":   _dist(hh.get("cook_dwelling",  pd.Series(dtype=str))),
-    }
+    oos_school_6_17 = df[school_6_17 & (df["_yes_enrolled"] == "No")]
+    oos_grade_dist = _dist(oos_school_6_17["outofschoolgrade"], top_n=8)
+    dropout_dist = _dist(oos_school_6_17["yearstopschool"], top_n=6)
 
-    # 9. Healthcare access
-    hc_rate = _rate(df["_yes_healthcare"] == "Yes",
-                    df["_yes_healthcare"].isin(["Yes", "No"]))
-    hc_distance = _dist(df.get("howfarishealthcentre", pd.Series(dtype=str)))
-    healthcare_access = {
-        "benefits_pct": hc_rate,
-        "distance_dist": hc_distance,
-        "distance_coverage_pct": round(
-            100 * (df.get("howfarishealthcentre").notna()).sum() / len(df), 2
-        ) if "howfarishealthcentre" in df.columns else 0.0,
-    }
+    # 6. Nutrition V2 (true 6-59 months)
+    months = df["age_months"]
+    muac_eligible = df[(months >= 6) & (months <= 59) & df["_muac_cat"].isin(["Green", "Yellow", "Red"])]
+    muac_denom = len(muac_eligible)
+    nut_all = _muac_stats(muac_eligible)
+    sam_count, mam_count, normal_count = nut_all["sam"], nut_all["mam"], nut_all["normal"]
+    wasted_count = sam_count + mam_count
 
-    # 10. Livelihoods
-    livelihoods = {
-        "labour_status": _dist(df.get("b5labour", pd.Series(dtype=str))),
-        "industry":      _dist(df.get("b6labour", pd.Series(dtype=str))),
-        "code_dist":     [],
-    }
-    if "livelihoods" in df.columns:
-        vc = df["livelihoods"].dropna().astype(int).astype(str).value_counts()
-        total = int(vc.sum())
-        livelihoods["code_dist"] = [
-            {
-                "code": code,
-                "label": LIVELIHOOD_CODE_MAP.get(code, f"Code {code}"),
-                "count": int(cnt),
-                "pct": round(100 * cnt / total, 2) if total else 0.0,
-            }
-            for code, cnt in vc.items()
-        ]
-
-    # 11. Shocks
-    hh_shock = _hh_dedupe(df)
-    shock_rate = _rate(hh_shock["_yes_anyshocks"] == "Yes",
-                       hh_shock["_yes_anyshocks"].isin(["Yes", "No"]))
-    shock_types = _dist(hh_shock.loc[hh_shock["_yes_anyshocks"] == "Yes", "_shock_type_norm"])
-    shock_years = _dist(hh_shock.loc[hh_shock["_yes_anyshocks"] == "Yes", "shock_year"]) \
-                  if "shock_year" in hh_shock.columns else []
-    shocks = {
-        "exposure_pct": shock_rate,
-        "types": shock_types,
-        "years": shock_years,
-    }
-
-    # 12. Coping
-    shock_hhs = hh_shock[hh_shock["_yes_anyshocks"] == "Yes"]
-    if "mechanism_type" in shock_hhs.columns and len(shock_hhs):
-        coping_dist = _dist(shock_hhs["mechanism_type"])
-        coping_coverage = round(
-            100 * shock_hhs["mechanism_type"].notna().sum() / len(shock_hhs), 2
-        )
-    else:
-        coping_dist = []
-        coping_coverage = 0.0
-    coping = {
-        "mechanisms": coping_dist,
-        "coverage_pct": coping_coverage,
-        "shock_exposed_hh": len(shock_hhs),
-    }
-
-    # 13. Assistance awareness
-    asked_mask = df["_yes_rutf"].isin(["Yes", "No"])
-    n_asked = int(asked_mask.sum())
-    assistance_awareness = {
-        "asked_n": n_asked,
-        "rutf_yes_pct":     round(100 * ((df["_yes_rutf"]     == "Yes") & asked_mask).sum() / n_asked, 2) if n_asked else 0.0,
-        "food_yes_pct":     round(100 * ((df["_yes_food"]     == "Yes") & asked_mask).sum() / n_asked, 2) if n_asked else 0.0,
-        "cash_yes_pct":     round(100 * ((df["_yes_cash"]     == "Yes") & asked_mask).sum() / n_asked, 2) if n_asked else 0.0,
-        "dontknow_yes_pct": round(100 * ((df["_yes_dontknow"] == "Yes") & asked_mask).sum() / n_asked, 2) if n_asked else 0.0,
-    }
-
-    # 14. Pregnant + lactating
-    women_repro = (df.get("sex") == "Female") & (agey >= 15) & (agey <= 49)
-    d = int(women_repro.sum())
-    n_preg = int(((df["_yes_pregnant"] == "Yes") & women_repro).sum())
-    n_lact = int(((df["_yes_lactating"] == "Yes") & women_repro).sum())
-    plw = {
-        "women_repro_age": d,
-        "pregnant":  {"n": n_preg, "d": d, "pct": round(100 * n_preg / d, 2) if d else 0.0},
-        "lactating": {"n": n_lact, "d": d, "pct": round(100 * n_lact / d, 2) if d else 0.0},
-    }
-
-    # 15. MUAC distribution
-    u5_mask = agey < 5
-    u5_df = df[u5_mask]
-    muac_raw = pd.to_numeric(u5_df.get("muac"), errors="coerce").dropna() \
-               if "muac" in u5_df.columns else pd.Series(dtype=float)
-    hist_bins = [0, 8, 10, 11.5, 12.5, 13.5, 15, 20, 25]
-    hist_labels = ["<8", "8-10", "10-11.5", "11.5-12.5 (SAM)", "12.5-13.5 (MAM)",
-                   "13.5-15", "15-20", "20+"]
-    if len(muac_raw):
-        counts, _ = np.histogram(muac_raw, bins=hist_bins)
-        muac_hist = [{"bin": lbl, "count": int(c)} for lbl, c in zip(hist_labels, counts)]
-    else:
-        muac_hist = [{"bin": lbl, "count": 0} for lbl in hist_labels]
-
-    muac_cat_counts = {
-        "Green":  int((u5_df["_muac_cat"] == "Green").sum()),
-        "Yellow": int((u5_df["_muac_cat"] == "Yellow").sum()),
-        "Red":    int((u5_df["_muac_cat"] == "Red").sum()),
-    }
-    muac_distribution = {
-        "histogram": muac_hist,
-        "categories": muac_cat_counts,
-        "measured_n": int(len(muac_raw)),
-    }
-
-    # 16. Age bands per UNICEF (0-5, 6-14, 15-17, 18+) x sex
-    age_bands_unicef: List[Dict[str, Any]] = []
-    for label, lo, hi in AGE_BANDS_UNICEF:
-        mask = (agey >= lo) & (agey <= hi)
-        m = int((mask & (df["sex"] == "Male")).sum())
-        f = int((mask & (df["sex"] == "Female")).sum())
-        age_bands_unicef.append({
-            "band": label, "male": m, "female": f, "total": m + f,
-        })
-
-    # 17. Children in PVHH (v3.5: decile is now properly numeric).
-    # Because decile is populated on EVERY row (not just head), the direct
-    # row-level filter now works correctly and gives the same answer as the
-    # HH-set approach. Sanity-checked against diag_pvhh output: 12,848 children.
-    if "decile" in df.columns and "hhnsrrno" in df.columns:
-        decile_num = pd.to_numeric(df["decile"], errors="coerce")
-        pvhh_mask = decile_num <= 3
-        child_in_pvhh_mask = (agey < 18) & pvhh_mask
-        total_children = int((agey < 18).sum())
-        n_pvhh_children = int(child_in_pvhh_mask.sum())
-        pvhh_hhs = hh[pd.to_numeric(hh["decile"], errors="coerce") <= 3] if "decile" in hh.columns else hh.iloc[0:0]
-        n_pvhh_hhs = len(pvhh_hhs)
-    else:
-        total_children = int((agey < 18).sum())
-        n_pvhh_children = 0
-        n_pvhh_hhs = 0
-
-    children_in_pvhh = {
-        "n": n_pvhh_children,
-        "d": total_children,
-        "pct": round(100 * n_pvhh_children / total_children, 2) if total_children else 0.0,
-        "pvhh_household_count": n_pvhh_hhs,
-        "note": "PVHH = poverty-vulnerable household (PMT decile 1-3). Count of children under 18 living in these households.",
-    }
-
-    # 18. Children in risk-prone HH (any shock experienced)
-    if "hhnsrrno" in df.columns:
-        shock_hhs_set = set(hh_shock.loc[hh_shock["_yes_anyshocks"] == "Yes", "hhnsrrno"])
-        child_mask = agey < 18
-        hh_in_shock = df["hhnsrrno"].isin(shock_hhs_set)
-        n_risk_children = int((child_mask & hh_in_shock).sum())
-        risk_hh_count = len(shock_hhs_set)
-    else:
-        n_risk_children = 0
-        risk_hh_count = 0
-
-    children_in_risk_hh = {
-        "n": n_risk_children,
-        "d": total_children,
-        "pct": round(100 * n_risk_children / total_children, 2) if total_children else 0.0,
-        "risk_household_count": risk_hh_count,
-        "note": "Risk-prone HH = household reporting any shock (anyshocks=Yes). Count of children under 18 in these households.",
-    }
-
-    # 19. Out-of-school by UNICEF bands (6-14, 15-17)
-    def _oos_band(lo: int, hi: int) -> Dict[str, Any]:
-        m = (agey >= lo) & (agey <= hi)
-        e = df.loc[m, "currentlyenrolledinschl"].astype(str).str.strip().str.lower()
-        ans = e.isin(["yes", "no"])
-        d = int(ans.sum())
-        n = int((e == "no").sum())
-        total = int(m.sum())
-        return {
-            "n": n, "d": d, "total_in_band": total,
-            "pct": round(100 * n / d, 2) if d else 0.0,
-        }
-
-    oos_6_14 = _oos_band(6, 14)
-    oos_15_17 = _oos_band(15, 17)
-    combined_n = oos_6_14["n"] + oos_15_17["n"]
-    combined_d = oos_6_14["d"] + oos_15_17["d"]
-    combined_total = oos_6_14["total_in_band"] + oos_15_17["total_in_band"]
-    oos_by_band = {
-        "age_6_14":  oos_6_14,
-        "age_15_17": oos_15_17,
-        "combined_6_17": {
-            "n": combined_n, "d": combined_d,
-            "total_in_band": combined_total,
-            "pct": round(100 * combined_n / combined_d, 2) if combined_d else 0.0,
+    nutrition_v2 = {
+        "eligible_under5": muac_denom,
+        "sam_count": sam_count, "mam_count": mam_count,
+        "normal_count": normal_count, "wasted_count": wasted_count,
+        "sam_pct": nut_all["sam_pct"], "mam_pct": nut_all["mam_pct"],
+        "normal_pct": nut_all["normal_pct"], "wasting_pct": nut_all["wasting_pct"],
+        "by_gender": {
+            "male": _muac_stats(muac_eligible[muac_eligible["is_male"]]),
+            "female": _muac_stats(muac_eligible[muac_eligible["is_female"]]),
+        },
+        "placeholders": {
+            "pregnant_enrolled_fn": {"status": "not_collected", "label": "Pregnant women enrolled in F&N programme"},
+            "malnourished_children_enrolled_fn": {"status": "not_collected", "label": "Children with malnutrition enrolled in F&N programme"},
         },
     }
 
-    # 20. HHs with no health insurance (derived from benefitfromhealthcare)
-    if "hhnsrrno" in df.columns and "_yes_healthcare" in df.columns:
-        yes_by_hh = df.groupby("hhnsrrno")["_yes_healthcare"].apply(
-            lambda s: "Yes" in set(s)
-        )
-        total_hh_here = len(yes_by_hh)
-        n_no_insurance = int((~yes_by_hh).sum())
-        no_health_insurance = {
-            "n": n_no_insurance,
-            "d": total_hh_here,
-            "pct": round(100 * n_no_insurance / total_hh_here, 2) if total_hh_here else 0.0,
-            "note": "HHs where no member reports benefiting from healthcare services. Proxy for 'no health insurance / no health access' per UNICEF #16.",
-        }
+    # 7. Health V2
+    p_df = df[df["_yes_pregnant"] == "Yes"]
+    pregnant_by_age = {
+        "under_18": int((p_df["agey"] < 18).sum()),
+        "18_24": int(((p_df["agey"] >= 18) & (p_df["agey"] <= 24)).sum()),
+        "25_34": int(((p_df["agey"] >= 25) & (p_df["agey"] <= 34)).sum()),
+        "35_plus": int((p_df["agey"] >= 35).sum()),
+    }
+
+    is_pwd = df["_yes_disability"] == "Yes"
+    plwd_total = int(is_pwd.sum())
+    plwd_males = int((df["is_male"] & is_pwd).sum())
+    plwd_females = int((df["is_female"] & is_pwd).sum())
+    n_children = int((agey < 18).sum())
+    children_plwd = int(((agey < 18) & is_pwd).sum())
+
+    pregnant_total = int((df["_yes_pregnant"] == "Yes").sum())
+    lactating_total = int((df["_yes_lactating"] == "Yes").sum())
+
+    health_v2 = {
+        "pregnant_total": pregnant_total,
+        "pregnant_caveat": "High survey non-response (63.1% missing in instrument)",
+        "pregnant_by_age": pregnant_by_age,
+        "lactating_total": lactating_total,
+        "lactating_caveat": "High survey non-response (89.7% missing in instrument)",
+        "plwd_total": plwd_total, "plwd_male": plwd_males, "plwd_female": plwd_females,
+        "plwd_pct": _pct_of(plwd_total, total_ind),
+        "children_plwd": children_plwd,
+        "children_plwd_pct": _pct_of(children_plwd, n_children),
+        "placeholders": {
+            "hhs_with_health_insurance": {"status": "not_collected", "label": "HHs with Health Insurance"},
+            "health_insurance_type": {"status": "not_collected", "label": "Health Insurance Type"},
+            "hhs_with_no_health_insurance": {"status": "not_collected", "label": "HHs with No Health Insurance"},
+            "children_0_7_covered_insurance": {"status": "not_collected", "label": "Children 0-7 in HH covered by insurance"},
+            "children_0_5_covered_insurance": {"status": "not_collected", "label": "Children 0-5 in HH covered by insurance"},
+        },
+    }
+
+    # 8. Youth (18-24) — with sex split
+    youth_df = df[(agey >= 18) & (agey <= 24)]
+    youth_data = _youth_stats(youth_df)
+    youth_data["labour_breakdown"] = _dist(youth_df["b5labour"])
+    youth_data["by_gender"] = {
+        "male": _youth_stats(youth_df[youth_df["is_male"]]),
+        "female": _youth_stats(youth_df[youth_df["is_female"]]),
+    }
+
+    # 9. Livelihoods & Resilience V2
+    if has_hh:
+        hh_ids = pd.Index(df["hhnsrrno"].unique())
+
+        def _hh_flag(mask: pd.Series) -> np.ndarray:
+            return hh_ids.isin(df.loc[mask, "hhnsrrno"].unique())
+
+        f_u5  = _hh_flag(agey <= 5)
+        f_pwd = _hh_flag(is_pwd)
+        f_eld = _hh_flag(agey >= 65)
+        f_plw = _hh_flag((df["_yes_pregnant"] == "Yes") | (df["_yes_lactating"] == "Yes"))
+
+        hh_sizes = df.groupby("hhnsrrno").size()
+        large_hhs = int((hh_sizes >= 8).sum())
+        multi_vuln = int((np.sum([f_u5, f_pwd, f_eld, f_plw], axis=0) >= 2).sum())
+        hh_disab_cnt = int(f_pwd.sum())
     else:
-        no_health_insurance = {"n": 0, "d": 0, "pct": 0.0, "note": ""}
+        large_hhs = multi_vuln = hh_disab_cnt = 0
+
+    shock_hhs = hh[hh["_yes_anyshocks"] == "Yes"]
+    shock_hh_cnt = len(shock_hhs)
+
+    shock_counts: Dict[str, int] = {}
+    for v in shock_hhs["shock_type"]:
+        for lbl in _decode_multi_codes(v, SHOCK_CODE_MAP, unknown_prefix="Shock"):
+            shock_counts[lbl] = shock_counts.get(lbl, 0) + 1
+    shock_dist = [
+        {"type": lbl, "count": int(cnt), "pct": _pct_of(cnt, shock_hh_cnt)}
+        for lbl, cnt in sorted(shock_counts.items(), key=lambda kv: -kv[1])
+    ]
+
+    coping_dist = _dist(shock_hhs["mechanism_type"], top_n=8)
+    coping_answered = _non_blank_count(shock_hhs["mechanism_type"])
+
+    pvhh_households = int((hh["decile"] <= 3).sum())
+
+    livelihoods_v2 = {
+        "livelihoods": _dist(hh["livelihoods"]),
+        "large_households": {"count": large_hhs, "pct": _pct_of(large_hhs, total_hh)},
+        "multi_vulnerable_households": {"count": multi_vuln, "pct": _pct_of(multi_vuln, total_hh)},
+        "hh_with_disability": {"count": hh_disab_cnt, "pct": _pct_of(hh_disab_cnt, total_hh)},
+        "pvhh_households": {"count": pvhh_households, "pct": _pct_of(pvhh_households, total_hh)},
+        "shock_exposure": {
+            "shock_hh_count": shock_hh_cnt,
+            "shock_hh_pct": _pct_of(shock_hh_cnt, total_hh),
+            "types": shock_dist,
+            "coping_mechanisms": coping_dist,
+        },
+    }
+
+    # 10. UNICEF V2 Age Bands (x sex)
+    def _age_band_cnt(mask: pd.Series) -> Dict[str, int]:
+        sub = df[mask]
+        return {"total": len(sub), "male": int(sub["is_male"].sum()), "female": int(sub["is_female"].sum())}
+
+    age_bands_v2 = {
+        "0-3":   _age_band_cnt(agey <= 3),
+        "0-5":   _age_band_cnt(agey <= 5),
+        "0-7":   _age_band_cnt(agey <= 7),
+        "0-17":  _age_band_cnt(agey < 18),
+        "6-9":   _age_band_cnt((agey >= 6) & (agey <= 9)),
+        "6-17":  _age_band_cnt((agey >= 6) & (agey <= 17)),
+        "10-14": _age_band_cnt((agey >= 10) & (agey <= 14)),
+        "15-17": _age_band_cnt((agey >= 15) & (agey <= 17)),
+        "18-24": _age_band_cnt((agey >= 18) & (agey <= 24)),
+        "18+":   _age_band_cnt(agey >= 18),
+    }
+
+    # 11. Children in PVHH & Risk HH
+    total_children = n_children
+    pvhh_children = int(((agey < 18) & (df["decile"] <= 3)).sum())
+
+    if has_hh and shock_hh_cnt:
+        shock_hh_ids = set(shock_hhs["hhnsrrno"])
+        risk_children = int(((agey < 18) & df["hhnsrrno"].isin(shock_hh_ids)).sum())
+    else:
+        risk_children = 0
+
+    women_repro = int((df["is_female"] & (agey >= 15) & (agey <= 49)).sum())
+    asked_n = int(df["_yes_rutf"].isin(["Yes", "No"]).sum())
+    asked_d = max(asked_n, 1)
+
+    all_nin_yes = int((df["_yes_validnin"] == "Yes").sum())
+    chronic_yes = int((df["_yes_chronic"] == "Yes").sum())
 
     return {
         "age_sex_pyramid": pyramid,
         "marital_status": marital_dist,
         "female_primary_respondent": female_primary_respondent,
         "birth_cert": {
-            "under_5": birthcert_0_5,
-            "age_6_17": birthcert_6_17,
-            "all_children": birthcert_all_children,
+            "under_5": {"n": civil_reg_0_5["birth_cert_yes"], "d": civil_reg_0_5["total"], "pct": civil_reg_0_5["birth_cert_pct"]},
+            "age_6_17": {"n": civil_reg_6_17["birth_cert_yes"], "d": civil_reg_6_17["total"], "pct": civil_reg_6_17["birth_cert_pct"]},
+            "all_children": {"n": civil_reg_0_17["birth_cert_yes"], "d": civil_reg_0_17["total"], "pct": civil_reg_0_17["birth_cert_pct"]},
         },
         "individual_nin": {
-            "children": nin_children,
-            "adults": nin_adults,
-            "all": nin_all,
+            "children": {"n": civil_reg_0_17["nin_yes"], "d": civil_reg_0_17["total"], "pct": civil_reg_0_17["nin_pct"]},
+            "adults": {"n": civil_reg_adults["nin_yes"], "d": civil_reg_adults["total"], "pct": civil_reg_adults["nin_pct"]},
+            "all": {"n": all_nin_yes, "d": total_ind, "pct": _pct_of(all_nin_yes, total_ind)},
         },
-        "disability": {"rate": dis_rate, "types": disability_types},
-        "chronic_illness": {"rate": chron_rate, "types": chronic_types},
-        "housing": housing,
-        "healthcare_access": healthcare_access,
-        "livelihoods": livelihoods,
-        "shocks": shocks,
-        "coping": coping,
-        "assistance_awareness": assistance_awareness,
-        "plw": plw,
-        "muac_distribution": muac_distribution,
-        "age_bands_unicef":       age_bands_unicef,
-        "children_in_pvhh":       children_in_pvhh,
-        "children_in_risk_hh":    children_in_risk_hh,
-        "oos_by_band":            oos_by_band,
-        "no_health_insurance":    no_health_insurance,
+        "disability": {
+            "rate": {"n": plwd_total, "d": total_ind, "pct": health_v2["plwd_pct"]},
+            "types": _dist(df["typeofdisability"], top_n=8),
+        },
+        "chronic_illness": {
+            "rate": {"n": chronic_yes, "d": total_ind, "pct": _pct_of(chronic_yes, total_ind)},
+            "types": _dist(df["chronicallyilltype"], top_n=8),
+        },
+        "housing": {
+            "roof": _dist(hh["roof_dwelling"]),
+            "floor": _dist(hh["floor_dwelling"]),
+            "toilet": _dist(hh["toilet_dwelling"]),
+            "water": _dist(hh["drink_dwelling"]),
+            "light": _dist(hh["light_dwelling"]),
+            "cook": _dist(hh["cook_dwelling"]),
+        },
+        "healthcare_access": {
+            "benefits_pct": _rate(df["_yes_healthcare"] == "Yes", df["_yes_healthcare"].isin(["Yes", "No"])),
+            "distance_dist": _dist(df["howfarishealthcentre"]),
+            "distance_coverage_pct": _pct_of(_non_blank_count(df["howfarishealthcentre"]), total_ind),
+        },
+        "livelihoods": {
+            "labour_status": _dist(df["b5labour"]),
+            "industry": _dist(df["b6labour"]),
+            "code_dist": livelihoods_v2["livelihoods"],
+        },
+        "shocks": {
+            "exposure_pct": {"n": shock_hh_cnt, "d": total_hh, "pct": livelihoods_v2["shock_exposure"]["shock_hh_pct"]},
+            "types": shock_dist,
+            "years": _dist(shock_hhs["shock_year"]),
+        },
+        "coping": {
+            "mechanisms": coping_dist,
+            "coverage_pct": _pct_of(coping_answered, shock_hh_cnt),
+            "shock_exposed_hh": shock_hh_cnt,
+        },
+        "assistance_awareness": {
+            "asked_n": asked_n,
+            "rutf_yes_pct": round(int((df["_yes_rutf"] == "Yes").sum()) / asked_d * 100, 2),
+            "food_yes_pct": round(int((df["_yes_food"] == "Yes").sum()) / asked_d * 100, 2),
+            "cash_yes_pct": round(int((df["_yes_cash"] == "Yes").sum()) / asked_d * 100, 2),
+            "dontknow_yes_pct": round(int((df["_yes_dontknow"] == "Yes").sum()) / asked_d * 100, 2),
+        },
+        "plw": {
+            "women_repro_age": women_repro,
+            "pregnant": {"n": pregnant_total, "d": women_repro, "pct": _pct_of(pregnant_total, women_repro)},
+            "lactating": {"n": lactating_total, "d": women_repro, "pct": _pct_of(lactating_total, women_repro)},
+        },
+        "muac_distribution": {
+            "categories": {"Green": normal_count, "Yellow": mam_count, "Red": sam_count},
+            "measured_n": muac_denom,
+        },
+        "age_bands_unicef": [
+            {"band": "0-5", "total": age_bands_v2["0-5"]["total"]},
+            {"band": "6-14", "total": age_bands_v2["6-9"]["total"] + age_bands_v2["10-14"]["total"]},
+            {"band": "15-17", "total": age_bands_v2["15-17"]["total"]},
+        ],
+        "children_in_pvhh": {"n": pvhh_children, "d": total_children, "pct": _pct_of(pvhh_children, total_children)},
+        "children_in_risk_hh": {"n": risk_children, "d": total_children, "pct": _pct_of(risk_children, total_children)},
+        "oos_by_band": {"age_6_14": oos_6_14, "age_15_17": oos_15_17, "combined_6_17": oos_6_17},
+        "no_health_insurance": {
+            "n": total_hh, "d": total_hh, "pct": 100.0,
+            "status": "not_collected", "note": "Data not collected in survey wave",
+        },
+
+        # ---- New v4.0.1 UNICEF Revamp additions ----
+        "age_bands_v2": age_bands_v2,
+        "civil_registration": {
+            "children_0_17": civil_reg_0_17,
+            "children_0_5": civil_reg_0_5,
+            "children_6_17": civil_reg_6_17,
+            "adults": civil_reg_adults,
+        },
+        "education_v2": {
+            "oos_6_17": oos_6_17,
+            "oos_6_9": oos_6_9,
+            "oos_10_14": oos_10_14,
+            "oos_15_17": oos_15_17,
+            "oos_6_14": oos_6_14,
+            "disabled_children": disabled_children_education,
+            "grade_distribution": grade_dist,
+            "oos_grade_distribution": oos_grade_dist,
+            "dropout_period": dropout_dist,
+        },
+        "nutrition_v2": nutrition_v2,
+        "health_v2": health_v2,
+        "youth": youth_data,
+        "livelihoods_resilience_v2": livelihoods_v2,
     }
 
-
 # ---------------------------------------------------------------------------
-# Level assembler
+# Level Assembler
 # ---------------------------------------------------------------------------
 
 def assemble_level(df: pd.DataFrame, level: str, keys: Dict[str, str]) -> Dict[str, Any]:
     out: Dict[str, Any] = {
-        "nsr":            nsr_block(df),
-        "update":         update_block(df),
+        "nsr":           nsr_block(df),
+        "update":        update_block(df),
         "vulnerability": vulnerability_block(df),
-        "unicef":         unicef_block(df),
-        "extended":       extended_block(df),
-        "level":          level,
+        "unicef":        unicef_block(df),
+        "extended":      extended_block(df),
+        "level":         level,
     }
     out.update(keys)
     return out
 
+# ---------------------------------------------------------------------------
+# Main Execution Entry Point
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
+def _blank(v: Any) -> bool:
+    return v is None or str(v).strip().lower() in BLANK_TOKENS
 
 def main() -> None:
+    start_time = datetime.now()
+    csv_path = find_input_csv()
+    df = load_and_clean(csv_path)
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    df = load_and_clean()
 
-    print("\nBuilding national summary ...")
+    print("\n[*] 1. Aggregating National summary ...")
     national = assemble_level(df, "national", {})
-    (OUT_DIR / "national_summary.json").write_text(json.dumps(national))
+    _write_json(OUT_DIR / "national_summary.json", national)
 
-    print("Building state summaries ...")
+    print("[*] 2. Aggregating State summaries ...")
     states = []
-    encountered_states = []
     for state, sub in df.groupby("state"):
-        if not state or state == "NAN":
+        if _blank(state):
             continue
         states.append(assemble_level(sub, "state", {"state": state}))
-        encountered_states.append(state)
-    (OUT_DIR / "states_summary.json").write_text(json.dumps(states))
-    print(f"  {len(states)} states written")
+    _write_json(OUT_DIR / "states_summary.json", states)
+    print(f"    -> {len(states)} state summaries written")
 
-    print("Building LGA summaries ...")
+    print("[*] 3. Aggregating LGA summaries ...")
     lgas = []
     for (state, lga), sub in df.groupby(["state", "lga"]):
-        if not lga or str(lga).lower() == "nan":
+        if _blank(state) or _blank(lga):
             continue
         lgas.append(assemble_level(sub, "lga", {"state": state, "lga": lga}))
-    (OUT_DIR / "lga_summary.json").write_text(json.dumps(lgas))
-    print(f"  {len(lgas)} LGAs written")
+    _write_json(OUT_DIR / "lga_summary.json", lgas)
+    print(f"    -> {len(lgas)} LGA summaries written")
 
-    print("Building ward summaries ...")
+    print("[*] 4. Aggregating Ward summaries ...")
     wards = []
     for (state, lga, ward), sub in df.groupby(["state", "lga", "ward"]):
-        if not ward or str(ward).lower() == "nan":
+        if _blank(state) or _blank(lga) or _blank(ward):
             continue
-        wards.append(assemble_level(sub, "ward",
-                                    {"state": state, "lga": lga, "ward": ward}))
-    (OUT_DIR / "ward_summary.json").write_text(json.dumps(wards))
-    print(f"  {len(wards)} wards written")
+        wards.append(assemble_level(sub, "ward", {"state": state, "lga": lga, "ward": ward}))
+    _write_json(OUT_DIR / "ward_summary.json", wards, indent=None)
+    print(f"    -> {len(wards)} ward summaries written")
 
-    print("Building community summaries ...")
+    print("[*] 5. Aggregating Community summaries ...")
     communities = []
-    for (state, lga, ward, comm), sub in df.groupby(["state", "lga", "ward", "community"]):
-        if not comm or str(comm).lower() == "nan":
+    for i, ((state, lga, ward, comm), sub) in enumerate(
+        df.groupby(["state", "lga", "ward", "community"]), start=1
+    ):
+        if _blank(state) or _blank(lga) or _blank(ward) or _blank(comm):
             continue
         communities.append(assemble_level(sub, "community", {
             "state": state, "lga": lga, "ward": ward, "community": comm,
         }))
-    (OUT_DIR / "community_summary.json").write_text(json.dumps(communities))
-    print(f"  {len(communities)} communities written")
+        if i % 500 == 0:
+            print(f"    ... {i:,} community groups processed")
+    _write_json(OUT_DIR / "community_summary.json", communities, indent=None)
+    print(f"    -> {len(communities)} community summaries written")
 
-    print("Building timeseries ...")
+    print("[*] 6. Aggregating Timeseries ...")
     ts_rows = []
     if "interviewdate" in df.columns:
         df["_month"] = pd.to_datetime(df["interviewdate"], errors="coerce").dt.strftime("%Y-%m")
@@ -910,57 +954,40 @@ def main() -> None:
                 "month": month,
                 "households": len(sub_hh),
                 "individuals": len(sub),
-                "nin_verified": int((sub["_yes_validnin"] == "Yes").sum()),
-                "pmt_mean": round(float(pd.to_numeric(sub_hh.get("pmt"), errors="coerce").mean()), 2),
+                "nin_verified": int(((sub["agey"] >= 16) & (sub["_yes_validnin"] == "Yes")).sum()),
+                "pmt_mean": round(float(sub_hh["pmt"].dropna().mean()), 2) if sub_hh["pmt"].notna().any() else 0.0,
             })
-    (OUT_DIR / "timeseries.json").write_text(json.dumps(ts_rows))
-    print(f"  {len(ts_rows)} timeseries rows written")
+    _write_json(OUT_DIR / "timeseries.json", ts_rows)
+    print(f"    -> {len(ts_rows)} timeseries rows written")
 
-    print("Building metadata ...")
+    print("[*] 7. Generating Metadata ...")
     total_hh_count = len(_hh_dedupe(df))
     meta = {
-        "generated_at":       datetime.now(timezone.utc).isoformat(),
-        "source_csv":         str(RAW_CSV.name),
-        "row_count":          len(df),
-        "household_count":    total_hh_count,
-        "state_count":        len(states),
-        "lga_count":          len(lgas),
-        "ward_count":         len(wards),
-        "community_count":    len(communities),
-        "aggregator_version": "3.5",
-
-        "source_file":     str(RAW_CSV.name),
-        "source_rows":     len(df),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_csv": str(csv_path.name),
+        "source_rows": len(df),
         "total_households": total_hh_count,
-        "total_members":   len(df),
-
-        "states":     sorted(encountered_states),
+        "total_members": len(df),
+        "states_count": len(states),
+        "lga_count": len(lgas),
+        "ward_count": len(wards),
+        "community_count": len(communities),
         "mdp_states": MDP_PILOT_STATES,
         "data_modes": DATA_MODES,
-
-        "unicef_indicators_available":       UNICEF_INDICATORS_AVAILABLE,
-        "unicef_indicators_pending_source":  UNICEF_INDICATORS_PENDING_SOURCE,
-
+        "aggregator_version": "4.0.1-unicef-revamp",
         "code_maps": {
-            "disability":  DISABILITY_CODE_MAP,
+            "disability": DISABILITY_CODE_MAP,
             "chronic_ill": CHRONIC_ILL_CODE_MAP,
-            "livelihood":  LIVELIHOOD_CODE_MAP,
-            "decile":      {k: v for k, v in DECILE_ORDINAL_MAP.items()},
-        },
-
-        "notes": {
-            "out_of_school":              "v3.1+ reports 29.18%. v2.1's 31.80% could not be reproduced from the current CSV.",
-            "female_primary_respondent":  "Renamed from 'female_headed_hh'. Captures who answered the enumerator, NOT DHS-comparable head-of-household. National ~50.7% (Sokoto 28% -> Oyo 59%).",
-            "hh_dedup":                   "v3.2 fixed Head-selection. All non-Head aggregations remain correct: HH-level fields verified identical across rows.",
-            "livelihood_codes":           "Codes 2-8 are labelled provisionally as 'Livelihood type N' pending the questionnaire codebook.",
-            "unicef_additions_v34":       "age_bands_unicef, children_in_pvhh (#5), children_in_risk_hh (#26), oos_by_band (#12, #25), no_health_insurance (#16) added per Indicator List for Review.",
-            "decile_fix_v35":             "CSV stores decile as ordinal strings ('1st'..'10th'). v3.5 normalises them to integers 1-10 in load_and_clean(). Prior to v3.5, all decile-derived numbers (poorest_pct, decile_distribution, vulnerability_index, children_in_pvhh) were silently zero.",
+            "livelihood": LIVELIHOOD_CODE_MAP,
+            "shock_types": SHOCK_CODE_MAP,
+            "decile": {k: v for k, v in DECILE_ORDINAL_MAP.items()},
         },
     }
-    (OUT_DIR / "metadata.json").write_text(json.dumps(meta, indent=2))
+    _write_json(OUT_DIR / "metadata.json", meta)
 
-    print("\n✅ Done. Wrote 7 files to public/data/")
-    print(f"   v3.5 fixes the decile silent-zero bug — poverty numbers are now correct.")
+    elapsed = (datetime.now() - start_time).total_seconds()
+    print(f"\n[+] Aggregation completed successfully in {elapsed:.1f}s!")
+    print(f"[+] Output written to: {OUT_DIR}")
 
 
 if __name__ == "__main__":

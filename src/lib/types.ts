@@ -1,25 +1,74 @@
 /**
- * TypeScript Data Model
- * ---------------------
- * Interfaces matching the pre-aggregated JSON files from scripts/aggregate.py (v3.4+).
+ * NASSCO MDP Dashboard — Type Definitions
+ * Version 4.0.0 (UNICEF Revamp)
  *
- * Every geographic level (national / state / LGA / ward / community) shares the
- * same GeoRecord shape. See scripts/aggregate.py file-header changelog for
- * methodology notes on each metric.
- *
- * v3.4 additions to ExtendedBlock:
- *   - age_bands_unicef     (UNICEF #4, #6 — 4 age bands x sex)
- *   - children_in_pvhh     (UNICEF #5)
- *   - children_in_risk_hh  (UNICEF #26)
- *   - oos_by_band          (UNICEF #12, #25 — OOS split into 6-14 vs 15-17)
- *   - no_health_insurance  (UNICEF #16)
+ * Ground rules:
+ * - DashboardData is exported from loadData.ts, NOT from this file.
+ * - All new V4 properties in ExtendedBlock are marked optional (?) for safety across geo grains.
  */
 
-// ---------------------------------------------------------------------------
-// Existing blocks (unchanged shape, unchanged semantics)
-// ---------------------------------------------------------------------------
+export type GeoLevel = "national" | "state" | "lga" | "ward" | "community";
+export type DashboardMode = "nsr" | "update";
 
-export interface NsrMetrics {
+export interface DrilldownPath {
+  state?: string;
+  lga?: string;
+  ward?: string;
+  community?: string;
+}
+
+/** Matches StatusDot COLOR_CLASS + insights.ts usage */
+export type InsightSeverity = "success" | "warning" | "danger" | "info";
+
+export interface InsightFlag {
+  id?: string;
+  severity: InsightSeverity;
+  category?: string;
+  title: string;
+  body?: string;
+  detail?: string;
+  location?: string;
+  metric?: string;
+  value?: string | number;
+  actionText?: string;
+  linkTab?: string;
+}
+
+export interface RankedItem {
+  id?: string;
+  rank: number;
+  name: string;
+  value?: number;
+  score?: number;
+  sublabel?: string;
+  state?: string;
+  lga?: string;
+  ward?: string;
+  community?: string;
+  indicators?: Record<string, number>;
+}
+
+export interface TimeseriesPoint {
+  state: string;
+  month: string;
+  households: number;
+  individuals: number;
+  nin_verified: number;
+  pmt_mean: number;
+}
+
+export type TimeseriesRow = TimeseriesPoint;
+
+export interface UnicefIndicators {
+  primary_attendance: number;
+  lower_sec_attendance: number;
+  upper_sec_attendance: number;
+  out_of_school: number;
+  under5_wasting: number;
+  [key: string]: number;
+}
+
+export interface NsrBlock {
   total_households: number;
   total_individuals: number;
   total_female: number;
@@ -41,7 +90,7 @@ export interface NsrMetrics {
   urban_pct: number;
 }
 
-export interface UpdateMetrics {
+export interface UpdateBlock {
   update_visits: number;
   updated_hh: number;
   new_entrants: number;
@@ -50,7 +99,7 @@ export interface UpdateMetrics {
   net_change: number;
 }
 
-export interface VulnerabilityMetrics {
+export interface VulnerabilityBlock {
   pmt_mean: number;
   pmt_median: number;
   decile_distribution: Record<string, number>;
@@ -63,16 +112,14 @@ export interface VulnerabilityMetrics {
   improved_water_pct: number;
 }
 
-export interface UnicefIndicators {
+export interface UnicefBlock {
   primary_age_attendance_pct: number;
   lower_secondary_attendance_pct: number;
   upper_secondary_attendance_pct: number;
   out_of_school_rate_pct: number;
-
   under5_wasting_pct: number;
   under5_sam_pct: number;
   under5_mam_pct: number;
-
   denominators: {
     children_6_11: number;
     children_12_14: number;
@@ -83,156 +130,240 @@ export interface UnicefIndicators {
     under5_total: number;
     under5_screened: number;
   };
-
   coverage: {
     education_response_pct: number;
     muac_screening_pct: number;
   };
+  [key: string]: any;
 }
 
 // ---------------------------------------------------------------------------
-// ExtendedBlock — v3.4
+// V4 UNICEF Revamp Sub-Interfaces
 // ---------------------------------------------------------------------------
 
-export interface RateWithCounts {
-  n: number;
-  d: number;
-  pct: number;
-  note?: string;
-}
-
-export interface DistributionItem {
-  label: string;
-  count: number;
-  pct: number;
-}
-
-export interface PyramidBand {
-  band: string;
+export interface GenderBreakdownCount {
+  total: number;
   male: number;
   female: number;
+}
+
+export interface AgeBandsV2 {
+  "0-3": GenderBreakdownCount;
+  "0-5": GenderBreakdownCount;
+  "0-7": GenderBreakdownCount;
+  "0-17": GenderBreakdownCount;
+  "6-9": GenderBreakdownCount;
+  "10-14": GenderBreakdownCount;
+  "15-17": GenderBreakdownCount;
+  "18-24": GenderBreakdownCount;
+}
+
+export interface CivilRegGroup {
   total: number;
+  birth_cert_yes: number;
+  birth_cert_no: number;
+  birth_cert_pct: number;
+  nin_yes: number;
+  nin_no: number;
+  nin_pct: number;
+  both: number;
+  both_pct: number;
+  cert_only: number;
+  cert_only_pct: number;
+  nin_only: number;
+  nin_only_pct: number;
+  neither: number;
+  neither_pct: number;
+  by_gender: {
+    male: {
+      total: number;
+      birth_cert_yes: number;
+      nin_yes: number;
+      birth_cert_pct: number;
+      nin_pct: number;
+    };
+    female: {
+      total: number;
+      birth_cert_yes: number;
+      nin_yes: number;
+      birth_cert_pct: number;
+      nin_pct: number;
+    };
+  };
 }
 
-export interface LivelihoodCode {
-  code: string;
-  label: string;
-  count: number;
-  pct: number;
+export interface CivilRegistrationBlock {
+  children_0_17: CivilRegGroup;
+  children_0_5: CivilRegGroup;
+  adults: CivilRegGroup;
 }
 
-export interface MuacHistogramBin {
-  bin: string;
-  count: number;
-}
-
-// -- v3.4 UNICEF-aligned additions --
-
-export interface UnicefAgeBand {
-  band: string;
-  male: number;
-  female: number;
+export interface OosBand {
   total: number;
+  oos: number;
+  enrolled: number;
+  oos_pct: number;
+  male: {
+    total: number;
+    oos: number;
+    oos_pct: number;
+  };
+  female: {
+    total: number;
+    oos: number;
+    oos_pct: number;
+  };
 }
 
-export interface ChildrenInPvhh {
-  n: number;
-  d: number;
-  pct: number;
-  pvhh_household_count: number;
-  note?: string;
+export interface EducationV2Block {
+  oos_6_17: OosBand;
+  oos_6_9: OosBand;
+  oos_10_14: OosBand;
+  oos_15_17: OosBand;
+  oos_6_14: OosBand;
+  disabled_children: {
+    total: number;
+    oos: number;
+    enrolled: number;
+    oos_pct: number;
+  };
+  grade_distribution: Array<{ label: string; count: number; pct: number }>;
+  oos_grade_distribution: Array<{ label: string; count: number; pct: number }>;
+  dropout_period: Array<{ label: string; count: number; pct: number }>;
 }
 
-export interface ChildrenInRiskHh {
-  n: number;
-  d: number;
-  pct: number;
-  risk_household_count: number;
-  note?: string;
+export interface NutritionV2Block {
+  eligible_under5: number;
+  sam_count: number;
+  mam_count: number;
+  normal_count: number;
+  wasted_count: number;
+  sam_pct: number;
+  mam_pct: number;
+  normal_pct: number;
+  wasting_pct: number;
+  by_gender: {
+    male: { total: number; sam: number; mam: number; wasting_pct: number };
+    female: { total: number; sam: number; mam: number; wasting_pct: number };
+  };
+  placeholders: {
+    pregnant_enrolled_fn: { status: string; label: string };
+    malnourished_children_enrolled_fn: { status: string; label: string };
+  };
 }
 
-export interface OosBandEntry {
-  n: number;
-  d: number;
-  pct: number;
-  total_in_band: number;
+export interface HealthV2Block {
+  pregnant_total: number;
+  pregnant_caveat: string;
+  pregnant_by_age: {
+    under_18: number;
+    "18_24": number;
+    "25_34": number;
+    "35_plus": number;
+  };
+  lactating_total: number;
+  lactating_caveat: string;
+  plwd_total: number;
+  plwd_male: number;
+  plwd_female: number;
+  plwd_pct: number;
+  children_plwd: number;
+  children_plwd_pct: number;
+  placeholders: {
+    hhs_with_health_insurance: { status: string; label: string };
+    health_insurance_type: { status: string; label: string };
+    hhs_with_no_health_insurance: { status: string; label: string };
+    children_0_7_covered_insurance: { status: string; label: string };
+    children_0_5_covered_insurance: { status: string; label: string };
+  };
 }
 
-export interface OosByBand {
-  age_6_14: OosBandEntry;
-  age_15_17: OosBandEntry;
-  combined_6_17: OosBandEntry;
+export interface YouthBlock {
+  total: number;
+  employed: number;
+  unemployed: number;
+  student: number;
+  unemployment_rate: number;
+  labour_breakdown: Array<{ label: string; count: number; pct: number }>;
 }
 
-export interface NoHealthInsurance {
-  n: number;
-  d: number;
-  pct: number;
-  note?: string;
+export interface LivelihoodsResilienceV2Block {
+  livelihoods: Array<{ label: string; count: number; pct: number }>;
+  large_households: { count: number; pct: number };
+  multi_vulnerable_households: { count: number; pct: number };
+  hh_with_disability: { count: number; pct: number };
+  shock_exposure: {
+    shock_hh_count: number;
+    shock_hh_pct: number;
+    types: Array<{ type: string; label?: string; count: number; pct: number }>;
+    coping_mechanisms: Array<{ label: string; count: number; pct: number }>;
+  };
 }
 
-// -- Full ExtendedBlock --
+// ---------------------------------------------------------------------------
+// Main Extended Block Interface
+// ---------------------------------------------------------------------------
 
 export interface ExtendedBlock {
-  age_sex_pyramid: PyramidBand[];
-  marital_status: DistributionItem[];
-  female_primary_respondent: RateWithCounts;
-
+  age_sex_pyramid: Array<{
+    band: string;
+    male: number;
+    female: number;
+    total: number;
+  }>;
+  marital_status: Array<{ label: string; count: number; pct: number }>;
+  female_primary_respondent: {
+    n: number;
+    d: number;
+    pct: number;
+    note: string;
+  };
   birth_cert: {
-    under_5: RateWithCounts;
-    age_6_17: RateWithCounts;
-    all_children: RateWithCounts;
+    under_5: { n: number; d: number; pct: number };
+    age_6_17: { n: number; d: number; pct: number };
+    all_children: { n: number; d: number; pct: number };
   };
-
   individual_nin: {
-    children: RateWithCounts;
-    adults: RateWithCounts;
-    all: RateWithCounts;
+    children: { n: number; d: number; pct: number };
+    adults: { n: number; d: number; pct: number };
+    all: { n: number; d: number; pct: number };
   };
-
   disability: {
-    rate: RateWithCounts;
-    types: DistributionItem[];
+    rate: { n: number; d: number; pct: number };
+    types: Array<{ label: string; count: number; pct: number }>;
   };
-
   chronic_illness: {
-    rate: RateWithCounts;
-    types: DistributionItem[];
+    rate: { n: number; d: number; pct: number };
+    types: Array<{ label: string; count: number; pct: number }>;
   };
-
   housing: {
-    roof: DistributionItem[];
-    floor: DistributionItem[];
-    toilet: DistributionItem[];
-    water: DistributionItem[];
-    light: DistributionItem[];
-    cook: DistributionItem[];
+    roof: Array<{ label: string; count: number; pct: number }>;
+    floor: Array<{ label: string; count: number; pct: number }>;
+    toilet: Array<{ label: string; count: number; pct: number }>;
+    water: Array<{ label: string; count: number; pct: number }>;
+    light: Array<{ label: string; count: number; pct: number }>;
+    cook: Array<{ label: string; count: number; pct: number }>;
   };
-
   healthcare_access: {
-    benefits_pct: RateWithCounts;
-    distance_dist: DistributionItem[];
+    benefits_pct: { n: number; d: number; pct: number };
+    distance_dist: Array<{ label: string; count: number; pct: number }>;
     distance_coverage_pct: number;
   };
-
   livelihoods: {
-    labour_status: DistributionItem[];
-    industry: DistributionItem[];
-    code_dist: LivelihoodCode[];
+    labour_status: Array<{ label: string; count: number; pct: number }>;
+    industry: Array<{ label: string; count: number; pct: number }>;
+    code_dist: Array<{ label: string; count: number; pct: number }>;
   };
-
   shocks: {
-    exposure_pct: RateWithCounts;
-    types: DistributionItem[];
-    years: DistributionItem[];
+    exposure_pct: { n: number; d: number; pct: number };
+    types: Array<{ type: string; label?: string; count: number; pct: number }>;
+    years: Array<{ label: string; count: number; pct: number }>;
   };
-
   coping: {
-    mechanisms: DistributionItem[];
+    mechanisms: Array<{ label: string; count: number; pct: number }>;
     coverage_pct: number;
     shock_exposed_hh: number;
   };
-
   assistance_awareness: {
     asked_n: number;
     rutf_yes_pct: number;
@@ -240,103 +371,65 @@ export interface ExtendedBlock {
     cash_yes_pct: number;
     dontknow_yes_pct: number;
   };
-
   plw: {
     women_repro_age: number;
-    pregnant: RateWithCounts;
-    lactating: RateWithCounts;
+    pregnant: { n: number; d: number; pct: number };
+    lactating: { n: number; d: number; pct: number };
   };
-
   muac_distribution: {
-    histogram: MuacHistogramBin[];
-    categories: { Green: number; Yellow: number; Red: number };
+    histogram: Array<{ bin: string; count: number }>;
+    categories: Record<string, number>;
     measured_n: number;
   };
+  age_bands_unicef: Array<{
+    band: string;
+    male: number;
+    female: number;
+    total: number;
+  }>;
+  children_in_pvhh: { n: number; d: number; pct: number };
+  children_in_risk_hh: { n: number; d: number; pct: number };
+  oos_by_band: Record<
+    string,
+    { n: number; d: number; total_in_band?: number; pct: number }
+  >;
+  no_health_insurance: { n: number; d: number; pct: number; note: string };
 
-  // v3.4 UNICEF-aligned additions
-  age_bands_unicef: UnicefAgeBand[];
-  children_in_pvhh: ChildrenInPvhh;
-  children_in_risk_hh: ChildrenInRiskHh;
-  oos_by_band: OosByBand;
-  no_health_insurance: NoHealthInsurance;
+  // V4 UNICEF Revamp Extensions
+  age_bands_v2?: AgeBandsV2;
+  civil_registration?: CivilRegistrationBlock;
+  education_v2?: EducationV2Block;
+  nutrition_v2?: NutritionV2Block;
+  health_v2?: HealthV2Block;
+  youth?: YouthBlock;
+  livelihoods_resilience_v2?: LivelihoodsResilienceV2Block;
 }
 
-// ---------------------------------------------------------------------------
-// Top-level GeoRecord and DashboardData
-// ---------------------------------------------------------------------------
-
 export interface GeoRecord {
-  nsr: NsrMetrics;
-  update: UpdateMetrics;
-  vulnerability: VulnerabilityMetrics;
-  unicef?: UnicefIndicators;
-  extended?: ExtendedBlock;
-  level: "national" | "state" | "lga" | "ward" | "community";
+  nsr: NsrBlock;
+  update: UpdateBlock;
+  vulnerability: VulnerabilityBlock;
+  unicef: UnicefBlock;
+  extended: ExtendedBlock;
+  level: GeoLevel;
   state?: string;
   lga?: string;
   ward?: string;
   community?: string;
-}
-
-export interface TimeseriesPoint {
-  state: string;
-  month: string;
-  households: number;
-  individuals: number;
-  nin_verified: number;
-  pmt_mean: number;
 }
 
 export interface DataMetadata {
   generated_at: string;
-  source_csv?: string;
-  source_file?: string;
-  row_count?: number;
-  source_rows?: number;
-  household_count?: number;
-  total_households?: number;
-  total_members?: number;
-  state_count?: number;
-  states?: string[];
+  source_csv: string;
+  source_rows: number;
+  total_households: number;
+  total_members: number;
+  states_count: number;
   lga_count: number;
   ward_count: number;
   community_count: number;
-  mdp_states?: string[];
-  data_modes?: string[];
-  update_note?: string;
-  unicef_indicators_available?: string[];
-  unicef_indicators_pending_source?: string[];
-  aggregator_version?: string;
-  code_maps?: {
-    disability?: Record<string, string>;
-    chronic_ill?: Record<string, string>;
-    livelihood?: Record<string, string>;
-  };
-  notes?: Record<string, string>;
-}
-
-export type DashboardMode = "nsr" | "update";
-
-export interface DrilldownPath {
-  state?: string;
-  lga?: string;
-  ward?: string;
-  community?: string;
-}
-
-export type InsightSeverity = "success" | "warning" | "danger" | "info";
-
-export interface InsightFlag {
-  severity: InsightSeverity;
-  title: string;
-  detail: string;
-  location?: string;
-}
-
-export interface RankedItem {
-  rank: number;
-  name: string;
-  value: number;
-  sublabel?: string;
-  state?: string;
+  mdp_states: string[];
+  data_modes: string[];
+  aggregator_version: string;
+  code_maps: Record<string, Record<string, string | number>>;
 }

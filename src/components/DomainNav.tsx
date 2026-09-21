@@ -3,10 +3,10 @@ import { clsx } from "clsx";
 
 export type DomainKey =
   | "overview"
-  | "registration"
-  | "child-protection"
+  | "civil-registration"
   | "education"
-  | "health-nutrition"
+  | "health"
+  | "nutrition"
   | "livelihoods";
 
 interface DomainDef {
@@ -18,29 +18,33 @@ interface DomainDef {
 const DOMAINS: DomainDef[] = [
   {
     key: "overview",
-    label: "Overview",
-    hint: "Map, KPIs and community ranking",
+    label: "Global / Overview",
+    hint: "Households, individuals, age bands, PVHH, pyramid",
   },
   {
-    key: "registration",
-    label: "Registration & Coverage",
-    hint: "Who was registered — people, households, ages",
+    key: "civil-registration",
+    label: "Civil Registration",
+    hint: "Birth certificates, NIN, dual documentation",
   },
   {
-    key: "child-protection",
-    label: "Child Protection & Documentation",
-    hint: "Birth certificates, NIN, disability",
+    key: "education",
+    label: "Education / Out of School",
+    hint: "OOS 6–9, 10–14, 15–17, disability attendance",
   },
-  { key: "education", label: "Education", hint: "Attendance, out-of-school" },
   {
-    key: "health-nutrition",
-    label: "Health & Nutrition",
-    hint: "MUAC, healthcare access, PLW",
+    key: "health",
+    label: "Health",
+    hint: "Pregnant, lactating, disability, insurance placeholders",
+  },
+  {
+    key: "nutrition",
+    label: "Nutrition",
+    hint: "SAM, MAM, wasting, F&N programme placeholders",
   },
   {
     key: "livelihoods",
-    label: "Livelihoods & Resilience",
-    hint: "Work, shocks, coping, housing",
+    label: "Livelihoods and Shock Exposure",
+    hint: "Livelihoods, youth employment, shocks, large HHs",
   },
 ];
 
