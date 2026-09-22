@@ -47,7 +47,7 @@ Error generating stack: `+e.message+`
       <h2>❌ Fatal: No #root element found in index.html</h2>
       <p>Check that public/index.html contains: &lt;div id="root"&gt;&lt;/div&gt;</p>
     </div>
-  `,Error(`No #root element`);ne(async()=>{let{default:e}=await import(`./App-YHwUKGqm.js`);return{default:e}},[]).then(({default:e})=>{y.createRoot(re).render((0,ee.jsx)(v.StrictMode,{children:(0,ee.jsx)(e,{})})),console.log(`✅ App mounted successfully`)}).catch(e=>{console.error(`❌ App import failed:`,e),re.innerHTML=`
+  `,Error(`No #root element`);ne(async()=>{let{default:e}=await import(`./App-DGr89YDS.js`);return{default:e}},[]).then(({default:e})=>{y.createRoot(re).render((0,ee.jsx)(v.StrictMode,{children:(0,ee.jsx)(e,{})})),console.log(`✅ App mounted successfully`)}).catch(e=>{console.error(`❌ App import failed:`,e),re.innerHTML=`
       <div style="
         padding:32px;
         font-family:monospace;
