@@ -23,8 +23,6 @@ interface NutritionProps {
   path: DrilldownPath;
   onPathChange: (path: DrilldownPath) => void;
   stateFilter?: string;
-  states?: GeoRecord[];
-  national?: GeoRecord;
 }
 
 export const Nutrition: FC<NutritionProps> = ({

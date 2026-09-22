@@ -18,7 +18,7 @@ export type MapMetric =
   | "female_head";
 
 export interface DrilldownMapProps {
-  data: DashboardData;
+  data?: DashboardData | null;
   path: DrilldownPath;
   onNavigate?: (path: DrilldownPath) => void;
   onPathChange?: (path: any) => void;
@@ -88,7 +88,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     label: "Birth Registration (0-17)",
     unit: "%",
     getValue: (r) =>
-      r.extended?.civil_registration?.children_0_17.birth_cert_pct ?? 0,
+      r.extended?.civil_registration?.children_0_17?.birth_cert_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, true),
   },
@@ -96,7 +96,8 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "nin",
     label: "NIN Coverage (0-17)",
     unit: "%",
-    getValue: (r) => r.extended?.civil_registration?.children_0_17.nin_pct ?? 0,
+    getValue: (r) =>
+      r.extended?.civil_registration?.children_0_17?.nin_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, true),
   },
@@ -104,7 +105,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "out_of_school",
     label: "Out-of-School Children Rate (6-17)",
     unit: "%",
-    getValue: (r) => r.extended?.education_v2?.oos_6_17.oos_pct ?? 0,
+    getValue: (r) => r.extended?.education_v2?.oos_6_17?.oos_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -121,7 +122,7 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     label: "Shock Exposure Rate",
     unit: "%",
     getValue: (r) =>
-      r.extended?.livelihoods_resilience_v2?.shock_exposure.shock_hh_pct ?? 0,
+      r.extended?.livelihoods_resilience_v2?.shock_exposure?.shock_hh_pct ?? 0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -226,25 +227,31 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
 
   const stateRecordsMap = useMemo(() => {
     const map = new Map<string, GeoRecord>();
-    data.states.forEach((rec) => {
+    const states =
+      data && "states" in data && Array.isArray(data.states) ? data.states : [];
+    states.forEach((rec) => {
       if (rec.state) map.set(normUpper(rec.state), rec);
     });
     return map;
-  }, [data.states]);
+  }, [data]);
 
   const lgaRecordsMap = useMemo(() => {
     const map = new Map<string, GeoRecord>();
-    data.lgas.forEach((rec) => {
+    const lgas =
+      data && "lgas" in data && Array.isArray(data.lgas) ? data.lgas : [];
+    lgas.forEach((rec) => {
       if (rec.state && rec.lga) {
         map.set(`${normUpper(rec.state)}||${normUpper(rec.lga)}`, rec);
       }
     });
     return map;
-  }, [data.lgas]);
+  }, [data]);
 
   const wardRecordsMap = useMemo(() => {
     const map = new Map<string, GeoRecord>();
-    data.wards.forEach((rec) => {
+    const wards =
+      data && "wards" in data && Array.isArray(data.wards) ? data.wards : [];
+    wards.forEach((rec) => {
       if (rec.state && rec.lga && rec.ward) {
         map.set(
           `${normUpper(rec.state)}||${normUpper(rec.lga)}||${normUpper(rec.ward)}`,
@@ -253,7 +260,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       }
     });
     return map;
-  }, [data.wards]);
+  }, [data]);
 
   const filteredGeoJson = useMemo(() => {
     if (activeState && activeLga && wardsGeoJson) {

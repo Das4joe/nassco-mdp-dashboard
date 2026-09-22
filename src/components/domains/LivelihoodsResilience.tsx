@@ -16,29 +16,21 @@ import KpiCard from "../KpiCard";
 import DrilldownMap from "../maps/DrilldownMap";
 
 interface LivelihoodsResilienceProps {
-  data?: GeoRecord | DashboardData;
-  record?: GeoRecord;
-  path?: DrilldownPath;
-  onPathChange?: (path: any) => void;
-  stateFilter?: string | null;
-  states?: GeoRecord[];
-  national?: GeoRecord;
+  data: DashboardData;
+  record: GeoRecord;
+  path: DrilldownPath;
+  onPathChange: (path: DrilldownPath) => void;
+  stateFilter?: string;
 }
 
 export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   data,
-  record: recordProp,
-  path = {},
+  record,
+  path,
   onPathChange,
   stateFilter,
 }) => {
   const theme = useChartTheme();
-  const rec = recordProp
-    ? recordProp
-    : data && "extended" in data
-      ? (data as GeoRecord)
-      : undefined;
-  if (!rec) return null;
 
   const labelVal = {
     position: "top" as const,
@@ -53,7 +45,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
     formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
   };
 
-  const liv = rec.extended.livelihoods_resilience_v2 ?? {
+  const liv = record.extended.livelihoods_resilience_v2 ?? {
     livelihoods: [],
     large_households: { count: 0, pct: 0 },
     multi_vulnerable_households: { count: 0, pct: 0 },
@@ -64,7 +56,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
       coping_mechanisms: [],
     },
   };
-  const youth = rec.extended.youth ?? {
+  const youth = record.extended.youth ?? {
     total: 0,
     employed: 0,
     unemployed: 0,
@@ -121,10 +113,10 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
           Shock Exposure Map
         </div>
         <DrilldownMap
-          data={data as DashboardData}
+          data={data}
           path={path}
           onPathChange={onPathChange}
-          selectedStateFilter={stateFilter ?? undefined}
+          selectedStateFilter={stateFilter}
           metric="shocks"
           height={400}
         />

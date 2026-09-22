@@ -18,29 +18,21 @@ import KpiCard from "../KpiCard";
 import DrilldownMap from "../maps/DrilldownMap";
 
 interface EducationProps {
-  data?: GeoRecord | DashboardData;
-  record?: GeoRecord;
-  path?: DrilldownPath;
-  onPathChange?: (path: any) => void;
-  stateFilter?: string | null;
-  states?: GeoRecord[];
-  national?: GeoRecord;
+  data: DashboardData;
+  record: GeoRecord;
+  path: DrilldownPath;
+  onPathChange: (path: DrilldownPath) => void;
+  stateFilter?: string;
 }
 
 export const Education: React.FC<EducationProps> = ({
   data,
-  record: recordProp,
-  path = {},
+  record,
+  path,
   onPathChange,
   stateFilter,
 }) => {
   const theme = useChartTheme();
-  const rec = recordProp
-    ? recordProp
-    : data && "extended" in data
-      ? (data as GeoRecord)
-      : undefined;
-  if (!rec) return null;
 
   const labelPct = {
     position: "top" as const,
@@ -55,12 +47,12 @@ export const Education: React.FC<EducationProps> = ({
     formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
   };
 
-  const edu = rec.extended.education_v2 ?? {
+  const edu = record.extended.education_v2 ?? {
     oos_6_17: {
       total: 0,
       oos: 0,
       enrolled: 0,
-      oos_pct: rec.unicef.out_of_school_rate_pct,
+      oos_pct: record.unicef.out_of_school_rate_pct,
       male: { total: 0, oos: 0, oos_pct: 0 },
       female: { total: 0, oos: 0, oos_pct: 0 },
     },
@@ -156,10 +148,10 @@ export const Education: React.FC<EducationProps> = ({
           Out-of-School Rate Map
         </div>
         <DrilldownMap
-          data={data as DashboardData}
+          data={data}
           path={path}
           onPathChange={onPathChange}
-          selectedStateFilter={stateFilter ?? undefined}
+          selectedStateFilter={stateFilter}
           metric="out_of_school"
           height={400}
         />

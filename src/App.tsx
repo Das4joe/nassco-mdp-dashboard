@@ -229,19 +229,21 @@ export default function App() {
 
           {domain === "education" && (
             <Education
-              data={currentRecord}
-              states={data.states}
-              national={data.national}
-              stateFilter={path.state ?? null}
+              data={data}
+              record={currentRecord}
+              path={path}
+              onPathChange={setPath}
+              stateFilter={path.state}
             />
           )}
 
           {domain === "health" && (
             <Health
-              data={currentRecord}
-              states={data.states}
-              national={data.national}
-              stateFilter={path.state ?? null}
+              data={data}
+              record={currentRecord}
+              path={path}
+              onPathChange={setPath}
+              stateFilter={path.state}
             />
           )}
 
@@ -257,10 +259,11 @@ export default function App() {
 
           {domain === "livelihoods" && (
             <LivelihoodsResilience
-              data={currentRecord}
-              states={data.states}
-              national={data.national}
-              stateFilter={path.state ?? null}
+              data={data}
+              record={currentRecord}
+              path={path}
+              onPathChange={setPath}
+              stateFilter={path.state}
             />
           )}
         </main>

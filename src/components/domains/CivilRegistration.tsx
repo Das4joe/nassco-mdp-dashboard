@@ -26,8 +26,6 @@ interface CivilRegistrationProps {
   path: DrilldownPath;
   onPathChange: (path: DrilldownPath) => void;
   stateFilter?: string;
-  states?: GeoRecord[];
-  national?: GeoRecord;
 }
 
 export const CivilRegistration: FC<CivilRegistrationProps> = ({

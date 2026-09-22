@@ -16,29 +16,21 @@ import {
 } from "recharts";
 
 interface HealthProps {
-  data?: GeoRecord | DashboardData;
-  record?: GeoRecord;
-  path?: DrilldownPath;
-  onPathChange?: (path: any) => void;
-  stateFilter?: string | null;
-  states?: GeoRecord[];
-  national?: GeoRecord;
+  data: DashboardData;
+  record: GeoRecord;
+  path: DrilldownPath;
+  onPathChange: (path: DrilldownPath) => void;
+  stateFilter?: string;
 }
 
 export const Health: FC<HealthProps> = ({
   data,
-  record: recordProp,
-  path = {},
+  record,
+  path,
   onPathChange,
   stateFilter,
 }) => {
   const theme = useChartTheme();
-  const rec = recordProp
-    ? recordProp
-    : data && "extended" in data
-      ? (data as GeoRecord)
-      : undefined;
-  if (!rec) return null;
 
   const labelVal = {
     position: "top" as const,
@@ -53,12 +45,12 @@ export const Health: FC<HealthProps> = ({
     formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
   };
 
-  const h2 = rec.extended.health_v2 ?? {
-    pregnant_total: rec.extended.plw.pregnant.n,
+  const h2 = record.extended.health_v2 ?? {
+    pregnant_total: record.extended.plw.pregnant.n,
     pregnant_by_age: { under_18: 0, "18_24": 0, "25_34": 0, "35_plus": 0 },
-    lactating_total: rec.extended.plw.lactating.n,
-    plwd_total: rec.extended.disability.rate.n,
-    plwd_pct: rec.extended.disability.rate.pct,
+    lactating_total: record.extended.plw.lactating.n,
+    plwd_total: record.extended.disability.rate.n,
+    plwd_pct: record.extended.disability.rate.pct,
     children_plwd: 0,
     children_plwd_pct: 0,
     placeholders: {},
@@ -71,7 +63,7 @@ export const Health: FC<HealthProps> = ({
     { band: "35+ yrs", Count: h2.pregnant_by_age["35_plus"] },
   ];
 
-  const disabilityTypesData = rec.extended.disability.types.map((t) => ({
+  const disabilityTypesData = record.extended.disability.types.map((t) => ({
     type: t.label,
     Count: t.count,
     "Share %": t.pct,
@@ -124,10 +116,10 @@ export const Health: FC<HealthProps> = ({
           Vulnerability Map
         </div>
         <DrilldownMap
-          data={data as DashboardData}
+          data={data}
           path={path}
           onPathChange={onPathChange}
-          selectedStateFilter={stateFilter ?? undefined}
+          selectedStateFilter={stateFilter}
           metric="vulnerability"
           height={400}
         />
