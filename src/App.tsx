@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import TopBar from "./components/TopBar";
-import ModeToggle from "./components/ModeToggle";
 import HeadlineKpis from "./components/HeadlineKpis";
 import StateComparisonRow from "./components/StateComparisonRow";
 import Breadcrumb from "./components/Breadcrumb";
@@ -15,7 +14,7 @@ import { Health } from "./components/domains/Health";
 import { Nutrition } from "./components/domains/Nutrition";
 import { LivelihoodsResilience } from "./components/domains/LivelihoodsResilience";
 import { loadAllData, type DashboardData } from "./lib/loadData";
-import type { DashboardMode, DrilldownPath, GeoRecord } from "./lib/types";
+import type { DrilldownPath, GeoRecord } from "./lib/types";
 
 const normU = (s?: string) => (s ?? "").trim().toUpperCase();
 const normL = (s?: string) => (s ?? "").trim().toLowerCase();
@@ -24,7 +23,6 @@ export default function App() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<DashboardMode>("nsr");
   const [isDark, setIsDark] = useState(false);
   const [path, setPath] = useState<DrilldownPath>({});
   const [domain, setDomain] = useState<DomainKey>("overview");
@@ -105,11 +103,6 @@ export default function App() {
       {domain === "overview" && (
         <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <ModeToggle mode={mode} onChange={setMode} />
-            <StateFilter value={path.state} onChange={handleStateFilter} />
-          </div>
-
-          <div className="flex items-center justify-between">
             <Breadcrumb
               path={path}
               onNavigate={(level) => {
@@ -125,19 +118,20 @@ export default function App() {
                   });
               }}
             />
+            <StateFilter value={path.state} onChange={handleStateFilter} />
           </div>
 
           <HeadlineKpis
             record={currentRecord}
             meta={data.metadata}
-            mode={mode}
+            mode="nsr"
           />
 
           {!path.state && (
             <StateComparisonRow
               states={data.states}
               nationalNinRate={data.national.nsr.nin_verification_rate}
-              mode={mode}
+              mode="nsr"
               activeState={path.state}
               onSelect={(state) => setPath({ state })}
             />
@@ -151,7 +145,7 @@ export default function App() {
               <DrilldownMap
                 data={data}
                 path={path}
-                mode={mode}
+                mode="nsr"
                 isDark={isDark}
                 onPathChange={setPath}
                 metric="vulnerability"
@@ -162,23 +156,17 @@ export default function App() {
               <InsightsSidebar
                 data={data}
                 path={path}
-                mode={mode}
+                mode="nsr"
                 onDrilldown={(p) => setPath({ ...path, ...p })}
               />
             </div>
           </div>
 
           <div className="pt-4">
-            <div className="mb-3">
-              <div className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted">
-                UNICEF Community Selection
-              </div>
-              <div className="text-xs text-ink-faint dark:text-ink-onDarkMuted mt-0.5">
-                Ranked using the official UNICEF Data Toolkit methodology.
-                Download the Excel template for handover to field teams.
-              </div>
-            </div>
-            <CommunityRankingPanel data={data} />
+            <CommunityRankingPanel
+              data={data}
+              selectedStateFilter={path.state}
+            />
           </div>
         </main>
       )}

@@ -1,101 +1,150 @@
-import { useMemo, useState } from "react";
-import { Download, Trophy, MapPin } from "lucide-react";
+import React, { useState, useMemo, useEffect } from "react";
+import { Download, Search, Building2 } from "lucide-react";
 import type { DashboardData } from "../lib/loadData";
-import { rankCommunities } from "../lib/unicefRanking";
-import { exportCommunityRankingXlsx } from "../lib/exportRanking";
-import { THEME } from "../theme";
 
 interface CommunityRankingPanelProps {
   data: DashboardData;
+  selectedStateFilter?: string;
 }
 
-// --------------------------------------------------------------------------
-// Score badge — shows "x.xx / 3.0" in colour-coded text
-// --------------------------------------------------------------------------
-function ScoreBadge({
-  score,
-  small = false,
-}: {
-  score: number | null;
-  small?: boolean;
-}) {
-  if (score === null)
-    return <span className="text-ink-faint dark:text-ink-onDarkMuted">—</span>;
-
-  const pct = score / 3;
-  const color =
-    pct <= 0.25
-      ? "text-status-danger"
-      : pct <= 0.5
-        ? "text-status-warning"
-        : pct <= 0.75
-          ? "text-ink-primary dark:text-ink-onDark"
-          : "text-status-success";
-
-  return (
-    <span
-      className={`tabular font-semibold ${small ? "text-xs" : ""} ${color}`}
-    >
-      {score.toFixed(2)}
-      <span className="font-normal text-ink-muted dark:text-ink-onDarkMuted">
-        {" / 3.0"}
-      </span>
-    </span>
-  );
-}
-
-// --------------------------------------------------------------------------
-// Main panel
-// --------------------------------------------------------------------------
-export default function CommunityRankingPanel({
+export const CommunityRankingPanel: React.FC<CommunityRankingPanelProps> = ({
   data,
-}: CommunityRankingPanelProps) {
-  const [stateFilter, setStateFilter] = useState<string>("ALL");
-  const [topN, setTopN] = useState<number>(20);
-
-  const rankings = useMemo(
-    () => rankCommunities(data.communities),
-    [data.communities],
+  selectedStateFilter,
+}) => {
+  const [stateFilter, setStateFilter] = useState<string>(
+    selectedStateFilter || "ALL",
   );
+  const [topCount, setTopCount] = useState<number>(20);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const filtered = useMemo(
-    () =>
-      stateFilter === "ALL"
-        ? rankings
-        : rankings.filter((r) => r.state === stateFilter),
-    [rankings, stateFilter],
-  );
+  useEffect(() => {
+    if (selectedStateFilter) {
+      setStateFilter(selectedStateFilter.toUpperCase());
+    } else {
+      setStateFilter("ALL");
+    }
+  }, [selectedStateFilter]);
 
-  const displayed = filtered.slice(0, topN === 9999 ? undefined : topN);
+  const allCommunities = useMemo(() => {
+    return data.communities || [];
+  }, [data]);
 
-  const handleDownload = () => {
-    exportCommunityRankingXlsx(
-      rankings,
-      stateFilter === "ALL" ? null : stateFilter,
+  const filteredCommunities = useMemo(() => {
+    let list = allCommunities;
+
+    if (stateFilter && stateFilter !== "ALL") {
+      list = list.filter(
+        (c) =>
+          (c.state || "").trim().toUpperCase() ===
+          stateFilter.trim().toUpperCase(),
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (c) =>
+          (c.community || "").toLowerCase().includes(q) ||
+          (c.lga || "").toLowerCase().includes(q) ||
+          (c.state || "").toLowerCase().includes(q),
+      );
+    }
+
+    return list;
+  }, [allCommunities, stateFilter, searchQuery]);
+
+  const displayedCommunities = useMemo(() => {
+    if (topCount === -1) return filteredCommunities;
+    return filteredCommunities.slice(0, topCount);
+  }, [filteredCommunities, topCount]);
+
+  const handleExportCSV = () => {
+    const headers = [
+      "#",
+      "Community",
+      "LGA",
+      "State",
+      "Number of PVHHs",
+      "Number of Individuals",
+      "Males",
+      "Females",
+      "Ages 0-17",
+      "18 and Above",
+    ];
+
+    const rows = filteredCommunities.map((c, idx) => {
+      const totalInd = c.nsr?.total_individuals ?? 0;
+      const u18 = c.nsr?.children_under18 ?? 0;
+      const a18 = Math.max(0, totalInd - u18);
+      const pvhh =
+        c.vulnerability?.poorest_households ??
+        Math.round(
+          (c.nsr?.total_households ?? 0) *
+            ((c.vulnerability?.poorest_pct ?? 0) / 100),
+        );
+
+      return [
+        idx + 1,
+        `"${c.community || ""}"`,
+        `"${c.lga || ""}"`,
+        `"${c.state || ""}"`,
+        pvhh,
+        totalInd,
+        c.nsr?.total_male ?? 0,
+        c.nsr?.total_female ?? 0,
+        u18,
+        a18,
+      ];
+    });
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `UNICEF_Community_Demographics_${stateFilter}_${new Date().toISOString().slice(0, 10)}.csv`,
     );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const mdpStates = data.metadata.mdp_states ?? [];
+  const statesList = ["ABIA", "BENUE", "OYO", "SOKOTO"];
 
   return (
-    <div className="space-y-4">
-      {/* Controls row */}
-      <div className="rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          {/* State filter */}
-          <div className="flex-1 min-w-[180px]">
-            <label className="text-xs font-semibold text-ink-muted dark:text-ink-onDarkMuted uppercase tracking-wide">
-              State
-            </label>
+    <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-5 space-y-4 shadow-card">
+      {/* Title & Controls Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-line-light dark:border-line-dark">
+        <div>
+          <h3 className="text-base font-bold text-ink-primary dark:text-ink-onDark flex items-center gap-2">
+            <Building2
+              size={18}
+              className="text-brand-600 dark:text-brand-400"
+            />
+            UNICEF COMMUNITY SELECTION & DEMOGRAPHICS
+          </h3>
+          <p className="text-xs text-ink-muted dark:text-ink-onDarkMuted mt-1">
+            Community-level demographic disaggregation across pilot states.
+            Download data for field team deployment.
+          </p>
+        </div>
+
+        <div className="flex items-center flex-wrap gap-3">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-semibold text-ink-muted dark:text-ink-onDarkMuted">
+              STATE
+            </span>
             <select
               value={stateFilter}
               onChange={(e) => setStateFilter(e.target.value)}
-              className="mt-1 w-full px-3 py-2 rounded-lg border border-line-light
-                         dark:border-line-dark bg-surface-light dark:bg-surface-darker
-                         text-ink-primary dark:text-ink-onDark text-sm"
+              className="px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs font-medium text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
             >
               <option value="ALL">All 4 MDP States</option>
-              {mdpStates.map((s) => (
+              {statesList.map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>
@@ -103,193 +152,144 @@ export default function CommunityRankingPanel({
             </select>
           </div>
 
-          {/* Top-N selector */}
-          <div className="min-w-[150px]">
-            <label className="text-xs font-semibold text-ink-muted dark:text-ink-onDarkMuted uppercase tracking-wide">
-              Show top
-            </label>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-semibold text-ink-muted dark:text-ink-onDarkMuted">
+              SHOW TOP
+            </span>
             <select
-              value={topN}
-              onChange={(e) => setTopN(Number(e.target.value))}
-              className="mt-1 w-full px-3 py-2 rounded-lg border border-line-light
-                         dark:border-line-dark bg-surface-light dark:bg-surface-darker
-                         text-ink-primary dark:text-ink-onDark text-sm"
+              value={topCount}
+              onChange={(e) => setTopCount(Number(e.target.value))}
+              className="px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs font-medium text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
             >
-              <option value={10}>10 communities</option>
               <option value={20}>20 communities</option>
               <option value={50}>50 communities</option>
               <option value={100}>100 communities</option>
-              <option value={9999}>All</option>
+              <option value={-1}>All communities</option>
             </select>
           </div>
 
-          {/* Download button */}
           <button
-            onClick={handleDownload}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold
-                       text-sm text-white shadow-card"
-            style={{ backgroundColor: THEME.brand.primary }}
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
           >
-            <Download size={15} />
+            <Download size={14} />
             Download UNICEF Excel
           </button>
         </div>
+      </div>
 
-        <div className="mt-3 text-xs text-ink-muted dark:text-ink-onDarkMuted">
+      {/* Filter / Search Bar & Subtext */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="text-ink-muted dark:text-ink-onDarkMuted font-medium">
           Showing{" "}
-          <span className="font-semibold text-ink-primary dark:text-ink-onDark">
-            {displayed.length}
+          <span className="font-bold text-ink-primary dark:text-ink-onDark">
+            {displayedCommunities.length}
           </span>{" "}
           of{" "}
-          <span className="font-semibold text-ink-primary dark:text-ink-onDark">
-            {filtered.length}
+          <span className="font-bold text-ink-primary dark:text-ink-onDark">
+            {filteredCommunities.length}
           </span>{" "}
-          communities — lowest score = highest priority for intervention
+          communities
+        </div>
+
+        <div className="relative max-w-xs w-full">
+          <Search
+            size={14}
+            className="absolute left-3 top-2.5 text-ink-faint"
+          />
+          <input
+            type="text"
+            placeholder="Search community or LGA..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
         </div>
       </div>
 
-      {/* Rankings table */}
-      <div className="rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-line-light dark:border-line-dark">
-          <Trophy size={16} className="text-status-warning" />
-          <span className="text-sm font-semibold text-ink-primary dark:text-ink-onDark">
-            Community Ranking — lowest score = highest priority
-          </span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-surface-page dark:bg-surface-darker text-ink-muted dark:text-ink-onDarkMuted text-xs uppercase tracking-wide">
-                <th className="px-3 py-2 text-left w-8">#</th>
-                <th className="px-3 py-2 text-left">Community</th>
-                <th className="px-3 py-2 text-left">LGA</th>
-                <th className="px-3 py-2 text-left">State</th>
-                <th className="px-3 py-2 text-right">Primary attend.</th>
-                <th className="px-3 py-2 text-right">Out-of-school</th>
-                <th className="px-3 py-2 text-right">U5 wasting</th>
-                <th className="px-3 py-2 text-right">Education score</th>
-                <th className="px-3 py-2 text-right">Health score</th>
-                <th className="px-3 py-2 text-right">Composite</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.map((r, i) => {
-                const eduScore =
-                  r.domainScores.find(
-                    (d) => d.domain === "Education & Child Development",
-                  )?.score ?? null;
-
-                const healthScore =
-                  r.domainScores.find((d) => d.domain === "Health & Nutrition")
-                    ?.score ?? null;
-
-                const primary = r.rawIndicators["primary_attendance"];
-                const oos = r.rawIndicators["out_of_school"];
-                const wasting = r.rawIndicators["under5_wasting"];
-
-                const oosHigh = oos !== undefined && oos > 50;
-                const wastingHigh = wasting !== undefined && wasting > 15; // WHO crisis threshold
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg border border-line-light dark:border-line-dark">
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="bg-surface-page dark:bg-surface-darker border-b border-line-light dark:border-line-dark text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted">
+              <th className="py-3 px-3 w-10 text-center">#</th>
+              <th className="py-3 px-3">Community</th>
+              <th className="py-3 px-3">LGA</th>
+              <th className="py-3 px-3">State</th>
+              <th className="py-3 px-3 text-right">Number of PVHHs</th>
+              <th className="py-3 px-3 text-right">Number of Individuals</th>
+              <th className="py-3 px-3 text-right">Males</th>
+              <th className="py-3 px-3 text-right">Females</th>
+              <th className="py-3 px-3 text-right">Ages 0–17</th>
+              <th className="py-3 px-3 text-right">18 and Above</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line-light dark:divide-line-dark">
+            {displayedCommunities.length > 0 ? (
+              displayedCommunities.map((c, i) => {
+                const totalInd = c.nsr?.total_individuals ?? 0;
+                const u18 = c.nsr?.children_under18 ?? 0;
+                const a18 = Math.max(0, totalInd - u18);
+                const pvhh =
+                  c.vulnerability?.poorest_households ??
+                  Math.round(
+                    (c.nsr?.total_households ?? 0) *
+                      ((c.vulnerability?.poorest_pct ?? 0) / 100),
+                  );
 
                 return (
                   <tr
-                    key={`${r.state}-${r.lga}-${r.ward}-${r.community}-${i}`}
-                    className="border-t border-line-light dark:border-line-dark
-                               hover:bg-surface-page dark:hover:bg-surface-darker
-                               transition-colors"
+                    key={`${c.state}-${c.lga}-${c.community}-${i}`}
+                    className="hover:bg-surface-page/60 dark:hover:bg-surface-darker/60 transition-colors text-ink-primary dark:text-ink-onDark"
                   >
-                    <td className="px-3 py-2.5 text-ink-muted dark:text-ink-onDarkMuted text-xs">
+                    <td className="py-2.5 px-3 text-center text-ink-faint font-mono text-[11px]">
                       {i + 1}
                     </td>
-
-                    <td className="px-3 py-2.5 font-medium text-ink-primary dark:text-ink-onDark max-w-[160px]">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin
-                          size={11}
-                          className="text-ink-faint dark:text-ink-onDarkMuted flex-shrink-0"
-                        />
-                        <span className="truncate">{r.community}</span>
-                      </div>
+                    <td className="py-2.5 px-3 font-semibold text-brand-700 dark:text-brand-400">
+                      {c.community}
                     </td>
-
-                    <td className="px-3 py-2.5 text-ink-muted dark:text-ink-onDarkMuted text-xs">
-                      {r.lga || "—"}
+                    <td className="py-2.5 px-3 font-medium uppercase text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
+                      {c.lga}
                     </td>
-
-                    <td className="px-3 py-2.5 text-ink-muted dark:text-ink-onDarkMuted text-xs">
-                      {r.state}
+                    <td className="py-2.5 px-3 font-medium uppercase text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
+                      {c.state}
                     </td>
-
-                    <td className="px-3 py-2.5 text-right tabular text-xs">
-                      {primary !== undefined ? `${primary.toFixed(1)}%` : "—"}
+                    <td className="py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">
+                      {pvhh.toLocaleString()}
                     </td>
-
-                    <td className="px-3 py-2.5 text-right tabular text-xs">
-                      {oos !== undefined ? (
-                        <span
-                          className={
-                            oosHigh ? "text-status-danger font-semibold" : ""
-                          }
-                        >
-                          {oos.toFixed(1)}%
-                          {oosHigh && (
-                            <span className="ml-1 text-[9px] font-bold uppercase tracking-wide">
-                              ⚠
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        "—"
-                      )}
+                    <td className="py-2.5 px-3 text-right font-semibold">
+                      {totalInd.toLocaleString()}
                     </td>
-
-                    {/* NEW — under-5 wasting, flagged red above WHO's 15% crisis threshold */}
-                    <td className="px-3 py-2.5 text-right tabular text-xs">
-                      {wasting !== undefined ? (
-                        <span
-                          className={
-                            wastingHigh
-                              ? "text-status-danger font-semibold"
-                              : ""
-                          }
-                        >
-                          {wasting.toFixed(1)}%
-                          {wastingHigh && (
-                            <span className="ml-1 text-[9px] font-bold uppercase tracking-wide">
-                              ⚠
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-ink-faint">—</span>
-                      )}
+                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
+                      {(c.nsr?.total_male ?? 0).toLocaleString()}
                     </td>
-
-                    <td className="px-3 py-2.5 text-right">
-                      <ScoreBadge score={eduScore} small />
+                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
+                      {(c.nsr?.total_female ?? 0).toLocaleString()}
                     </td>
-
-                    {/* NEW — Health & Nutrition domain score */}
-                    <td className="px-3 py-2.5 text-right">
-                      <ScoreBadge score={healthScore} small />
+                    <td className="py-2.5 px-3 text-right font-mono text-amber-600 dark:text-amber-400 font-medium">
+                      {u18.toLocaleString()}
                     </td>
-
-                    <td className="px-3 py-2.5 text-right">
-                      <ScoreBadge score={r.compositeScore} small />
+                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
+                      {a18.toLocaleString()}
                     </td>
                   </tr>
                 );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {displayed.length === 0 && (
-          <div className="px-4 py-8 text-center text-sm text-ink-muted dark:text-ink-onDarkMuted">
-            No communities match the current filter.
-          </div>
-        )}
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={10}
+                  className="py-8 text-center text-ink-muted italic text-xs"
+                >
+                  No community records match the selected filters.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-}
+};
+
+export default CommunityRankingPanel;
