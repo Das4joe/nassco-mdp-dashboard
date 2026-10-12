@@ -7,7 +7,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Briefcase, AlertTriangle, Shield, Users } from "lucide-react";
+import {
+  Briefcase,
+  AlertTriangle,
+  Shield,
+  Users,
+  User,
+  HelpCircle,
+} from "lucide-react";
 import type { GeoRecord, DrilldownPath } from "../../lib/types";
 import type { DashboardData } from "../../lib/loadData";
 import { useChartTheme } from "../../lib/useChartTheme";
@@ -31,7 +38,6 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   stateFilter,
 }) => {
   const theme = useChartTheme();
-
   const labelVal = {
     position: "top" as const,
     fill: theme.axisTick,
@@ -56,6 +62,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
       coping_mechanisms: [],
     },
   };
+
   const youth = record.extended.youth ?? {
     total: 0,
     employed: 0,
@@ -63,6 +70,8 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
     unemployment_rate: 0,
     labour_breakdown: [],
   };
+  const femaleHeaded = record.extended.female_primary_respondent?.n || 0;
+  const childrenRiskProne = record.extended.children_in_risk_hh?.n || 0;
 
   const shockTypesData = liv.shock_exposure.types.map((s) => ({
     type: s.type,
@@ -73,6 +82,11 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
     Count: c.count,
   }));
 
+  const missingCharts = [
+    "Female-headed households (shock prone)",
+    "Households with disabilities (shock prone)",
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
@@ -82,30 +96,42 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
           </h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
         <KpiCard
-          label="Shock Exposure Rate"
-          value={`${liv.shock_exposure.shock_hh_pct}%`}
-          icon={<AlertTriangle size={18} />}
-          accent="#DC2626"
+          label="Female-Headed HHs"
+          value={femaleHeaded.toLocaleString()}
+          icon={<User size={16} />}
+          accent="#9333EA"
         />
         <KpiCard
-          label="Youth Unemployment"
-          value={`${youth.unemployment_rate}%`}
-          icon={<Briefcase size={18} />}
+          label="Youth Employed"
+          value={youth.employed.toLocaleString()}
+          icon={<Briefcase size={16} />}
+          accent="#059669"
+        />
+        <KpiCard
+          label="Youth Unemployed"
+          value={youth.unemployed.toLocaleString()}
+          icon={<AlertTriangle size={16} />}
           accent="#E67E22"
         />
         <KpiCard
-          label="Multi-Vulnerable HHs"
-          value={`${liv.multi_vulnerable_households.pct}%`}
-          icon={<Shield size={18} />}
-          accent="#075E54"
+          label="Shock-Prone HHs"
+          value={liv.shock_exposure.shock_hh_count.toLocaleString()}
+          icon={<AlertTriangle size={16} />}
+          accent="#DC2626"
         />
         <KpiCard
-          label="Large Households"
-          value={`${liv.large_households.pct}%`}
-          icon={<Users size={18} />}
-          accent="#128C7E"
+          label="Children Risk-Prone"
+          value={childrenRiskProne.toLocaleString()}
+          icon={<Shield size={16} />}
+          accent="#D97706"
+        />
+        <KpiCard
+          label="Multi-Vulnerable HHs"
+          value={liv.multi_vulnerable_households.count.toLocaleString()}
+          icon={<Users size={16} />}
+          accent="#075E54"
         />
       </div>
       <div className="space-y-3">
@@ -138,11 +164,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="Count"
                 fill="#DC2626"
@@ -168,11 +190,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="Count"
                 fill="#E67E22"
@@ -201,11 +219,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="count"
                 fill="#075E54"
@@ -232,11 +246,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="count"
                 fill="#128C7E"
@@ -247,8 +257,25 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
           </ResponsiveContainer>
         </ChartCard>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        {missingCharts.map((p, i) => (
+          <div
+            key={i}
+            className="bg-surface-light dark:bg-surface-dark rounded-xl border border-line-light dark:border-line-dark p-5 flex items-start gap-3"
+          >
+            <HelpCircle size={20} className="text-ink-muted" />
+            <div>
+              <h4 className="text-xs font-bold text-ink-primary dark:text-ink-onDark">
+                {p}
+              </h4>
+              <p className="text-[11px] text-ink-faint mt-1.5 italic">
+                Cross-tabulation not captured in this survey wave.
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
-
 export default LivelihoodsResilience;

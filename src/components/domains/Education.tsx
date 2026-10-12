@@ -9,7 +9,13 @@ import {
   Legend,
   Cell,
 } from "recharts";
-import { BookOpen, AlertCircle, Award, Calendar } from "lucide-react";
+import {
+  BookOpen,
+  AlertCircle,
+  Award,
+  Calendar,
+  HelpCircle,
+} from "lucide-react";
 import type { GeoRecord, DrilldownPath } from "../../lib/types";
 import type { DashboardData } from "../../lib/loadData";
 import { useChartTheme } from "../../lib/useChartTheme";
@@ -34,16 +40,16 @@ export const Education: React.FC<EducationProps> = ({
 }) => {
   const theme = useChartTheme();
 
-  const labelPct = {
-    position: "top" as const,
-    fill: theme.axisTick,
-    fontSize: 11,
-    formatter: (v: number) => (v > 0 ? `${v.toFixed(1)}%` : ""),
-  };
   const labelVal = {
     position: "top" as const,
     fill: theme.axisTick,
-    fontSize: 11,
+    fontSize: 10,
+    formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
+  };
+  const labelValH = {
+    position: "right" as const,
+    fill: theme.axisTick,
+    fontSize: 10,
     formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
   };
 
@@ -52,7 +58,7 @@ export const Education: React.FC<EducationProps> = ({
       total: 0,
       oos: 0,
       enrolled: 0,
-      oos_pct: record.unicef.out_of_school_rate_pct,
+      oos_pct: 0,
       male: { total: 0, oos: 0, oos_pct: 0 },
       female: { total: 0, oos: 0, oos_pct: 0 },
     },
@@ -89,23 +95,24 @@ export const Education: React.FC<EducationProps> = ({
   const oosBandsData = [
     {
       band: "6–9 (Prim)",
-      Male: edu.oos_6_9.male.oos_pct,
-      Female: edu.oos_6_9.female.oos_pct,
+      Male: edu.oos_6_9.male.oos,
+      Female: edu.oos_6_9.female.oos,
     },
     {
       band: "10–14 (JSS)",
-      Male: edu.oos_10_14.male.oos_pct,
-      Female: edu.oos_10_14.female.oos_pct,
+      Male: edu.oos_10_14.male.oos,
+      Female: edu.oos_10_14.female.oos,
     },
     {
       band: "15–17 (SSS)",
-      Male: edu.oos_15_17.male.oos_pct,
-      Female: edu.oos_15_17.female.oos_pct,
+      Male: edu.oos_15_17.male.oos,
+      Female: edu.oos_15_17.female.oos,
     },
   ];
-  const disabledEducationData = [
-    { status: "In School", count: edu.disabled_children.enrolled },
-    { status: "Out of School", count: edu.disabled_children.oos },
+
+  const genderNotAttendingData = [
+    { gender: "Boys (0-17)", count: edu.oos_6_17.male.oos },
+    { gender: "Girls (0-17)", count: edu.oos_6_17.female.oos },
   ];
 
   return (
@@ -119,26 +126,26 @@ export const Education: React.FC<EducationProps> = ({
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="OOS Rate (6–17)"
-          value={`${edu.oos_6_17.oos_pct}%`}
+          label="OOS (6–17 yrs)"
+          value={edu.oos_6_17.oos.toLocaleString()}
           icon={<AlertCircle size={18} />}
           accent="#DC2626"
         />
         <KpiCard
-          label="OOS Rate (6–9)"
-          value={`${edu.oos_6_9.oos_pct}%`}
+          label="OOS (6–9 yrs)"
+          value={edu.oos_6_9.oos.toLocaleString()}
           icon={<BookOpen size={18} />}
           accent="#E67E22"
         />
         <KpiCard
-          label="OOS Rate (15–17)"
-          value={`${edu.oos_15_17.oos_pct}%`}
+          label="OOS (15–17 yrs)"
+          value={edu.oos_15_17.oos.toLocaleString()}
           icon={<Calendar size={18} />}
           accent="#128C7E"
         />
         <KpiCard
           label="Disabled OOS"
-          value={`${edu.disabled_children.oos_pct}%`}
+          value={edu.disabled_children.oos.toLocaleString()}
           icon={<Award size={18} />}
           accent="#075E54"
         />
@@ -157,7 +164,10 @@ export const Education: React.FC<EducationProps> = ({
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="OOS Rate by Age Band & Gender" height={320}>
+        <ChartCard
+          title="Out-of-School Children (Count by Band & Gender)"
+          height={320}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={oosBandsData}
@@ -170,7 +180,6 @@ export const Education: React.FC<EducationProps> = ({
                 tickLine={false}
               />
               <YAxis
-                unit="%"
                 tick={{ fill: theme.axisTick, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
@@ -185,45 +194,37 @@ export const Education: React.FC<EducationProps> = ({
                 dataKey="Male"
                 fill="#075E54"
                 radius={[4, 4, 0, 0]}
-                label={labelPct}
+                label={labelVal}
               />
               <Bar
                 dataKey="Female"
                 fill="#E67E22"
                 radius={[4, 4, 0, 0]}
-                label={labelPct}
+                label={labelVal}
               />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-        <ChartCard
-          title="Attendance Among Children with Disabilities"
-          height={320}
-        >
+        <ChartCard title="Children Not Attending by Gender (0-17)" height={320}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={disabledEducationData}
-              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
+              data={genderNotAttendingData}
+              layout="vertical"
+              margin={{ top: 25, right: 30, left: 10, bottom: 4 }}
             >
-              <XAxis
-                dataKey="status"
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
+              <XAxis type="number" hide />
               <YAxis
+                dataKey="gender"
+                type="category"
+                width={100}
                 tick={{ fill: theme.axisTick, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} label={labelVal}>
-                {disabledEducationData.map((_, i) => (
-                  <Cell key={i} fill={i === 0 ? "#059669" : "#DC2626"} />
+              <Tooltip contentStyle={theme.tooltip} />
+              <Bar dataKey="count" radius={[0, 4, 4, 0]} label={labelValH}>
+                {genderNotAttendingData.map((_, i) => (
+                  <Cell key={i} fill={i === 0 ? "#0284C7" : "#E67E22"} />
                 ))}
               </Bar>
             </BarChart>
@@ -231,7 +232,7 @@ export const Education: React.FC<EducationProps> = ({
         </ChartCard>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="In-School Children Grade Distribution" height={280}>
+        <ChartCard title="Last Grade Completed (In-School)" height={280}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={edu.grade_distribution}
@@ -248,11 +249,7 @@ export const Education: React.FC<EducationProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="count"
                 fill="#075E54"
@@ -279,11 +276,7 @@ export const Education: React.FC<EducationProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="count"
                 fill="#E67E22"
@@ -294,8 +287,21 @@ export const Education: React.FC<EducationProps> = ({
           </ResponsiveContainer>
         </ChartCard>
       </div>
+      <div className="grid grid-cols-1 gap-4 pt-2">
+        <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-line-light dark:border-line-dark p-5 flex items-start gap-3">
+          <HelpCircle size={20} className="text-ink-muted" />
+          <div>
+            <h4 className="text-xs font-bold text-ink-primary dark:text-ink-onDark">
+              Children with disabilities never enrolled (Male/Female)
+            </h4>
+            <p className="text-[11px] text-ink-faint mt-1.5 italic">
+              Specific gender-disability cross-tabulation for non-enrollment was
+              not captured in this survey wave.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
-
 export default Education;

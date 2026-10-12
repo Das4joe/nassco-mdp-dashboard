@@ -5,7 +5,14 @@ import { useChartTheme } from "../../lib/useChartTheme";
 import { ChartCard } from "./ChartCard";
 import KpiCard from "../KpiCard";
 import DrilldownMap from "../maps/DrilldownMap";
-import { Activity, AlertTriangle, ShieldCheck } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  ShieldCheck,
+  Heart,
+  UserCheck,
+  HelpCircle,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -62,6 +69,11 @@ export const Nutrition: FC<NutritionProps> = ({
     },
   };
 
+  const plw = record.extended.health_v2 ?? {
+    pregnant_total: 0,
+    lactating_total: 0,
+  };
+
   const muacOverview = [
     { name: "Normal (Green)", count: nut.normal_count, color: "#059669" },
     { name: "MAM (Yellow)", count: nut.mam_count, color: "#D97706" },
@@ -73,9 +85,15 @@ export const Nutrition: FC<NutritionProps> = ({
   ];
 
   const nutritionPlaceholders = [
-    { title: "HHs Enrolled in Food/Nutrition Programmes" },
-    { title: "Children (0–5) in Nutrition Interventions" },
-    { title: "Pregnant/Lactating Women Enrolled in Nutrition Programmes" },
+    { title: "Pregnant women enrolled into food/nutrition programme" },
+    {
+      title:
+        "Children with Malnutrition enrolled into food/nutrition programme",
+    },
+    {
+      title:
+        "Children with Malnutrition not enrolled into food/nutrition programme",
+    },
   ];
 
   return (
@@ -83,33 +101,39 @@ export const Nutrition: FC<NutritionProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
         <div>
           <h2 className="text-xl font-bold text-ink-primary dark:text-ink-onDark">
-            Nutrition & Acute Malnutrition
+            Nutrition & Malnutrition Counts
           </h2>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiCard
-          label="Under-5 Wasting Rate"
-          value={`${nut.wasting_pct}%`}
-          icon={<AlertTriangle size={18} />}
+          label="Currently Pregnant"
+          value={plw.pregnant_total.toLocaleString()}
+          icon={<Heart size={16} />}
+          accent="#9333EA"
+        />
+        <KpiCard
+          label="Lactating Mothers"
+          value={plw.lactating_total.toLocaleString()}
+          icon={<UserCheck size={16} />}
+          accent="#0284C7"
+        />
+        <KpiCard
+          label="SAM (MUAC Red)"
+          value={nut.sam_count.toLocaleString()}
+          icon={<Activity size={16} />}
           accent="#DC2626"
         />
         <KpiCard
-          label="Severe Acute (SAM)"
-          value={`${nut.sam_pct}%`}
-          icon={<Activity size={18} />}
-          accent="#B91C1C"
-        />
-        <KpiCard
-          label="Moderate Acute (MAM)"
-          value={`${nut.mam_pct}%`}
-          icon={<AlertTriangle size={18} />}
+          label="MAM (MUAC Yellow)"
+          value={nut.mam_count.toLocaleString()}
+          icon={<AlertTriangle size={16} />}
           accent="#D97706"
         />
         <KpiCard
-          label="Normal Nutrition Status"
-          value={`${nut.normal_pct}%`}
-          icon={<ShieldCheck size={18} />}
+          label="Normal (MUAC Green)"
+          value={nut.normal_count.toLocaleString()}
+          icon={<ShieldCheck size={16} />}
           accent="#059669"
         />
       </div>
@@ -127,7 +151,10 @@ export const Nutrition: FC<NutritionProps> = ({
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Child Acute Malnutrition Status (6–59m)" height={300}>
+        <ChartCard
+          title="Children with acute malnutrition (Count)"
+          height={300}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={muacOverview}
@@ -144,11 +171,7 @@ export const Nutrition: FC<NutritionProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} label={labelVal}>
                 {muacOverview.map((e, i) => (
                   <Cell key={i} fill={e.color} />
@@ -175,11 +198,7 @@ export const Nutrition: FC<NutritionProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Legend verticalAlign="top" align="right" />
               <Bar
                 dataKey="Wasting %"
@@ -191,19 +210,19 @@ export const Nutrition: FC<NutritionProps> = ({
           </ResponsiveContainer>
         </ChartCard>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
         {nutritionPlaceholders.map((p, i) => (
           <div
             key={i}
             className="bg-surface-light dark:bg-surface-dark rounded-xl border border-line-light dark:border-line-dark p-5 flex items-start gap-3"
           >
-            <ShieldCheck size={20} className="text-ink-muted" />
+            <HelpCircle size={20} className="text-ink-muted" />
             <div>
               <h4 className="text-xs font-bold text-ink-primary dark:text-ink-onDark">
                 {p.title}
               </h4>
               <p className="text-[11px] text-ink-faint mt-1.5 italic">
-                Data Not Collected in This Wave.
+                Enrollment cross-tabs not captured in this survey wave.
               </p>
             </div>
           </div>
@@ -212,5 +231,4 @@ export const Nutrition: FC<NutritionProps> = ({
     </div>
   );
 };
-
 export default Nutrition;

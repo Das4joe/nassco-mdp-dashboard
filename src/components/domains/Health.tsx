@@ -66,7 +66,6 @@ export const Health: FC<HealthProps> = ({
   const disabilityTypesData = record.extended.disability.types.map((t) => ({
     type: t.label,
     Count: t.count,
-    "Share %": t.pct,
   }));
   const insurancePlaceholders = [
     { title: "HHs with Health Insurance" },
@@ -98,9 +97,10 @@ export const Health: FC<HealthProps> = ({
           icon={<UserCheck size={18} />}
           accent="#075E54"
         />
+        {/* Changed to Absolute Count per UNICEF Request */}
         <KpiCard
           label="Persons w/ Disabilities"
-          value={`${h2.plwd_pct}%`}
+          value={h2.plwd_total.toLocaleString()}
           icon={<Activity size={18} />}
           accent="#128C7E"
         />
@@ -142,11 +142,7 @@ export const Health: FC<HealthProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="Count"
                 fill="#E67E22"
@@ -172,11 +168,7 @@ export const Health: FC<HealthProps> = ({
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip
-                contentStyle={theme.tooltip}
-                labelStyle={theme.tooltipLabel}
-                itemStyle={theme.tooltipItem}
-              />
+              <Tooltip contentStyle={theme.tooltip} />
               <Bar
                 dataKey="Count"
                 fill="#075E54"
@@ -208,6 +200,4 @@ export const Health: FC<HealthProps> = ({
     </div>
   );
 };
-
-export const HealthNutrition = Health;
 export default Health;
