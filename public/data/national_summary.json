@@ -1,1 +1,129 @@
-{"level": "national", "nsr": {"total_households": 138676, "total_individuals": 138676, "total_male": 138676, "total_female": 0, "children_under18": 57688, "children_under5": 15183, "nin_verification_rate": 0}, "vulnerability": {"vulnerability_index": 0, "poorest_households": 19414, "poorest_pct": 14.0}, "extended": {"age_sex_pyramid": [{"band": "0-4", "male": 11313, "female": 0, "total": 11313}, {"band": "5-9", "male": 19284, "female": 0, "total": 19284}, {"band": "10-14", "male": 16952, "female": 0, "total": 16952}, {"band": "15-19", "male": 15799, "female": 0, "total": 15799}, {"band": "20-24", "male": 13352, "female": 0, "total": 13352}], "disability": {"types": [{"label": "Visual", "count": 481}, {"label": "Hearing", "count": 344}, {"label": "Physical", "count": 275}, {"label": "Cognitive", "count": 275}]}, "health_v2": {"pregnant_total": 2483, "lactating_total": 718, "plwd_total": 1376, "children_plwd": 221, "children_0_5_insurance": 0, "children_0_7_insurance": 0, "children_0_5_no_insurance": 15183, "children_0_7_no_insurance": 22960}, "civil_registration": {"children_0_17": {"birth_cert_yes": 0, "birth_cert_no": 57688, "nin_yes": 0, "nin_no": 57688, "both": 0, "neither": 57688, "cert_only": 0, "nin_only": 0, "by_gender": {"male": {"birth_cert_yes": 0, "nin_yes": 0}, "female": {"birth_cert_yes": 0, "nin_yes": 0}}}, "children_0_5": {"birth_cert_yes": 0, "birth_cert_no": 15183, "nin_yes": 0, "nin_no": 15183, "neither": 15183, "cert_only": 0, "nin_only": 0}}, "education_v2": {"oos_6_17": {"oos": 42505, "male": {"oos": 42505}, "female": {"oos": 0}}, "oos_6_9": {"oos": 15414, "male": {"oos": 15414}, "female": {"oos": 0}}, "oos_10_14": {"oos": 16952, "male": {"oos": 16952}, "female": {"oos": 0}}, "oos_15_17": {"oos": 10139, "male": {"oos": 10139}, "female": {"oos": 0}}, "disabled_children": {"oos": 161}}, "nutrition_v2": {"sam_count": 9165, "mam_count": 2346, "normal_count": 2418}, "livelihoods_resilience_v2": {"shock_exposure": {"shock_hh_count": 0}}, "youth": {"employed": 19012, "unemployed": 0}, "children_in_risk_hh": {"n": 0}, "female_primary_respondent": {"n": 0}, "age_bands_v2": {"0-17": {"total": 57688, "male": 57688, "female": 0}, "0-3": {"total": 8195}, "18-24": {"total": 19012}}}}
+{
+  "total_households": 594,
+  "total_individuals": 138676,
+  "children_0_17": 57688,
+  "children_0_5": 15183,
+  "youth_18_24": 19012,
+  "plwd": 1376,
+  "children_with_disabilities": 221,
+  "pregnant_women": 2483,
+  "lactating_mothers": 718,
+  "pyramid_0_24": [
+    {
+      "ageGroup": "0-4",
+      "boys": 6053,
+      "girls": 5260,
+      "total": 11313
+    },
+    {
+      "ageGroup": "5-9",
+      "boys": 10568,
+      "girls": 8716,
+      "total": 19284
+    },
+    {
+      "ageGroup": "10-14",
+      "boys": 9181,
+      "girls": 7771,
+      "total": 16952
+    },
+    {
+      "ageGroup": "15-19",
+      "boys": 8245,
+      "girls": 7554,
+      "total": 15799
+    },
+    {
+      "ageGroup": "20-24",
+      "boys": 6383,
+      "girls": 6969,
+      "total": 13352
+    }
+  ],
+  "gender_ratio": {
+    "boys": 31164,
+    "girls": 26524
+  },
+  "age_ratio": [
+    {
+      "ageGroup": "0-4",
+      "count": 11313
+    },
+    {
+      "ageGroup": "5-9",
+      "count": 19284
+    },
+    {
+      "ageGroup": "10-14",
+      "count": 16952
+    },
+    {
+      "ageGroup": "15-19",
+      "count": 15799
+    },
+    {
+      "ageGroup": "20-24",
+      "count": 13352
+    }
+  ],
+  "civil_registration": {
+    "c_0_17_with_bc": 9957,
+    "c_0_5_with_bc": 2750,
+    "c_0_17_no_bc": 47731,
+    "c_0_5_no_bc": 12433,
+    "c_0_17_with_nin": 1505,
+    "c_0_5_with_nin": 33,
+    "c_0_17_no_nin": 56183,
+    "c_0_5_no_nin": 15150,
+    "c_0_17_no_bc_no_nin": 46647,
+    "c_0_5_no_bc_no_nin": 12407,
+    "c_0_17_bc_no_nin": 9536,
+    "c_0_5_bc_no_nin": 2743,
+    "c_0_17_nin_no_bc": 1084,
+    "c_0_5_nin_no_bc": 26,
+    "bc_by_gender": {
+      "boys_with_bc": 5408,
+      "girls_with_bc": 4549,
+      "boys_no_bc": 25756,
+      "girls_no_bc": 21975
+    },
+    "nin_by_gender": {
+      "boys_with_nin": 701,
+      "girls_with_nin": 804,
+      "boys_no_nin": 30463,
+      "girls_no_nin": 25720
+    }
+  },
+  "education": {
+    "out_of_school_6_9": 5265,
+    "out_of_school_10_14": 4329,
+    "out_of_school_15_17": 2810,
+    "disabled_never_enrolled_0_17": 132,
+    "out_of_school_6_9_boys": 3051,
+    "out_of_school_6_9_girls": 2214,
+    "out_of_school_10_14_boys": 2592,
+    "out_of_school_10_14_girls": 1737,
+    "out_of_school_15_17_boys": 1543,
+    "out_of_school_15_17_girls": 1267,
+    "not_attending_0_17_boys": 12426,
+    "not_attending_0_17_girls": 9565
+  },
+  "health_nutrition": {
+    "pregnant_women": 2483,
+    "lactating_mothers": 718,
+    "sam_children": 7990,
+    "mam_children": 2166,
+    "normal_children": 982,
+    "health_insurance_0_7_covered": 0,
+    "health_insurance_0_7_not_covered": 22960,
+    "health_insurance_0_5_covered": 0,
+    "health_insurance_0_5_not_covered": 15183
+  },
+  "livelihoods": {
+    "female_headed_hhs": 531,
+    "youth_employed": 14562,
+    "youth_unemployed": 4450,
+    "shock_prone_hhs": 401,
+    "children_in_risk_hhs": 6692
+  }
+}
