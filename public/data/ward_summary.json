@@ -1,5 +1,16 @@
 [
   {
+    "nsr": {
+      "total_households": 12,
+      "total_individuals": 35,
+      "children_0_17": 15,
+      "children_0_5": 5,
+      "youth_18_24": 3,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 12,
     "total_individuals": 35,
     "children_0_17": 15,
@@ -132,6 +143,17 @@
     "ward": "AMANKALU/AKOLIUFU"
   },
   {
+    "nsr": {
+      "total_households": 3,
+      "total_individuals": 13,
+      "children_0_17": 5,
+      "children_0_5": 2,
+      "youth_18_24": 2,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 3,
     "total_individuals": 13,
     "children_0_17": 5,
@@ -264,6 +286,17 @@
     "ward": "BENDE"
   },
   {
+    "nsr": {
+      "total_households": 26,
+      "total_individuals": 91,
+      "children_0_17": 49,
+      "children_0_5": 10,
+      "youth_18_24": 13,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 2,
+      "lactating_mothers": 1
+    },
     "total_households": 26,
     "total_individuals": 91,
     "children_0_17": 49,
@@ -396,6 +429,17 @@
     "ward": "IGBERE 'A'"
   },
   {
+    "nsr": {
+      "total_households": 94,
+      "total_individuals": 487,
+      "children_0_17": 222,
+      "children_0_5": 54,
+      "youth_18_24": 52,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 94,
     "total_individuals": 487,
     "children_0_17": 222,
@@ -528,6 +572,17 @@
     "ward": "IGBERE 'B'"
   },
   {
+    "nsr": {
+      "total_households": 152,
+      "total_individuals": 1014,
+      "children_0_17": 409,
+      "children_0_5": 137,
+      "youth_18_24": 108,
+      "plwd": 8,
+      "children_with_disabilities": 1,
+      "pregnant_women": 27,
+      "lactating_mothers": 4
+    },
     "total_households": 152,
     "total_individuals": 1014,
     "children_0_17": 409,
@@ -660,6 +715,17 @@
     "ward": "ITEM C"
   },
   {
+    "nsr": {
+      "total_households": 139,
+      "total_individuals": 829,
+      "children_0_17": 401,
+      "children_0_5": 119,
+      "youth_18_24": 88,
+      "plwd": 4,
+      "children_with_disabilities": 2,
+      "pregnant_women": 13,
+      "lactating_mothers": 3
+    },
     "total_households": 139,
     "total_individuals": 829,
     "children_0_17": 401,
@@ -792,6 +858,17 @@
     "ward": "UGWUEKE/EZEUKWU"
   },
   {
+    "nsr": {
+      "total_households": 6,
+      "total_individuals": 23,
+      "children_0_17": 3,
+      "children_0_5": 1,
+      "youth_18_24": 2,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 6,
     "total_individuals": 23,
     "children_0_17": 3,
@@ -924,6 +1001,17 @@
     "ward": "UMU - IMENYI"
   },
   {
+    "nsr": {
+      "total_households": 105,
+      "total_individuals": 678,
+      "children_0_17": 272,
+      "children_0_5": 61,
+      "youth_18_24": 82,
+      "plwd": 7,
+      "children_with_disabilities": 0,
+      "pregnant_women": 6,
+      "lactating_mothers": 1
+    },
     "total_households": 105,
     "total_individuals": 678,
     "children_0_17": 272,
@@ -1056,6 +1144,17 @@
     "ward": "IBERE I"
   },
   {
+    "nsr": {
+      "total_households": 218,
+      "total_individuals": 1121,
+      "children_0_17": 389,
+      "children_0_5": 117,
+      "youth_18_24": 115,
+      "plwd": 11,
+      "children_with_disabilities": 0,
+      "pregnant_women": 10,
+      "lactating_mothers": 0
+    },
     "total_households": 218,
     "total_individuals": 1121,
     "children_0_17": 389,
@@ -1188,6 +1287,17 @@
     "ward": "IBERE II"
   },
   {
+    "nsr": {
+      "total_households": 4,
+      "total_individuals": 11,
+      "children_0_17": 5,
+      "children_0_5": 0,
+      "youth_18_24": 2,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 4,
     "total_individuals": 11,
     "children_0_17": 5,
@@ -1320,6 +1430,17 @@
     "ward": "OBORO II"
   },
   {
+    "nsr": {
+      "total_households": 4,
+      "total_individuals": 16,
+      "children_0_17": 5,
+      "children_0_5": 2,
+      "youth_18_24": 1,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 4,
     "total_individuals": 16,
     "children_0_17": 5,
@@ -1452,6 +1573,17 @@
     "ward": "OBORO III"
   },
   {
+    "nsr": {
+      "total_households": 10,
+      "total_individuals": 20,
+      "children_0_17": 2,
+      "children_0_5": 0,
+      "youth_18_24": 0,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 10,
     "total_individuals": 20,
     "children_0_17": 2,
@@ -1584,6 +1716,17 @@
     "ward": "EZERE"
   },
   {
+    "nsr": {
+      "total_households": 111,
+      "total_individuals": 651,
+      "children_0_17": 210,
+      "children_0_5": 66,
+      "youth_18_24": 74,
+      "plwd": 15,
+      "children_with_disabilities": 1,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 111,
     "total_individuals": 651,
     "children_0_17": 210,
@@ -1716,6 +1859,17 @@
     "ward": "IKEAGHA I"
   },
   {
+    "nsr": {
+      "total_households": 161,
+      "total_individuals": 1079,
+      "children_0_17": 123,
+      "children_0_5": 15,
+      "youth_18_24": 146,
+      "plwd": 8,
+      "children_with_disabilities": 0,
+      "pregnant_women": 4,
+      "lactating_mothers": 0
+    },
     "total_households": 161,
     "total_individuals": 1079,
     "children_0_17": 123,
@@ -1848,6 +2002,17 @@
     "ward": "ISU AMAWU"
   },
   {
+    "nsr": {
+      "total_households": 86,
+      "total_individuals": 709,
+      "children_0_17": 362,
+      "children_0_5": 52,
+      "youth_18_24": 90,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 2,
+      "lactating_mothers": 0
+    },
     "total_households": 86,
     "total_individuals": 709,
     "children_0_17": 362,
@@ -1980,6 +2145,17 @@
     "ward": "AZUMINI"
   },
   {
+    "nsr": {
+      "total_households": 131,
+      "total_individuals": 1060,
+      "children_0_17": 455,
+      "children_0_5": 44,
+      "youth_18_24": 155,
+      "plwd": 2,
+      "children_with_disabilities": 1,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 131,
     "total_individuals": 1060,
     "children_0_17": 455,
@@ -2112,6 +2288,17 @@
     "ward": "IKWUEKE EAST"
   },
   {
+    "nsr": {
+      "total_households": 62,
+      "total_individuals": 529,
+      "children_0_17": 240,
+      "children_0_5": 62,
+      "youth_18_24": 77,
+      "plwd": 5,
+      "children_with_disabilities": 0,
+      "pregnant_women": 7,
+      "lactating_mothers": 0
+    },
     "total_households": 62,
     "total_individuals": 529,
     "children_0_17": 240,
@@ -2244,6 +2431,17 @@
     "ward": "IKWURIATOR EAST"
   },
   {
+    "nsr": {
+      "total_households": 84,
+      "total_individuals": 365,
+      "children_0_17": 134,
+      "children_0_5": 3,
+      "youth_18_24": 62,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 84,
     "total_individuals": 365,
     "children_0_17": 134,
@@ -2376,6 +2574,17 @@
     "ward": "IKWURIATOR WEST"
   },
   {
+    "nsr": {
+      "total_households": 100,
+      "total_individuals": 606,
+      "children_0_17": 273,
+      "children_0_5": 49,
+      "youth_18_24": 69,
+      "plwd": 3,
+      "children_with_disabilities": 0,
+      "pregnant_women": 11,
+      "lactating_mothers": 0
+    },
     "total_households": 100,
     "total_individuals": 606,
     "children_0_17": 273,
@@ -2508,6 +2717,17 @@
     "ward": "ASA NORTH"
   },
   {
+    "nsr": {
+      "total_households": 91,
+      "total_individuals": 696,
+      "children_0_17": 271,
+      "children_0_5": 41,
+      "youth_18_24": 82,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 6,
+      "lactating_mothers": 0
+    },
     "total_households": 91,
     "total_individuals": 696,
     "children_0_17": 271,
@@ -2640,6 +2860,17 @@
     "ward": "OBOKWE"
   },
   {
+    "nsr": {
+      "total_households": 10,
+      "total_individuals": 26,
+      "children_0_17": 11,
+      "children_0_5": 1,
+      "youth_18_24": 4,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 10,
     "total_individuals": 26,
     "children_0_17": 11,
@@ -2772,6 +3003,17 @@
     "ward": "OGWULE OGBAULU"
   },
   {
+    "nsr": {
+      "total_households": 147,
+      "total_individuals": 556,
+      "children_0_17": 234,
+      "children_0_5": 32,
+      "youth_18_24": 131,
+      "plwd": 16,
+      "children_with_disabilities": 11,
+      "pregnant_women": 6,
+      "lactating_mothers": 0
+    },
     "total_households": 147,
     "total_individuals": 556,
     "children_0_17": 234,
@@ -2904,6 +3146,17 @@
     "ward": "OKOKOLO"
   },
   {
+    "nsr": {
+      "total_households": 266,
+      "total_individuals": 2221,
+      "children_0_17": 983,
+      "children_0_5": 105,
+      "youth_18_24": 440,
+      "plwd": 235,
+      "children_with_disabilities": 31,
+      "pregnant_women": 82,
+      "lactating_mothers": 30
+    },
     "total_households": 266,
     "total_individuals": 2221,
     "children_0_17": 983,
@@ -3036,6 +3289,17 @@
     "ward": "AKPETE/OJANTELLE"
   },
   {
+    "nsr": {
+      "total_households": 519,
+      "total_individuals": 1087,
+      "children_0_17": 291,
+      "children_0_5": 70,
+      "youth_18_24": 230,
+      "plwd": 12,
+      "children_with_disabilities": 1,
+      "pregnant_women": 40,
+      "lactating_mothers": 17
+    },
     "total_households": 519,
     "total_individuals": 1087,
     "children_0_17": 291,
@@ -3168,6 +3432,17 @@
     "ward": "IGORO"
   },
   {
+    "nsr": {
+      "total_households": 260,
+      "total_individuals": 1619,
+      "children_0_17": 422,
+      "children_0_5": 66,
+      "youth_18_24": 386,
+      "plwd": 127,
+      "children_with_disabilities": 7,
+      "pregnant_women": 342,
+      "lactating_mothers": 145
+    },
     "total_households": 260,
     "total_individuals": 1619,
     "children_0_17": 422,
@@ -3300,6 +3575,17 @@
     "ward": "OBA"
   },
   {
+    "nsr": {
+      "total_households": 115,
+      "total_individuals": 766,
+      "children_0_17": 311,
+      "children_0_5": 118,
+      "youth_18_24": 145,
+      "plwd": 16,
+      "children_with_disabilities": 0,
+      "pregnant_women": 14,
+      "lactating_mothers": 1
+    },
     "total_households": 115,
     "total_individuals": 766,
     "children_0_17": 311,
@@ -3432,6 +3718,17 @@
     "ward": "GBEMACHA"
   },
   {
+    "nsr": {
+      "total_households": 180,
+      "total_individuals": 1646,
+      "children_0_17": 759,
+      "children_0_5": 234,
+      "youth_18_24": 255,
+      "plwd": 31,
+      "children_with_disabilities": 1,
+      "pregnant_women": 46,
+      "lactating_mothers": 0
+    },
     "total_households": 180,
     "total_individuals": 1646,
     "children_0_17": 759,
@@ -3564,6 +3861,17 @@
     "ward": "IKYOGBAJIR"
   },
   {
+    "nsr": {
+      "total_households": 239,
+      "total_individuals": 2382,
+      "children_0_17": 1085,
+      "children_0_5": 359,
+      "youth_18_24": 407,
+      "plwd": 20,
+      "children_with_disabilities": 9,
+      "pregnant_women": 38,
+      "lactating_mothers": 5
+    },
     "total_households": 239,
     "total_individuals": 2382,
     "children_0_17": 1085,
@@ -3696,6 +4004,17 @@
     "ward": "MBAYOM"
   },
   {
+    "nsr": {
+      "total_households": 441,
+      "total_individuals": 3461,
+      "children_0_17": 1645,
+      "children_0_5": 497,
+      "youth_18_24": 537,
+      "plwd": 15,
+      "children_with_disabilities": 1,
+      "pregnant_women": 54,
+      "lactating_mothers": 23
+    },
     "total_households": 441,
     "total_individuals": 3461,
     "children_0_17": 1645,
@@ -3828,6 +4147,17 @@
     "ward": "SHOUGH"
   },
   {
+    "nsr": {
+      "total_households": 177,
+      "total_individuals": 1068,
+      "children_0_17": 247,
+      "children_0_5": 50,
+      "youth_18_24": 111,
+      "plwd": 32,
+      "children_with_disabilities": 0,
+      "pregnant_women": 15,
+      "lactating_mothers": 2
+    },
     "total_households": 177,
     "total_individuals": 1068,
     "children_0_17": 247,
@@ -3960,6 +4290,17 @@
     "ward": "MBADYUL"
   },
   {
+    "nsr": {
+      "total_households": 252,
+      "total_individuals": 1759,
+      "children_0_17": 392,
+      "children_0_5": 93,
+      "youth_18_24": 206,
+      "plwd": 13,
+      "children_with_disabilities": 0,
+      "pregnant_women": 30,
+      "lactating_mothers": 1
+    },
     "total_households": 252,
     "total_individuals": 1759,
     "children_0_17": 392,
@@ -4092,6 +4433,17 @@
     "ward": "UKEMBERGYA/ISWAREV"
   },
   {
+    "nsr": {
+      "total_households": 249,
+      "total_individuals": 1233,
+      "children_0_17": 306,
+      "children_0_5": 113,
+      "youth_18_24": 161,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 26,
+      "lactating_mothers": 4
+    },
     "total_households": 249,
     "total_individuals": 1233,
     "children_0_17": 306,
@@ -4224,6 +4576,17 @@
     "ward": "YONOV"
   },
   {
+    "nsr": {
+      "total_households": 251,
+      "total_individuals": 1210,
+      "children_0_17": 479,
+      "children_0_5": 76,
+      "youth_18_24": 165,
+      "plwd": 14,
+      "children_with_disabilities": 2,
+      "pregnant_women": 58,
+      "lactating_mothers": 24
+    },
     "total_households": 251,
     "total_individuals": 1210,
     "children_0_17": 479,
@@ -4356,6 +4719,17 @@
     "ward": "IRABI"
   },
   {
+    "nsr": {
+      "total_households": 390,
+      "total_individuals": 2360,
+      "children_0_17": 997,
+      "children_0_5": 86,
+      "youth_18_24": 337,
+      "plwd": 21,
+      "children_with_disabilities": 2,
+      "pregnant_women": 79,
+      "lactating_mothers": 20
+    },
     "total_households": 390,
     "total_individuals": 2360,
     "children_0_17": 997,
@@ -4488,6 +4862,17 @@
     "ward": "OBEKO"
   },
   {
+    "nsr": {
+      "total_households": 314,
+      "total_individuals": 1493,
+      "children_0_17": 604,
+      "children_0_5": 88,
+      "youth_18_24": 210,
+      "plwd": 20,
+      "children_with_disabilities": 3,
+      "pregnant_women": 51,
+      "lactating_mothers": 11
+    },
     "total_households": 314,
     "total_individuals": 1493,
     "children_0_17": 604,
@@ -4620,6 +5005,17 @@
     "ward": "OKPOKWU"
   },
   {
+    "nsr": {
+      "total_households": 332,
+      "total_individuals": 1632,
+      "children_0_17": 692,
+      "children_0_5": 79,
+      "youth_18_24": 198,
+      "plwd": 25,
+      "children_with_disabilities": 3,
+      "pregnant_women": 60,
+      "lactating_mothers": 14
+    },
     "total_households": 332,
     "total_individuals": 1632,
     "children_0_17": 692,
@@ -4752,6 +5148,17 @@
     "ward": "ORIHI"
   },
   {
+    "nsr": {
+      "total_households": 100,
+      "total_individuals": 856,
+      "children_0_17": 320,
+      "children_0_5": 80,
+      "youth_18_24": 149,
+      "plwd": 13,
+      "children_with_disabilities": 2,
+      "pregnant_women": 6,
+      "lactating_mothers": 1
+    },
     "total_households": 100,
     "total_individuals": 856,
     "children_0_17": 320,
@@ -4884,6 +5291,17 @@
     "ward": "OGLEWU ICHO"
   },
   {
+    "nsr": {
+      "total_households": 226,
+      "total_individuals": 747,
+      "children_0_17": 234,
+      "children_0_5": 105,
+      "youth_18_24": 154,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 49,
+      "lactating_mothers": 1
+    },
     "total_households": 226,
     "total_individuals": 747,
     "children_0_17": 234,
@@ -5016,6 +5434,17 @@
     "ward": "ONYAGEDE ICHO (OGOLI)"
   },
   {
+    "nsr": {
+      "total_households": 125,
+      "total_individuals": 195,
+      "children_0_17": 15,
+      "children_0_5": 1,
+      "youth_18_24": 47,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 125,
     "total_individuals": 195,
     "children_0_17": 15,
@@ -5148,6 +5577,17 @@
     "ward": "ONYAGEDE-EHAJE (ALLE"
   },
   {
+    "nsr": {
+      "total_households": 159,
+      "total_individuals": 706,
+      "children_0_17": 257,
+      "children_0_5": 44,
+      "youth_18_24": 109,
+      "plwd": 7,
+      "children_with_disabilities": 1,
+      "pregnant_women": 32,
+      "lactating_mothers": 0
+    },
     "total_households": 159,
     "total_individuals": 706,
     "children_0_17": 257,
@@ -5280,6 +5720,17 @@
     "ward": "MBAAYO"
   },
   {
+    "nsr": {
+      "total_households": 332,
+      "total_individuals": 1352,
+      "children_0_17": 526,
+      "children_0_5": 86,
+      "youth_18_24": 185,
+      "plwd": 13,
+      "children_with_disabilities": 2,
+      "pregnant_women": 26,
+      "lactating_mothers": 1
+    },
     "total_households": 332,
     "total_individuals": 1352,
     "children_0_17": 526,
@@ -5412,6 +5863,17 @@
     "ward": "MBAKWAKEM"
   },
   {
+    "nsr": {
+      "total_households": 84,
+      "total_individuals": 332,
+      "children_0_17": 135,
+      "children_0_5": 29,
+      "youth_18_24": 41,
+      "plwd": 4,
+      "children_with_disabilities": 1,
+      "pregnant_women": 9,
+      "lactating_mothers": 0
+    },
     "total_households": 84,
     "total_individuals": 332,
     "children_0_17": 135,
@@ -5544,6 +6006,17 @@
     "ward": "MBANYAGBER"
   },
   {
+    "nsr": {
+      "total_households": 174,
+      "total_individuals": 1507,
+      "children_0_17": 693,
+      "children_0_5": 207,
+      "youth_18_24": 142,
+      "plwd": 6,
+      "children_with_disabilities": 0,
+      "pregnant_women": 7,
+      "lactating_mothers": 0
+    },
     "total_households": 174,
     "total_individuals": 1507,
     "children_0_17": 693,
@@ -5676,6 +6149,17 @@
     "ward": "AKINMORIN/JOBELE"
   },
   {
+    "nsr": {
+      "total_households": 189,
+      "total_individuals": 3985,
+      "children_0_17": 1733,
+      "children_0_5": 453,
+      "youth_18_24": 498,
+      "plwd": 13,
+      "children_with_disabilities": 3,
+      "pregnant_women": 17,
+      "lactating_mothers": 3
+    },
     "total_households": 189,
     "total_individuals": 3985,
     "children_0_17": 1733,
@@ -5808,6 +6292,17 @@
     "ward": "AWE I"
   },
   {
+    "nsr": {
+      "total_households": 207,
+      "total_individuals": 1906,
+      "children_0_17": 851,
+      "children_0_5": 259,
+      "youth_18_24": 224,
+      "plwd": 6,
+      "children_with_disabilities": 0,
+      "pregnant_women": 7,
+      "lactating_mothers": 0
+    },
     "total_households": 207,
     "total_individuals": 1906,
     "children_0_17": 851,
@@ -5940,6 +6435,17 @@
     "ward": "AWE II"
   },
   {
+    "nsr": {
+      "total_households": 63,
+      "total_individuals": 323,
+      "children_0_17": 136,
+      "children_0_5": 33,
+      "youth_18_24": 37,
+      "plwd": 2,
+      "children_with_disabilities": 1,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 63,
     "total_individuals": 323,
     "children_0_17": 136,
@@ -6072,6 +6578,17 @@
     "ward": "FIDITI I"
   },
   {
+    "nsr": {
+      "total_households": 347,
+      "total_individuals": 2491,
+      "children_0_17": 994,
+      "children_0_5": 270,
+      "youth_18_24": 337,
+      "plwd": 10,
+      "children_with_disabilities": 1,
+      "pregnant_women": 8,
+      "lactating_mothers": 0
+    },
     "total_households": 347,
     "total_individuals": 2491,
     "children_0_17": 994,
@@ -6204,6 +6721,17 @@
     "ward": "FIDITI II"
   },
   {
+    "nsr": {
+      "total_households": 137,
+      "total_individuals": 2255,
+      "children_0_17": 979,
+      "children_0_5": 256,
+      "youth_18_24": 307,
+      "plwd": 14,
+      "children_with_disabilities": 0,
+      "pregnant_women": 16,
+      "lactating_mothers": 0
+    },
     "total_households": 137,
     "total_individuals": 2255,
     "children_0_17": 979,
@@ -6336,6 +6864,17 @@
     "ward": "ILORA I"
   },
   {
+    "nsr": {
+      "total_households": 169,
+      "total_individuals": 1498,
+      "children_0_17": 589,
+      "children_0_5": 118,
+      "youth_18_24": 196,
+      "plwd": 6,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 1
+    },
     "total_households": 169,
     "total_individuals": 1498,
     "children_0_17": 589,
@@ -6468,6 +7007,17 @@
     "ward": "ILORA II"
   },
   {
+    "nsr": {
+      "total_households": 81,
+      "total_individuals": 662,
+      "children_0_17": 258,
+      "children_0_5": 64,
+      "youth_18_24": 104,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 81,
     "total_individuals": 662,
     "children_0_17": 258,
@@ -6600,6 +7150,17 @@
     "ward": "IMINI"
   },
   {
+    "nsr": {
+      "total_households": 107,
+      "total_individuals": 1422,
+      "children_0_17": 625,
+      "children_0_5": 152,
+      "youth_18_24": 197,
+      "plwd": 6,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 1
+    },
     "total_households": 107,
     "total_individuals": 1422,
     "children_0_17": 625,
@@ -6732,6 +7293,17 @@
     "ward": "IWARE"
   },
   {
+    "nsr": {
+      "total_households": 227,
+      "total_individuals": 1671,
+      "children_0_17": 775,
+      "children_0_5": 198,
+      "youth_18_24": 204,
+      "plwd": 7,
+      "children_with_disabilities": 1,
+      "pregnant_women": 13,
+      "lactating_mothers": 3
+    },
     "total_households": 227,
     "total_individuals": 1671,
     "children_0_17": 775,
@@ -6864,6 +7436,17 @@
     "ward": "ALAGA"
   },
   {
+    "nsr": {
+      "total_households": 141,
+      "total_individuals": 3675,
+      "children_0_17": 1569,
+      "children_0_5": 439,
+      "youth_18_24": 495,
+      "plwd": 25,
+      "children_with_disabilities": 5,
+      "pregnant_women": 31,
+      "lactating_mothers": 2
+    },
     "total_households": 141,
     "total_individuals": 3675,
     "children_0_17": 1569,
@@ -6996,6 +7579,17 @@
     "ward": "OWO/AGUNREGE/SAB"
   },
   {
+    "nsr": {
+      "total_households": 4,
+      "total_individuals": 11,
+      "children_0_17": 3,
+      "children_0_5": 1,
+      "youth_18_24": 1,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 4,
     "total_individuals": 11,
     "children_0_17": 3,
@@ -7128,6 +7722,17 @@
     "ward": "TEDE II"
   },
   {
+    "nsr": {
+      "total_households": 172,
+      "total_individuals": 1370,
+      "children_0_17": 575,
+      "children_0_5": 96,
+      "youth_18_24": 159,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 2,
+      "lactating_mothers": 2
+    },
     "total_households": 172,
     "total_individuals": 1370,
     "children_0_17": 575,
@@ -7260,6 +7865,17 @@
     "ward": "AYETE I"
   },
   {
+    "nsr": {
+      "total_households": 159,
+      "total_individuals": 441,
+      "children_0_17": 188,
+      "children_0_5": 44,
+      "youth_18_24": 49,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 2,
+      "lactating_mothers": 0
+    },
     "total_households": 159,
     "total_individuals": 441,
     "children_0_17": 188,
@@ -7392,6 +8008,17 @@
     "ward": "AYETE II"
   },
   {
+    "nsr": {
+      "total_households": 307,
+      "total_individuals": 831,
+      "children_0_17": 300,
+      "children_0_5": 86,
+      "youth_18_24": 99,
+      "plwd": 2,
+      "children_with_disabilities": 1,
+      "pregnant_women": 4,
+      "lactating_mothers": 0
+    },
     "total_households": 307,
     "total_individuals": 831,
     "children_0_17": 300,
@@ -7524,6 +8151,17 @@
     "ward": "IGANGAN IV"
   },
   {
+    "nsr": {
+      "total_households": 264,
+      "total_individuals": 1442,
+      "children_0_17": 535,
+      "children_0_5": 131,
+      "youth_18_24": 201,
+      "plwd": 5,
+      "children_with_disabilities": 0,
+      "pregnant_women": 5,
+      "lactating_mothers": 0
+    },
     "total_households": 264,
     "total_individuals": 1442,
     "children_0_17": 535,
@@ -7656,6 +8294,17 @@
     "ward": "OFIKI II"
   },
   {
+    "nsr": {
+      "total_households": 337,
+      "total_individuals": 3526,
+      "children_0_17": 1402,
+      "children_0_5": 344,
+      "youth_18_24": 469,
+      "plwd": 11,
+      "children_with_disabilities": 0,
+      "pregnant_women": 44,
+      "lactating_mothers": 7
+    },
     "total_households": 337,
     "total_individuals": 3526,
     "children_0_17": 1402,
@@ -7788,6 +8437,17 @@
     "ward": "TAPA I"
   },
   {
+    "nsr": {
+      "total_households": 120,
+      "total_individuals": 792,
+      "children_0_17": 327,
+      "children_0_5": 79,
+      "youth_18_24": 107,
+      "plwd": 3,
+      "children_with_disabilities": 1,
+      "pregnant_women": 8,
+      "lactating_mothers": 1
+    },
     "total_households": 120,
     "total_individuals": 792,
     "children_0_17": 327,
@@ -7920,6 +8580,17 @@
     "ward": "IGBOJAIYE"
   },
   {
+    "nsr": {
+      "total_households": 44,
+      "total_individuals": 230,
+      "children_0_17": 107,
+      "children_0_5": 33,
+      "youth_18_24": 38,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 5,
+      "lactating_mothers": 0
+    },
     "total_households": 44,
     "total_individuals": 230,
     "children_0_17": 107,
@@ -8052,6 +8723,17 @@
     "ward": "OKAKA I"
   },
   {
+    "nsr": {
+      "total_households": 206,
+      "total_individuals": 4082,
+      "children_0_17": 1743,
+      "children_0_5": 401,
+      "youth_18_24": 603,
+      "plwd": 35,
+      "children_with_disabilities": 2,
+      "pregnant_women": 30,
+      "lactating_mothers": 5
+    },
     "total_households": 206,
     "total_individuals": 4082,
     "children_0_17": 1743,
@@ -8184,6 +8866,17 @@
     "ward": "OKAKA II"
   },
   {
+    "nsr": {
+      "total_households": 138,
+      "total_individuals": 1361,
+      "children_0_17": 625,
+      "children_0_5": 162,
+      "youth_18_24": 175,
+      "plwd": 20,
+      "children_with_disabilities": 2,
+      "pregnant_women": 27,
+      "lactating_mothers": 10
+    },
     "total_households": 138,
     "total_individuals": 1361,
     "children_0_17": 625,
@@ -8316,6 +9009,17 @@
     "ward": "OKE-AMU"
   },
   {
+    "nsr": {
+      "total_households": 155,
+      "total_individuals": 2043,
+      "children_0_17": 889,
+      "children_0_5": 238,
+      "youth_18_24": 308,
+      "plwd": 31,
+      "children_with_disabilities": 2,
+      "pregnant_women": 24,
+      "lactating_mothers": 9
+    },
     "total_households": 155,
     "total_individuals": 2043,
     "children_0_17": 889,
@@ -8448,6 +9152,17 @@
     "ward": "OTU II"
   },
   {
+    "nsr": {
+      "total_households": 264,
+      "total_individuals": 4329,
+      "children_0_17": 1997,
+      "children_0_5": 613,
+      "youth_18_24": 600,
+      "plwd": 15,
+      "children_with_disabilities": 1,
+      "pregnant_women": 59,
+      "lactating_mothers": 26
+    },
     "total_households": 264,
     "total_individuals": 4329,
     "children_0_17": 1997,
@@ -8580,6 +9295,17 @@
     "ward": "OWODE/IPAPO"
   },
   {
+    "nsr": {
+      "total_households": 103,
+      "total_individuals": 591,
+      "children_0_17": 216,
+      "children_0_5": 36,
+      "youth_18_24": 77,
+      "plwd": 2,
+      "children_with_disabilities": 1,
+      "pregnant_women": 2,
+      "lactating_mothers": 1
+    },
     "total_households": 103,
     "total_individuals": 591,
     "children_0_17": 216,
@@ -8712,6 +9438,17 @@
     "ward": "AGBAAKIN I"
   },
   {
+    "nsr": {
+      "total_households": 42,
+      "total_individuals": 148,
+      "children_0_17": 71,
+      "children_0_5": 10,
+      "youth_18_24": 21,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 42,
     "total_individuals": 148,
     "children_0_17": 71,
@@ -8844,6 +9581,17 @@
     "ward": "AGBAAKIN II"
   },
   {
+    "nsr": {
+      "total_households": 99,
+      "total_individuals": 646,
+      "children_0_17": 182,
+      "children_0_5": 21,
+      "youth_18_24": 72,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 18,
+      "lactating_mothers": 1
+    },
     "total_households": 99,
     "total_individuals": 646,
     "children_0_17": 182,
@@ -8976,6 +9724,17 @@
     "ward": "IWERE-ILE I"
   },
   {
+    "nsr": {
+      "total_households": 62,
+      "total_individuals": 186,
+      "children_0_17": 47,
+      "children_0_5": 6,
+      "youth_18_24": 27,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 62,
     "total_individuals": 186,
     "children_0_17": 47,
@@ -9108,6 +9867,17 @@
     "ward": "IWERE-ILE III"
   },
   {
+    "nsr": {
+      "total_households": 62,
+      "total_individuals": 159,
+      "children_0_17": 45,
+      "children_0_5": 10,
+      "youth_18_24": 9,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 7,
+      "lactating_mothers": 0
+    },
     "total_households": 62,
     "total_individuals": 159,
     "children_0_17": 45,
@@ -9240,6 +10010,17 @@
     "ward": "SABI GANA I"
   },
   {
+    "nsr": {
+      "total_households": 59,
+      "total_individuals": 333,
+      "children_0_17": 80,
+      "children_0_5": 10,
+      "youth_18_24": 47,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 59,
     "total_individuals": 333,
     "children_0_17": 80,
@@ -9372,6 +10153,17 @@
     "ward": "SABI GANA II"
   },
   {
+    "nsr": {
+      "total_households": 164,
+      "total_individuals": 1288,
+      "children_0_17": 451,
+      "children_0_5": 91,
+      "youth_18_24": 160,
+      "plwd": 15,
+      "children_with_disabilities": 2,
+      "pregnant_women": 15,
+      "lactating_mothers": 4
+    },
     "total_households": 164,
     "total_individuals": 1288,
     "children_0_17": 451,
@@ -9504,6 +10296,17 @@
     "ward": "SABI GANA III"
   },
   {
+    "nsr": {
+      "total_households": 113,
+      "total_individuals": 1091,
+      "children_0_17": 431,
+      "children_0_5": 54,
+      "youth_18_24": 148,
+      "plwd": 2,
+      "children_with_disabilities": 1,
+      "pregnant_women": 5,
+      "lactating_mothers": 0
+    },
     "total_households": 113,
     "total_individuals": 1091,
     "children_0_17": 431,
@@ -9636,6 +10439,17 @@
     "ward": "SABI GANA IV"
   },
   {
+    "nsr": {
+      "total_households": 123,
+      "total_individuals": 1036,
+      "children_0_17": 360,
+      "children_0_5": 99,
+      "youth_18_24": 121,
+      "plwd": 18,
+      "children_with_disabilities": 1,
+      "pregnant_women": 11,
+      "lactating_mothers": 1
+    },
     "total_households": 123,
     "total_individuals": 1036,
     "children_0_17": 360,
@@ -9768,6 +10582,17 @@
     "ward": "APATERE/KUFFI/OGUNBODE/OGO"
   },
   {
+    "nsr": {
+      "total_households": 122,
+      "total_individuals": 385,
+      "children_0_17": 89,
+      "children_0_5": 18,
+      "youth_18_24": 62,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 122,
     "total_individuals": 385,
     "children_0_17": 89,
@@ -9900,6 +10725,17 @@
     "ward": "EJIOKU/IGBON/ARIKU"
   },
   {
+    "nsr": {
+      "total_households": 83,
+      "total_individuals": 590,
+      "children_0_17": 197,
+      "children_0_5": 61,
+      "youth_18_24": 90,
+      "plwd": 5,
+      "children_with_disabilities": 1,
+      "pregnant_women": 16,
+      "lactating_mothers": 5
+    },
     "total_households": 83,
     "total_individuals": 590,
     "children_0_17": 197,
@@ -10032,6 +10868,17 @@
     "ward": "LAGUN"
   },
   {
+    "nsr": {
+      "total_households": 139,
+      "total_individuals": 483,
+      "children_0_17": 140,
+      "children_0_5": 27,
+      "youth_18_24": 59,
+      "plwd": 3,
+      "children_with_disabilities": 1,
+      "pregnant_women": 10,
+      "lactating_mothers": 6
+    },
     "total_households": 139,
     "total_individuals": 483,
     "children_0_17": 140,
@@ -10164,6 +11011,17 @@
     "ward": "OFA-IGBO"
   },
   {
+    "nsr": {
+      "total_households": 50,
+      "total_individuals": 364,
+      "children_0_17": 138,
+      "children_0_5": 33,
+      "youth_18_24": 48,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 5,
+      "lactating_mothers": 3
+    },
     "total_households": 50,
     "total_individuals": 364,
     "children_0_17": 138,
@@ -10296,6 +11154,17 @@
     "ward": "SAGBE/PABIEKUN"
   },
   {
+    "nsr": {
+      "total_households": 82,
+      "total_individuals": 644,
+      "children_0_17": 264,
+      "children_0_5": 82,
+      "youth_18_24": 106,
+      "plwd": 13,
+      "children_with_disabilities": 0,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 82,
     "total_individuals": 644,
     "children_0_17": 264,
@@ -10428,6 +11297,17 @@
     "ward": "AJAAWA I"
   },
   {
+    "nsr": {
+      "total_households": 181,
+      "total_individuals": 1987,
+      "children_0_17": 838,
+      "children_0_5": 241,
+      "youth_18_24": 294,
+      "plwd": 13,
+      "children_with_disabilities": 2,
+      "pregnant_women": 8,
+      "lactating_mothers": 0
+    },
     "total_households": 181,
     "total_individuals": 1987,
     "children_0_17": 838,
@@ -10560,6 +11440,17 @@
     "ward": "AJAAWA II"
   },
   {
+    "nsr": {
+      "total_households": 230,
+      "total_individuals": 2277,
+      "children_0_17": 860,
+      "children_0_5": 253,
+      "youth_18_24": 335,
+      "plwd": 13,
+      "children_with_disabilities": 2,
+      "pregnant_women": 14,
+      "lactating_mothers": 4
+    },
     "total_households": 230,
     "total_individuals": 2277,
     "children_0_17": 860,
@@ -10692,6 +11583,17 @@
     "ward": "AYEDE"
   },
   {
+    "nsr": {
+      "total_households": 226,
+      "total_individuals": 2897,
+      "children_0_17": 1394,
+      "children_0_5": 477,
+      "youth_18_24": 401,
+      "plwd": 14,
+      "children_with_disabilities": 4,
+      "pregnant_women": 31,
+      "lactating_mothers": 8
+    },
     "total_households": 226,
     "total_individuals": 2897,
     "children_0_17": 1394,
@@ -10824,6 +11726,17 @@
     "ward": "IDEWURE"
   },
   {
+    "nsr": {
+      "total_households": 88,
+      "total_individuals": 983,
+      "children_0_17": 377,
+      "children_0_5": 108,
+      "youth_18_24": 141,
+      "plwd": 5,
+      "children_with_disabilities": 0,
+      "pregnant_women": 8,
+      "lactating_mothers": 0
+    },
     "total_households": 88,
     "total_individuals": 983,
     "children_0_17": 377,
@@ -10956,6 +11869,17 @@
     "ward": "LAGBEDU"
   },
   {
+    "nsr": {
+      "total_households": 98,
+      "total_individuals": 1748,
+      "children_0_17": 787,
+      "children_0_5": 206,
+      "youth_18_24": 228,
+      "plwd": 10,
+      "children_with_disabilities": 2,
+      "pregnant_women": 10,
+      "lactating_mothers": 1
+    },
     "total_households": 98,
     "total_individuals": 1748,
     "children_0_17": 787,
@@ -11088,6 +12012,17 @@
     "ward": "ODO-OBA"
   },
   {
+    "nsr": {
+      "total_households": 194,
+      "total_individuals": 3653,
+      "children_0_17": 1353,
+      "children_0_5": 134,
+      "youth_18_24": 603,
+      "plwd": 8,
+      "children_with_disabilities": 3,
+      "pregnant_women": 33,
+      "lactating_mothers": 15
+    },
     "total_households": 194,
     "total_individuals": 3653,
     "children_0_17": 1353,
@@ -11220,6 +12155,17 @@
     "ward": "ORI IRE II"
   },
   {
+    "nsr": {
+      "total_households": 39,
+      "total_individuals": 602,
+      "children_0_17": 297,
+      "children_0_5": 20,
+      "youth_18_24": 70,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 4,
+      "lactating_mothers": 0
+    },
     "total_households": 39,
     "total_individuals": 602,
     "children_0_17": 297,
@@ -11352,6 +12298,17 @@
     "ward": "ORI IRE IV"
   },
   {
+    "nsr": {
+      "total_households": 30,
+      "total_individuals": 125,
+      "children_0_17": 44,
+      "children_0_5": 0,
+      "youth_18_24": 13,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 30,
     "total_individuals": 125,
     "children_0_17": 44,
@@ -11484,6 +12441,17 @@
     "ward": "ORI IRE VII"
   },
   {
+    "nsr": {
+      "total_households": 92,
+      "total_individuals": 674,
+      "children_0_17": 219,
+      "children_0_5": 6,
+      "youth_18_24": 105,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 7,
+      "lactating_mothers": 1
+    },
     "total_households": 92,
     "total_individuals": 674,
     "children_0_17": 219,
@@ -11616,6 +12584,17 @@
     "ward": "ORI IRE VIII"
   },
   {
+    "nsr": {
+      "total_households": 1,
+      "total_individuals": 5,
+      "children_0_17": 0,
+      "children_0_5": 0,
+      "youth_18_24": 2,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 1,
     "total_individuals": 5,
     "children_0_17": 0,
@@ -11748,6 +12727,17 @@
     "ward": "ORI IRE X"
   },
   {
+    "nsr": {
+      "total_households": 134,
+      "total_individuals": 3113,
+      "children_0_17": 1343,
+      "children_0_5": 383,
+      "youth_18_24": 445,
+      "plwd": 27,
+      "children_with_disabilities": 2,
+      "pregnant_women": 18,
+      "lactating_mothers": 1
+    },
     "total_households": 134,
     "total_individuals": 3113,
     "children_0_17": 1343,
@@ -11880,6 +12870,17 @@
     "ward": "AGO AMODU II"
   },
   {
+    "nsr": {
+      "total_households": 143,
+      "total_individuals": 2327,
+      "children_0_17": 1091,
+      "children_0_5": 309,
+      "youth_18_24": 307,
+      "plwd": 20,
+      "children_with_disabilities": 0,
+      "pregnant_women": 21,
+      "lactating_mothers": 5
+    },
     "total_households": 143,
     "total_individuals": 2327,
     "children_0_17": 1091,
@@ -12012,6 +13013,17 @@
     "ward": "SEPETERI I"
   },
   {
+    "nsr": {
+      "total_households": 83,
+      "total_individuals": 288,
+      "children_0_17": 164,
+      "children_0_5": 57,
+      "youth_18_24": 25,
+      "plwd": 2,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 83,
     "total_individuals": 288,
     "children_0_17": 164,
@@ -12144,6 +13156,17 @@
     "ward": "SEPETERI II"
   },
   {
+    "nsr": {
+      "total_households": 101,
+      "total_individuals": 802,
+      "children_0_17": 408,
+      "children_0_5": 147,
+      "youth_18_24": 114,
+      "plwd": 3,
+      "children_with_disabilities": 0,
+      "pregnant_women": 8,
+      "lactating_mothers": 1
+    },
     "total_households": 101,
     "total_individuals": 802,
     "children_0_17": 408,
@@ -12276,6 +13299,17 @@
     "ward": "SEPETERI IV"
   },
   {
+    "nsr": {
+      "total_households": 126,
+      "total_individuals": 1671,
+      "children_0_17": 606,
+      "children_0_5": 171,
+      "youth_18_24": 215,
+      "plwd": 4,
+      "children_with_disabilities": 1,
+      "pregnant_women": 7,
+      "lactating_mothers": 1
+    },
     "total_households": 126,
     "total_individuals": 1671,
     "children_0_17": 606,
@@ -12408,6 +13442,17 @@
     "ward": "IREGBA"
   },
   {
+    "nsr": {
+      "total_households": 88,
+      "total_individuals": 351,
+      "children_0_17": 103,
+      "children_0_5": 38,
+      "youth_18_24": 56,
+      "plwd": 1,
+      "children_with_disabilities": 1,
+      "pregnant_women": 0,
+      "lactating_mothers": 0
+    },
     "total_households": 88,
     "total_individuals": 351,
     "children_0_17": 103,
@@ -12540,6 +13585,17 @@
     "ward": "IRESAAPA"
   },
   {
+    "nsr": {
+      "total_households": 416,
+      "total_individuals": 3142,
+      "children_0_17": 1180,
+      "children_0_5": 289,
+      "youth_18_24": 377,
+      "plwd": 19,
+      "children_with_disabilities": 3,
+      "pregnant_women": 36,
+      "lactating_mothers": 21
+    },
     "total_households": 416,
     "total_individuals": 3142,
     "children_0_17": 1180,
@@ -12672,6 +13728,17 @@
     "ward": "IWOFIN"
   },
   {
+    "nsr": {
+      "total_households": 84,
+      "total_individuals": 439,
+      "children_0_17": 271,
+      "children_0_5": 48,
+      "youth_18_24": 48,
+      "plwd": 3,
+      "children_with_disabilities": 2,
+      "pregnant_women": 3,
+      "lactating_mothers": 0
+    },
     "total_households": 84,
     "total_individuals": 439,
     "children_0_17": 271,
@@ -12804,6 +13871,17 @@
     "ward": "GAWAZZAI"
   },
   {
+    "nsr": {
+      "total_households": 102,
+      "total_individuals": 785,
+      "children_0_17": 444,
+      "children_0_5": 50,
+      "youth_18_24": 102,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 12,
+      "lactating_mothers": 5
+    },
     "total_households": 102,
     "total_individuals": 785,
     "children_0_17": 444,
@@ -12936,6 +14014,17 @@
     "ward": "JAMALI"
   },
   {
+    "nsr": {
+      "total_households": 100,
+      "total_individuals": 1204,
+      "children_0_17": 692,
+      "children_0_5": 109,
+      "youth_18_24": 162,
+      "plwd": 0,
+      "children_with_disabilities": 0,
+      "pregnant_women": 5,
+      "lactating_mothers": 1
+    },
     "total_households": 100,
     "total_individuals": 1204,
     "children_0_17": 692,
@@ -13068,6 +14157,17 @@
     "ward": "SORON G"
   },
   {
+    "nsr": {
+      "total_households": 151,
+      "total_individuals": 2452,
+      "children_0_17": 1384,
+      "children_0_5": 384,
+      "youth_18_24": 293,
+      "plwd": 8,
+      "children_with_disabilities": 1,
+      "pregnant_women": 17,
+      "lactating_mothers": 4
+    },
     "total_households": 151,
     "total_individuals": 2452,
     "children_0_17": 1384,
@@ -13200,6 +14300,17 @@
     "ward": "CHILAS/MAKUYA"
   },
   {
+    "nsr": {
+      "total_households": 131,
+      "total_individuals": 1279,
+      "children_0_17": 711,
+      "children_0_5": 254,
+      "youth_18_24": 105,
+      "plwd": 3,
+      "children_with_disabilities": 0,
+      "pregnant_women": 13,
+      "lactating_mothers": 1
+    },
     "total_households": 131,
     "total_individuals": 1279,
     "children_0_17": 711,
@@ -13332,6 +14443,17 @@
     "ward": "KARFEN CHANA"
   },
   {
+    "nsr": {
+      "total_households": 334,
+      "total_individuals": 1751,
+      "children_0_17": 1037,
+      "children_0_5": 340,
+      "youth_18_24": 140,
+      "plwd": 3,
+      "children_with_disabilities": 2,
+      "pregnant_women": 6,
+      "lactating_mothers": 2
+    },
     "total_households": 334,
     "total_individuals": 1751,
     "children_0_17": 1037,
@@ -13464,6 +14586,17 @@
     "ward": "MARGAI - B"
   },
   {
+    "nsr": {
+      "total_households": 159,
+      "total_individuals": 413,
+      "children_0_17": 172,
+      "children_0_5": 61,
+      "youth_18_24": 50,
+      "plwd": 22,
+      "children_with_disabilities": 0,
+      "pregnant_women": 37,
+      "lactating_mothers": 7
+    },
     "total_households": 159,
     "total_individuals": 413,
     "children_0_17": 172,
@@ -13596,6 +14729,17 @@
     "ward": "SANGI"
   },
   {
+    "nsr": {
+      "total_households": 300,
+      "total_individuals": 1763,
+      "children_0_17": 967,
+      "children_0_5": 327,
+      "youth_18_24": 175,
+      "plwd": 3,
+      "children_with_disabilities": 1,
+      "pregnant_women": 103,
+      "lactating_mothers": 26
+    },
     "total_households": 300,
     "total_individuals": 1763,
     "children_0_17": 967,
@@ -13728,6 +14872,17 @@
     "ward": "UNGUSHI"
   },
   {
+    "nsr": {
+      "total_households": 118,
+      "total_individuals": 745,
+      "children_0_17": 276,
+      "children_0_5": 152,
+      "youth_18_24": 82,
+      "plwd": 3,
+      "children_with_disabilities": 0,
+      "pregnant_women": 14,
+      "lactating_mothers": 3
+    },
     "total_households": 118,
     "total_individuals": 745,
     "children_0_17": 276,
@@ -13860,6 +15015,17 @@
     "ward": "HORO BIRNI"
   },
   {
+    "nsr": {
+      "total_households": 312,
+      "total_individuals": 2194,
+      "children_0_17": 859,
+      "children_0_5": 515,
+      "youth_18_24": 220,
+      "plwd": 7,
+      "children_with_disabilities": 3,
+      "pregnant_women": 14,
+      "lactating_mothers": 1
+    },
     "total_households": 312,
     "total_individuals": 2194,
     "children_0_17": 859,
@@ -13992,6 +15158,17 @@
     "ward": "KAMBAMA"
   },
   {
+    "nsr": {
+      "total_households": 126,
+      "total_individuals": 427,
+      "children_0_17": 115,
+      "children_0_5": 62,
+      "youth_18_24": 52,
+      "plwd": 1,
+      "children_with_disabilities": 0,
+      "pregnant_women": 1,
+      "lactating_mothers": 0
+    },
     "total_households": 126,
     "total_individuals": 427,
     "children_0_17": 115,
@@ -14124,6 +15301,17 @@
     "ward": "LAMBARA"
   },
   {
+    "nsr": {
+      "total_households": 191,
+      "total_individuals": 1099,
+      "children_0_17": 377,
+      "children_0_5": 97,
+      "youth_18_24": 195,
+      "plwd": 6,
+      "children_with_disabilities": 0,
+      "pregnant_women": 74,
+      "lactating_mothers": 54
+    },
     "total_households": 191,
     "total_individuals": 1099,
     "children_0_17": 377,
@@ -14256,6 +15444,17 @@
     "ward": "KUBODU NORTH"
   },
   {
+    "nsr": {
+      "total_households": 224,
+      "total_individuals": 1352,
+      "children_0_17": 647,
+      "children_0_5": 163,
+      "youth_18_24": 213,
+      "plwd": 6,
+      "children_with_disabilities": 2,
+      "pregnant_women": 38,
+      "lactating_mothers": 13
+    },
     "total_households": 224,
     "total_individuals": 1352,
     "children_0_17": 647,
@@ -14388,6 +15587,17 @@
     "ward": "KUBODU SOUTH"
   },
   {
+    "nsr": {
+      "total_households": 161,
+      "total_individuals": 799,
+      "children_0_17": 335,
+      "children_0_5": 107,
+      "youth_18_24": 109,
+      "plwd": 4,
+      "children_with_disabilities": 0,
+      "pregnant_women": 18,
+      "lactating_mothers": 9
+    },
     "total_households": 161,
     "total_individuals": 799,
     "children_0_17": 335,
@@ -14520,6 +15730,17 @@
     "ward": "LABANI"
   },
   {
+    "nsr": {
+      "total_households": 142,
+      "total_individuals": 775,
+      "children_0_17": 389,
+      "children_0_5": 213,
+      "youth_18_24": 72,
+      "plwd": 13,
+      "children_with_disabilities": 8,
+      "pregnant_women": 30,
+      "lactating_mothers": 4
+    },
     "total_households": 142,
     "total_individuals": 775,
     "children_0_17": 389,
@@ -14652,6 +15873,17 @@
     "ward": "BARAYAR GIWA"
   },
   {
+    "nsr": {
+      "total_households": 253,
+      "total_individuals": 1579,
+      "children_0_17": 673,
+      "children_0_5": 225,
+      "youth_18_24": 267,
+      "plwd": 7,
+      "children_with_disabilities": 2,
+      "pregnant_women": 10,
+      "lactating_mothers": 3
+    },
     "total_households": 253,
     "total_individuals": 1579,
     "children_0_17": 673,
@@ -14784,6 +16016,17 @@
     "ward": "KURUWA"
   },
   {
+    "nsr": {
+      "total_households": 189,
+      "total_individuals": 1164,
+      "children_0_17": 597,
+      "children_0_5": 277,
+      "youth_18_24": 144,
+      "plwd": 102,
+      "children_with_disabilities": 63,
+      "pregnant_women": 52,
+      "lactating_mothers": 18
+    },
     "total_households": 189,
     "total_individuals": 1164,
     "children_0_17": 597,
@@ -14916,6 +16159,17 @@
     "ward": "KWARARE"
   },
   {
+    "nsr": {
+      "total_households": 205,
+      "total_individuals": 1048,
+      "children_0_17": 406,
+      "children_0_5": 108,
+      "youth_18_24": 139,
+      "plwd": 13,
+      "children_with_disabilities": 3,
+      "pregnant_women": 60,
+      "lactating_mothers": 20
+    },
     "total_households": 205,
     "total_individuals": 1048,
     "children_0_17": 406,
@@ -15048,6 +16302,17 @@
     "ward": "BAKALE"
   },
   {
+    "nsr": {
+      "total_households": 118,
+      "total_individuals": 877,
+      "children_0_17": 315,
+      "children_0_5": 109,
+      "youth_18_24": 132,
+      "plwd": 11,
+      "children_with_disabilities": 0,
+      "pregnant_women": 109,
+      "lactating_mothers": 59
+    },
     "total_households": 118,
     "total_individuals": 877,
     "children_0_17": 315,
@@ -15180,6 +16445,17 @@
     "ward": "BIRNIRUWA"
   },
   {
+    "nsr": {
+      "total_households": 240,
+      "total_individuals": 1349,
+      "children_0_17": 563,
+      "children_0_5": 256,
+      "youth_18_24": 153,
+      "plwd": 13,
+      "children_with_disabilities": 5,
+      "pregnant_women": 83,
+      "lactating_mothers": 30
+    },
     "total_households": 240,
     "total_individuals": 1349,
     "children_0_17": 563,

@@ -5,7 +5,6 @@ import argparse
 import pandas as pd
 import numpy as np
 
-# --- DEFAULT PATH CONFIGURATION ---
 DEFAULT_INPUT = r"C:\Users\fdasb\Documents\MASTERs Program\Project folder\UNICEF SUSI BATCH1_08072026_PMT\NASSCO Multi-Dimensional Poverty.dta"
 DEFAULT_OUTDIR = r"public/data"
 
@@ -14,7 +13,6 @@ def clean_str_series(series):
     """Utility to safely standardize string columns (handling Stata Categoricals & NaNs)."""
     if series is None:
         return pd.Series(dtype=str)
-    # Converting Categorical to object first prevents category mismatch errors
     return series.astype(object).fillna("").astype(str).str.strip().str.title()
 
 
@@ -37,6 +35,25 @@ def compute_metrics(sub_df):
         if "hhno" in sub_df.columns
         else total_records
     )
+
+    # Top-level NSR Summary Object (Required by Frontend)
+    nsr_data = {
+        "total_households": total_households,
+        "total_individuals": total_records,
+        "children_0_17": int(sub_df["is_0_17"].sum()),
+        "children_0_5": int(sub_df["is_0_5"].sum()),
+        "youth_18_24": int(sub_df["is_18_24"].sum()),
+        "plwd": int(sub_df["is_disabled"].sum()),
+        "children_with_disabilities": int(
+            (sub_df["is_0_17"] & sub_df["is_disabled"]).sum()
+        ),
+        "pregnant_women": int(
+            (sub_df["is_female"] & sub_df["is_pregnant"]).sum()
+        ),
+        "lactating_mothers": int(
+            (sub_df["is_female"] & sub_df["is_lactating"]).sum()
+        ),
+    }
 
     # 1. DEMOGRAPHICS & POPULATION PYRAMID (0-24)
     pyramid_bands = [
@@ -223,21 +240,16 @@ def compute_metrics(sub_df):
     )
 
     return {
+        "nsr": nsr_data,  # EXPLICITLY WRAPPED FOR FRONTEND
         "total_households": total_households,
         "total_individuals": total_records,
-        "children_0_17": int(sub_df["is_0_17"].sum()),
-        "children_0_5": int(sub_df["is_0_5"].sum()),
-        "youth_18_24": int(sub_df["is_18_24"].sum()),
-        "plwd": int(sub_df["is_disabled"].sum()),
-        "children_with_disabilities": int(
-            (sub_df["is_0_17"] & sub_df["is_disabled"]).sum()
-        ),
-        "pregnant_women": int(
-            (sub_df["is_female"] & sub_df["is_pregnant"]).sum()
-        ),
-        "lactating_mothers": int(
-            (sub_df["is_female"] & sub_df["is_lactating"]).sum()
-        ),
+        "children_0_17": nsr_data["children_0_17"],
+        "children_0_5": nsr_data["children_0_5"],
+        "youth_18_24": nsr_data["youth_18_24"],
+        "plwd": nsr_data["plwd"],
+        "children_with_disabilities": nsr_data["children_with_disabilities"],
+        "pregnant_women": nsr_data["pregnant_women"],
+        "lactating_mothers": nsr_data["lactating_mothers"],
         "pyramid_0_24": pyramid_0_24,
         "gender_ratio": {"boys": total_boys_17, "girls": total_girls_17},
         "age_ratio": age_ratio,
@@ -274,12 +286,8 @@ def compute_metrics(sub_df):
             "not_attending_0_17_girls": not_attending_0_17_girls,
         },
         "health_nutrition": {
-            "pregnant_women": int(
-                (sub_df["is_female"] & sub_df["is_pregnant"]).sum()
-            ),
-            "lactating_mothers": int(
-                (sub_df["is_female"] & sub_df["is_lactating"]).sum()
-            ),
+            "pregnant_women": nsr_data["pregnant_women"],
+            "lactating_mothers": nsr_data["lactating_mothers"],
             "sam_children": sam_children,
             "mam_children": mam_children,
             "normal_children": normal_children,
@@ -324,7 +332,6 @@ def main():
         print(f"❌ ERROR: File not found at {input_path}")
         sys.exit(1)
 
-    # 1. LOAD DATA
     if input_path.endswith(".dta"):
         print("⏳ Loading Stata (.dta) file... (takes ~15 seconds)")
         df = pd.read_stata(input_path)
@@ -336,7 +343,6 @@ def main():
 
     os.makedirs(outdir, exist_ok=True)
 
-    # 2. STANDARDIZE & PRE-CALCULATE COLUMNS FOR FAST VECTORIZED AGGREGATION
     print("⏳ Cleaning and pre-indexing survey variables...")
 
     df["agey"] = (
@@ -385,19 +391,16 @@ def main():
     else:
         df["muac_cat"] = np.nan
 
-    # Clean Geo Names
     df["state_clean"] = df["state"].apply(clean_geo_name)
     df["lga_clean"] = df["lga"].apply(clean_geo_name)
     df["ward_clean"] = df["ward"].apply(clean_geo_name)
     df["community_clean"] = df["community_name"].apply(clean_geo_name)
 
-    # 3. GENERATE NATIONAL SUMMARY
     print("⏳ Generating National Summary...")
     national_summary = compute_metrics(df)
     with open(os.path.join(outdir, "national_summary.json"), "w") as f:
         json.dump(national_summary, f, indent=2)
 
-    # 4. GENERATE STATE SUMMARY
     print("⏳ Generating State Summaries...")
     states_list = []
     for state_name, group in df.groupby("state_clean"):
@@ -408,7 +411,6 @@ def main():
     with open(os.path.join(outdir, "states_summary.json"), "w") as f:
         json.dump(states_list, f, indent=2)
 
-    # 5. GENERATE LGA SUMMARY
     print("⏳ Generating LGA Summaries...")
     lga_list = []
     for (state_name, lga_name), group in df.groupby(
@@ -422,7 +424,6 @@ def main():
     with open(os.path.join(outdir, "lga_summary.json"), "w") as f:
         json.dump(lga_list, f, indent=2)
 
-    # 6. GENERATE WARD SUMMARY
     print("⏳ Generating Ward Summaries...")
     ward_list = []
     for (state_name, lga_name, ward_name), group in df.groupby(
@@ -437,7 +438,6 @@ def main():
     with open(os.path.join(outdir, "ward_summary.json"), "w") as f:
         json.dump(ward_list, f, indent=2)
 
-    # 7. GENERATE COMMUNITY SUMMARY
     print("⏳ Generating Community Selection & Demographics Table...")
     community_list = []
     for (state_name, lga_name, ward_name, comm_name), group in df.groupby(
@@ -449,7 +449,6 @@ def main():
         c_data["ward"] = ward_name
         c_data["community"] = comm_name
 
-        # Explicit community demographics requested by UNICEF
         c_data["pvhhs"] = int(group["hhno"].nunique())
         c_data["males"] = int(group["is_male"].sum())
         c_data["females"] = int(group["is_female"].sum())

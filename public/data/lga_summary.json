@@ -1,5 +1,16 @@
 [
   {
+    "nsr": {
+      "total_households": 170,
+      "total_individuals": 2492,
+      "children_0_17": 1104,
+      "children_0_5": 328,
+      "youth_18_24": 268,
+      "plwd": 14,
+      "children_with_disabilities": 3,
+      "pregnant_women": 45,
+      "lactating_mothers": 8
+    },
     "total_households": 170,
     "total_individuals": 2492,
     "children_0_17": 1104,
@@ -131,6 +142,17 @@
     "lga": "BENDE"
   },
   {
+    "nsr": {
+      "total_households": 228,
+      "total_individuals": 1826,
+      "children_0_17": 671,
+      "children_0_5": 180,
+      "youth_18_24": 200,
+      "plwd": 19,
+      "children_with_disabilities": 0,
+      "pregnant_women": 16,
+      "lactating_mothers": 1
+    },
     "total_households": 228,
     "total_individuals": 1826,
     "children_0_17": 671,
@@ -262,6 +284,17 @@
     "lga": "IKWUANO"
   },
   {
+    "nsr": {
+      "total_households": 162,
+      "total_individuals": 1750,
+      "children_0_17": 335,
+      "children_0_5": 81,
+      "youth_18_24": 220,
+      "plwd": 23,
+      "children_with_disabilities": 1,
+      "pregnant_women": 7,
+      "lactating_mothers": 0
+    },
     "total_households": 162,
     "total_individuals": 1750,
     "children_0_17": 335,
@@ -393,6 +426,17 @@
     "lga": "ISUIKWUATO"
   },
   {
+    "nsr": {
+      "total_households": 141,
+      "total_individuals": 2663,
+      "children_0_17": 1191,
+      "children_0_5": 161,
+      "youth_18_24": 384,
+      "plwd": 8,
+      "children_with_disabilities": 1,
+      "pregnant_women": 13,
+      "lactating_mothers": 0
+    },
     "total_households": 141,
     "total_individuals": 2663,
     "children_0_17": 1191,
@@ -524,6 +568,17 @@
     "lga": "UKWA EAST"
   },
   {
+    "nsr": {
+      "total_households": 108,
+      "total_individuals": 1302,
+      "children_0_17": 544,
+      "children_0_5": 90,
+      "youth_18_24": 151,
+      "plwd": 5,
+      "children_with_disabilities": 0,
+      "pregnant_women": 17,
+      "lactating_mothers": 0
+    },
     "total_households": 108,
     "total_individuals": 1302,
     "children_0_17": 544,
@@ -655,6 +710,17 @@
     "lga": "UKWA WEST"
   },
   {
+    "nsr": {
+      "total_households": 150,
+      "total_individuals": 582,
+      "children_0_17": 245,
+      "children_0_5": 33,
+      "youth_18_24": 135,
+      "plwd": 16,
+      "children_with_disabilities": 11,
+      "pregnant_women": 6,
+      "lactating_mothers": 0
+    },
     "total_households": 150,
     "total_individuals": 582,
     "children_0_17": 245,
@@ -786,6 +852,17 @@
     "lga": "AGATU"
   },
   {
+    "nsr": {
+      "total_households": 545,
+      "total_individuals": 4927,
+      "children_0_17": 1696,
+      "children_0_5": 241,
+      "youth_18_24": 1056,
+      "plwd": 374,
+      "children_with_disabilities": 39,
+      "pregnant_women": 464,
+      "lactating_mothers": 192
+    },
     "total_households": 545,
     "total_individuals": 4927,
     "children_0_17": 1696,
@@ -917,6 +994,17 @@
     "lga": "APA"
   },
   {
+    "nsr": {
+      "total_households": 444,
+      "total_individuals": 8255,
+      "children_0_17": 3800,
+      "children_0_5": 1208,
+      "youth_18_24": 1344,
+      "plwd": 82,
+      "children_with_disabilities": 11,
+      "pregnant_women": 152,
+      "lactating_mothers": 29
+    },
     "total_households": 444,
     "total_individuals": 8255,
     "children_0_17": 3800,
@@ -1048,6 +1136,17 @@
     "lga": "GWER EAST"
   },
   {
+    "nsr": {
+      "total_households": 261,
+      "total_individuals": 4060,
+      "children_0_17": 945,
+      "children_0_5": 256,
+      "youth_18_24": 478,
+      "plwd": 49,
+      "children_with_disabilities": 0,
+      "pregnant_women": 71,
+      "lactating_mothers": 7
+    },
     "total_households": 261,
     "total_individuals": 4060,
     "children_0_17": 945,
@@ -1179,6 +1278,17 @@
     "lga": "LOGO"
   },
   {
+    "nsr": {
+      "total_households": 396,
+      "total_individuals": 6695,
+      "children_0_17": 2772,
+      "children_0_5": 329,
+      "youth_18_24": 910,
+      "plwd": 80,
+      "children_with_disabilities": 10,
+      "pregnant_women": 248,
+      "lactating_mothers": 69
+    },
     "total_households": 396,
     "total_individuals": 6695,
     "children_0_17": 2772,
@@ -1310,6 +1420,17 @@
     "lga": "OBI"
   },
   {
+    "nsr": {
+      "total_households": 254,
+      "total_individuals": 1798,
+      "children_0_17": 569,
+      "children_0_5": 186,
+      "youth_18_24": 350,
+      "plwd": 17,
+      "children_with_disabilities": 2,
+      "pregnant_women": 58,
+      "lactating_mothers": 2
+    },
     "total_households": 254,
     "total_individuals": 1798,
     "children_0_17": 569,
@@ -1441,6 +1562,17 @@
     "lga": "OHIMINI"
   },
   {
+    "nsr": {
+      "total_households": 342,
+      "total_individuals": 2390,
+      "children_0_17": 918,
+      "children_0_5": 159,
+      "youth_18_24": 335,
+      "plwd": 24,
+      "children_with_disabilities": 4,
+      "pregnant_women": 67,
+      "lactating_mothers": 1
+    },
     "total_households": 342,
     "total_individuals": 2390,
     "children_0_17": 918,
@@ -1572,6 +1704,17 @@
     "lga": "TARKA"
   },
   {
+    "nsr": {
+      "total_households": 356,
+      "total_individuals": 16049,
+      "children_0_17": 6858,
+      "children_0_5": 1812,
+      "youth_18_24": 2042,
+      "plwd": 67,
+      "children_with_disabilities": 5,
+      "pregnant_women": 63,
+      "lactating_mothers": 5
+    },
     "total_households": 356,
     "total_individuals": 16049,
     "children_0_17": 6858,
@@ -1703,6 +1846,17 @@
     "lga": "AFIJIO"
   },
   {
+    "nsr": {
+      "total_households": 229,
+      "total_individuals": 5357,
+      "children_0_17": 2347,
+      "children_0_5": 638,
+      "youth_18_24": 700,
+      "plwd": 32,
+      "children_with_disabilities": 6,
+      "pregnant_women": 44,
+      "lactating_mothers": 5
+    },
     "total_households": 229,
     "total_individuals": 5357,
     "children_0_17": 2347,
@@ -1834,6 +1988,17 @@
     "lga": "ATISBO"
   },
   {
+    "nsr": {
+      "total_households": 438,
+      "total_individuals": 7610,
+      "children_0_17": 3000,
+      "children_0_5": 701,
+      "youth_18_24": 977,
+      "plwd": 20,
+      "children_with_disabilities": 1,
+      "pregnant_women": 57,
+      "lactating_mothers": 9
+    },
     "total_households": 438,
     "total_individuals": 7610,
     "children_0_17": 3000,
@@ -1965,6 +2130,17 @@
     "lga": "IBARAPA NORTH"
   },
   {
+    "nsr": {
+      "total_households": 266,
+      "total_individuals": 12837,
+      "children_0_17": 5688,
+      "children_0_5": 1526,
+      "youth_18_24": 1831,
+      "plwd": 105,
+      "children_with_disabilities": 8,
+      "pregnant_women": 153,
+      "lactating_mothers": 51
+    },
     "total_households": 266,
     "total_individuals": 12837,
     "children_0_17": 5688,
@@ -2096,6 +2272,17 @@
     "lga": "ITESIWAJU"
   },
   {
+    "nsr": {
+      "total_households": 166,
+      "total_individuals": 4442,
+      "children_0_17": 1523,
+      "children_0_5": 238,
+      "youth_18_24": 561,
+      "plwd": 24,
+      "children_with_disabilities": 4,
+      "pregnant_women": 49,
+      "lactating_mothers": 6
+    },
     "total_households": 166,
     "total_individuals": 4442,
     "children_0_17": 1523,
@@ -2227,6 +2414,17 @@
     "lga": "IWAJOWA"
   },
   {
+    "nsr": {
+      "total_households": 187,
+      "total_individuals": 2858,
+      "children_0_17": 924,
+      "children_0_5": 238,
+      "youth_18_24": 380,
+      "plwd": 31,
+      "children_with_disabilities": 3,
+      "pregnant_women": 45,
+      "lactating_mothers": 15
+    },
     "total_households": 187,
     "total_individuals": 2858,
     "children_0_17": 924,
@@ -2358,6 +2556,17 @@
     "lga": "LAGELU"
   },
   {
+    "nsr": {
+      "total_households": 268,
+      "total_individuals": 10536,
+      "children_0_17": 4520,
+      "children_0_5": 1367,
+      "youth_18_24": 1505,
+      "plwd": 68,
+      "children_with_disabilities": 10,
+      "pregnant_women": 74,
+      "lactating_mothers": 13
+    },
     "total_households": 268,
     "total_individuals": 10536,
     "children_0_17": 4520,
@@ -2489,6 +2698,17 @@
     "lga": "OGO-OLUWA"
   },
   {
+    "nsr": {
+      "total_households": 194,
+      "total_individuals": 5059,
+      "children_0_17": 1913,
+      "children_0_5": 160,
+      "youth_18_24": 793,
+      "plwd": 13,
+      "children_with_disabilities": 3,
+      "pregnant_women": 44,
+      "lactating_mothers": 16
+    },
     "total_households": 194,
     "total_individuals": 5059,
     "children_0_17": 1913,
@@ -2620,6 +2840,17 @@
     "lga": "ORI-IRE"
   },
   {
+    "nsr": {
+      "total_households": 146,
+      "total_individuals": 6530,
+      "children_0_17": 3006,
+      "children_0_5": 896,
+      "youth_18_24": 891,
+      "plwd": 52,
+      "children_with_disabilities": 2,
+      "pregnant_women": 48,
+      "lactating_mothers": 7
+    },
     "total_households": 146,
     "total_individuals": 6530,
     "children_0_17": 3006,
@@ -2751,6 +2982,17 @@
     "lga": "SAKI EAST"
   },
   {
+    "nsr": {
+      "total_households": 421,
+      "total_individuals": 5164,
+      "children_0_17": 1889,
+      "children_0_5": 498,
+      "youth_18_24": 648,
+      "plwd": 24,
+      "children_with_disabilities": 5,
+      "pregnant_women": 43,
+      "lactating_mothers": 22
+    },
     "total_households": 421,
     "total_individuals": 5164,
     "children_0_17": 1889,
@@ -2882,6 +3124,17 @@
     "lga": "SURULERE"
   },
   {
+    "nsr": {
+      "total_households": 117,
+      "total_individuals": 2428,
+      "children_0_17": 1407,
+      "children_0_5": 207,
+      "youth_18_24": 312,
+      "plwd": 4,
+      "children_with_disabilities": 2,
+      "pregnant_women": 20,
+      "lactating_mothers": 6
+    },
     "total_households": 117,
     "total_individuals": 2428,
     "children_0_17": 1407,
@@ -3013,6 +3266,17 @@
     "lga": "BINJI"
   },
   {
+    "nsr": {
+      "total_households": 167,
+      "total_individuals": 3731,
+      "children_0_17": 2095,
+      "children_0_5": 638,
+      "youth_18_24": 398,
+      "plwd": 11,
+      "children_with_disabilities": 1,
+      "pregnant_women": 30,
+      "lactating_mothers": 5
+    },
     "total_households": 167,
     "total_individuals": 3731,
     "children_0_17": 2095,
@@ -3144,6 +3408,17 @@
     "lga": "GUDU"
   },
   {
+    "nsr": {
+      "total_households": 368,
+      "total_individuals": 3927,
+      "children_0_17": 2176,
+      "children_0_5": 728,
+      "youth_18_24": 365,
+      "plwd": 28,
+      "children_with_disabilities": 3,
+      "pregnant_women": 146,
+      "lactating_mothers": 35
+    },
     "total_households": 368,
     "total_individuals": 3927,
     "children_0_17": 2176,
@@ -3275,6 +3550,17 @@
     "lga": "KEBBE"
   },
   {
+    "nsr": {
+      "total_households": 314,
+      "total_individuals": 3366,
+      "children_0_17": 1250,
+      "children_0_5": 729,
+      "youth_18_24": 354,
+      "plwd": 11,
+      "children_with_disabilities": 3,
+      "pregnant_women": 29,
+      "lactating_mothers": 4
+    },
     "total_households": 314,
     "total_individuals": 3366,
     "children_0_17": 1250,
@@ -3406,6 +3692,17 @@
     "lga": "SHAGARI"
   },
   {
+    "nsr": {
+      "total_households": 250,
+      "total_individuals": 3250,
+      "children_0_17": 1359,
+      "children_0_5": 367,
+      "youth_18_24": 517,
+      "plwd": 16,
+      "children_with_disabilities": 2,
+      "pregnant_women": 130,
+      "lactating_mothers": 76
+    },
     "total_households": 250,
     "total_individuals": 3250,
     "children_0_17": 1359,
@@ -3537,6 +3834,17 @@
     "lga": "SILAME"
   },
   {
+    "nsr": {
+      "total_households": 323,
+      "total_individuals": 3518,
+      "children_0_17": 1659,
+      "children_0_5": 715,
+      "youth_18_24": 483,
+      "plwd": 122,
+      "children_with_disabilities": 73,
+      "pregnant_women": 92,
+      "lactating_mothers": 25
+    },
     "total_households": 323,
     "total_individuals": 3518,
     "children_0_17": 1659,
@@ -3668,6 +3976,17 @@
     "lga": "TURETA"
   },
   {
+    "nsr": {
+      "total_households": 263,
+      "total_individuals": 3274,
+      "children_0_17": 1284,
+      "children_0_5": 473,
+      "youth_18_24": 424,
+      "plwd": 37,
+      "children_with_disabilities": 8,
+      "pregnant_women": 252,
+      "lactating_mothers": 109
+    },
     "total_households": 263,
     "total_individuals": 3274,
     "children_0_17": 1284,
