@@ -1,25 +1,7 @@
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import {
-  Briefcase,
-  AlertTriangle,
-  Shield,
-  Users,
-  User,
-  HelpCircle,
-} from "lucide-react";
 import type { GeoRecord, DrilldownPath } from "../../lib/types";
 import type { DashboardData } from "../../lib/loadData";
-import { useChartTheme } from "../../lib/useChartTheme";
 import { ChartCard } from "./ChartCard";
-import KpiCard from "../KpiCard";
 import DrilldownMap from "../maps/DrilldownMap";
 
 interface LivelihoodsResilienceProps {
@@ -37,103 +19,67 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   onPathChange,
   stateFilter,
 }) => {
-  const theme = useChartTheme();
-  const labelVal = {
-    position: "top" as const,
-    fill: theme.axisTick,
-    fontSize: 11,
-    formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
-  };
-  const labelValH = {
-    position: "right" as const,
-    fill: theme.axisTick,
-    fontSize: 11,
-    formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
-  };
-
   const liv = record.extended.livelihoods_resilience_v2 ?? {
-    livelihoods: [],
-    large_households: { count: 0, pct: 0 },
-    multi_vulnerable_households: { count: 0, pct: 0 },
-    shock_exposure: {
-      shock_hh_count: 0,
-      shock_hh_pct: 0,
-      types: [],
-      coping_mechanisms: [],
-    },
+    shock_exposure: { shock_hh_count: 0 },
   };
 
-  const youth = record.extended.youth ?? {
-    total: 0,
-    employed: 0,
-    unemployed: 0,
-    unemployment_rate: 0,
-    labour_breakdown: [],
-  };
+  const youth = record.extended.youth ?? { employed: 0, unemployed: 0 };
   const femaleHeaded = record.extended.female_primary_respondent?.n || 0;
   const childrenRiskProne = record.extended.children_in_risk_hh?.n || 0;
-
-  const shockTypesData = liv.shock_exposure.types.map((s) => ({
-    type: s.type,
-    Count: s.count,
-  }));
-  const copingData = liv.shock_exposure.coping_mechanisms.map((c) => ({
-    mechanism: c.label,
-    Count: c.count,
-  }));
-
-  const missingCharts = [
-    "Female-headed households (shock prone)",
-    "Households with disabilities (shock prone)",
-  ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
         <div>
           <h2 className="text-xl font-bold text-ink-primary dark:text-ink-onDark">
-            Livelihoods & Shock Exposure
+            Livelihoods
           </h2>
         </div>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
-        <KpiCard
-          label="Female-Headed HHs"
-          value={femaleHeaded.toLocaleString()}
-          icon={<User size={16} />}
-          accent="#9333EA"
-        />
-        <KpiCard
-          label="Youth Employed"
-          value={youth.employed.toLocaleString()}
-          icon={<Briefcase size={16} />}
-          accent="#059669"
-        />
-        <KpiCard
-          label="Youth Unemployed"
-          value={youth.unemployed.toLocaleString()}
-          icon={<AlertTriangle size={16} />}
-          accent="#E67E22"
-        />
-        <KpiCard
-          label="Shock-Prone HHs"
-          value={liv.shock_exposure.shock_hh_count.toLocaleString()}
-          icon={<AlertTriangle size={16} />}
-          accent="#DC2626"
-        />
-        <KpiCard
-          label="Children Risk-Prone"
-          value={childrenRiskProne.toLocaleString()}
-          icon={<Shield size={16} />}
-          accent="#D97706"
-        />
-        <KpiCard
-          label="Multi-Vulnerable HHs"
-          value={liv.multi_vulnerable_households.count.toLocaleString()}
-          icon={<Users size={16} />}
-          accent="#075E54"
-        />
+
+      <div>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
+          Indicator
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {[
+            { l: "Female-Headed Households", v: femaleHeaded, c: "#9333EA" },
+            { l: "Source of Livelihood (HHs)", v: 0, c: "#64748b", ph: true },
+            { l: "Youth employment", v: youth.employed, c: "#059669" },
+            { l: "Youth unemployment", v: youth.unemployed, c: "#DC2626" },
+            {
+              l: "Shock-Prone Households",
+              v: liv.shock_exposure.shock_hh_count,
+              c: "#D97706",
+            },
+            {
+              l: "Children in Risk-Prone Households",
+              v: childrenRiskProne,
+              c: "#E67E22",
+            },
+            { l: "Household Coping mechanisms", v: 0, c: "#64748b", ph: true },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-lg p-3 shadow-sm flex flex-col justify-between"
+            >
+              <div className="text-[10px] uppercase font-bold text-ink-muted dark:text-ink-onDarkMuted mb-2 leading-tight">
+                {item.l}
+              </div>
+              {item.ph ? (
+                <div className="text-[10px] italic text-ink-faint">
+                  Not isolated in export
+                </div>
+              ) : (
+                <div className="text-xl font-black" style={{ color: item.c }}>
+                  {item.v.toLocaleString()}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
+
       <div className="space-y-3">
         <div className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
           Shock Exposure Map
@@ -147,133 +93,41 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
           height={400}
         />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Shock Exposure by Type" height={320}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={shockTypesData}
-              layout="vertical"
-              margin={{ top: 8, right: 35, left: 16, bottom: 4 }}
-            >
-              <XAxis type="number" hide />
-              <YAxis
-                dataKey="type"
-                type="category"
-                width={140}
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar
-                dataKey="Count"
-                fill="#DC2626"
-                radius={[0, 4, 4, 0]}
-                label={labelValH}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-        <ChartCard title="Household Coping Mechanisms" height={320}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={copingData}
-              layout="vertical"
-              margin={{ top: 8, right: 35, left: 16, bottom: 4 }}
-            >
-              <XAxis type="number" hide />
-              <YAxis
-                dataKey="mechanism"
-                type="category"
-                width={140}
-                tick={{ fill: theme.axisTick, fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar
-                dataKey="Count"
-                fill="#E67E22"
-                radius={[0, 4, 4, 0]}
-                label={labelValH}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Livelihood Sectors" height={280}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={liv.livelihoods}
-              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
-            >
-              <XAxis
-                dataKey="label"
-                tick={{ fill: theme.axisTick, fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar
-                dataKey="count"
-                fill="#075E54"
-                radius={[4, 4, 0, 0]}
-                label={labelVal}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-        <ChartCard title="Youth Labour Activity (18–24)" height={280}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={youth.labour_breakdown}
-              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
-            >
-              <XAxis
-                dataKey="label"
-                tick={{ fill: theme.axisTick, fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar
-                dataKey="count"
-                fill="#128C7E"
-                radius={[4, 4, 0, 0]}
-                label={labelVal}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        {missingCharts.map((p, i) => (
-          <div
-            key={i}
-            className="bg-surface-light dark:bg-surface-dark rounded-xl border border-line-light dark:border-line-dark p-5 flex items-start gap-3"
-          >
-            <HelpCircle size={20} className="text-ink-muted" />
-            <div>
-              <h4 className="text-xs font-bold text-ink-primary dark:text-ink-onDark">
-                {p}
-              </h4>
-              <p className="text-[11px] text-ink-faint mt-1.5 italic">
-                Cross-tabulation not captured in this survey wave.
-              </p>
-            </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ChartCard title="Children in Risk-Prone Households" height={280}>
+          <div className="h-full flex items-center justify-center text-3xl font-black text-brand-600">
+            {childrenRiskProne.toLocaleString()}
           </div>
-        ))}
+        </ChartCard>
+        <ChartCard title="Female-headed households (shock prone)" height={280}>
+          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
+            Cross-tabulation (Female Headed × Shock Exposure) not captured in
+            backend export.
+          </div>
+        </ChartCard>
+        <ChartCard
+          title="Households with disabilities (shock prone)"
+          height={280}
+        >
+          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
+            Cross-tabulation (Disabilities × Shock Exposure) not captured in
+            backend export.
+          </div>
+        </ChartCard>
+        <ChartCard
+          title="Households with multiple vulnerable members"
+          height={280}
+        >
+          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
+            Indicator logic not captured in backend export.
+          </div>
+        </ChartCard>
+        <ChartCard title="Large households" height={280}>
+          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
+            Indicator logic not captured in backend export.
+          </div>
+        </ChartCard>
       </div>
     </div>
   );

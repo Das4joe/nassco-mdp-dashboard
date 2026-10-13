@@ -105,7 +105,10 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "out_of_school",
     label: "Out-of-School Children Rate (6-17)",
     unit: "%",
-    getValue: (r) => r.extended?.education_v2?.oos_6_17?.oos_pct ?? 0,
+    getValue: (r) =>
+      r.extended?.education_v2?.oos_6_17?.oos_pct ??
+      r.unicef?.out_of_school_rate_pct ??
+      0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -113,7 +116,10 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "wasting",
     label: "Under-5 Wasting Rate",
     unit: "%",
-    getValue: (r) => r.extended?.nutrition_v2?.wasting_pct ?? 0,
+    getValue: (r) =>
+      r.extended?.nutrition_v2?.wasting_pct ??
+      r.unicef?.under5_wasting_pct ??
+      0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -122,7 +128,9 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     label: "Shock Exposure Rate",
     unit: "%",
     getValue: (r) =>
-      r.extended?.livelihoods_resilience_v2?.shock_exposure?.shock_hh_pct ?? 0,
+      r.extended?.livelihoods_resilience_v2?.shock_exposure?.shock_hh_pct ??
+      r.extended?.livelihoods_resilience_v2?.shock_exposure?.shock_hh_count ??
+      0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },
@@ -130,7 +138,10 @@ const METRIC_CONFIGS: Record<MapMetric, MetricConfig> = {
     key: "female_head",
     label: "Female Primary Respondent Rate",
     unit: "%",
-    getValue: (r) => r.extended?.female_primary_respondent?.pct ?? 0,
+    getValue: (r) =>
+      r.extended?.female_primary_respondent?.pct ??
+      r.extended?.female_primary_respondent?.n ??
+      0,
     format: (v) => `${v.toFixed(1)}%`,
     colorScale: (ratio) => getColorForRatio(ratio, false),
   },

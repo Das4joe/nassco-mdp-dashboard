@@ -99,100 +99,40 @@ export default function App() {
     else setPath({ state });
   };
 
-  // --- Overview chart data ---
-  const pyramidRaw = currentRecord.extended?.age_sex_pyramid ?? [];
-  const pyramid0to24 = pyramidRaw.filter((b) =>
-    [
-      "0-4",
-      "5-9",
-      "10-14",
-      "15-19",
-      "20-24",
-      "0–4",
-      "5–9",
-      "10–14",
-      "15–19",
-      "20–24",
-    ].includes(b.band),
-  );
+  // --- Demographic Data Processing ---
+  const rawPyramid = currentRecord.extended?.age_sex_pyramid ?? [];
+  const targetBands = [
+    "0-4",
+    "5-9",
+    "10-14",
+    "15-19",
+    "20-24",
+    "0–4",
+    "5–9",
+    "10–14",
+    "15–19",
+    "20–24",
+  ];
 
-  // Fallback: build from age_bands_v2 if pyramid empty
+  // Transform to Diverging Data for True Pyramid (Males = negative, Females = positive)
+  const pyramidData = rawPyramid
+    .filter((b) => targetBands.includes(b.band))
+    .map((b) => ({
+      band: b.band,
+      male: -(b.male || 0),
+      female: b.female || 0,
+      total: b.total || 0,
+    }));
+
   const ageBands = currentRecord.extended?.age_bands_v2;
-  const pyramidData =
-    pyramid0to24.length > 0
-      ? pyramid0to24
-      : [
-          {
-            band: "0-3",
-            male: ageBands?.["0-3"]?.male ?? 0,
-            female: ageBands?.["0-3"]?.female ?? 0,
-            total: ageBands?.["0-3"]?.total ?? 0,
-          },
-          {
-            band: "0-5",
-            male: ageBands?.["0-5"]?.male ?? 0,
-            female: ageBands?.["0-5"]?.female ?? 0,
-            total: ageBands?.["0-5"]?.total ?? 0,
-          },
-          {
-            band: "6-9",
-            male: ageBands?.["6-9"]?.male ?? 0,
-            female: ageBands?.["6-9"]?.female ?? 0,
-            total: ageBands?.["6-9"]?.total ?? 0,
-          },
-          {
-            band: "10-14",
-            male: ageBands?.["10-14"]?.male ?? 0,
-            female: ageBands?.["10-14"]?.female ?? 0,
-            total: ageBands?.["10-14"]?.total ?? 0,
-          },
-          {
-            band: "15-17",
-            male: ageBands?.["15-17"]?.male ?? 0,
-            female: ageBands?.["15-17"]?.female ?? 0,
-            total: ageBands?.["15-17"]?.total ?? 0,
-          },
-          {
-            band: "18-24",
-            male: ageBands?.["18-24"]?.male ?? 0,
-            female: ageBands?.["18-24"]?.female ?? 0,
-            total: ageBands?.["18-24"]?.total ?? 0,
-          },
-        ];
-
   const boys017 =
     ageBands?.["0-17"]?.male ?? currentRecord.nsr?.total_male ?? 0;
   const girls017 =
     ageBands?.["0-17"]?.female ?? currentRecord.nsr?.total_female ?? 0;
   const genderRatio = [
-    { name: "Boys (0–17)", value: boys017, color: "#0284C7" },
-    { name: "Girls (0–17)", value: girls017, color: "#E67E22" },
+    { name: "Boys", value: boys017, color: "#0284C7" },
+    { name: "Girls", value: girls017, color: "#E67E22" },
   ];
-
-  const disabilityTypes = (currentRecord.extended?.disability?.types ?? []).map(
-    (t) => ({
-      name: t.label,
-      count: t.count,
-    }),
-  );
-
-  const children017 =
-    ageBands?.["0-17"]?.total ?? currentRecord.nsr?.children_under18 ?? 0;
-  const children03 = ageBands?.["0-3"]?.total ?? 0;
-  const youth1824 = ageBands?.["18-24"]?.total ?? 0;
-  const plwdTotal =
-    currentRecord.extended?.health_v2?.plwd_total ??
-    currentRecord.extended?.disability?.rate?.n ??
-    0;
-  const childrenPlwd = currentRecord.extended?.health_v2?.children_plwd ?? 0;
-  const pregnantTotal =
-    currentRecord.extended?.health_v2?.pregnant_total ??
-    currentRecord.extended?.plw?.pregnant?.n ??
-    0;
-  const lactatingTotal =
-    currentRecord.extended?.health_v2?.lactating_total ??
-    currentRecord.extended?.plw?.lactating?.n ??
-    0;
 
   return (
     <div className="min-h-screen bg-surface-page dark:bg-surface-darker pb-12">
@@ -205,7 +145,6 @@ export default function App() {
         <DomainNav active={domain} onChange={setDomain} />
       </div>
 
-      {/* ===================== GLOBAL / OVERVIEW ===================== */}
       {domain === "overview" && (
         <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-6 space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -227,10 +166,9 @@ export default function App() {
             <StateFilter value={path.state} onChange={handleStateFilter} />
           </div>
 
-          {/* —— 9 UNICEF Core Indicators (absolute counts) —— */}
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
-              UNICEF Core Global Indicators
+              Indicator
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               <KpiCard
@@ -246,53 +184,59 @@ export default function App() {
                 accent="#128C7E"
               />
               <KpiCard
-                label="Children (0–17)"
-                value={children017.toLocaleString()}
+                label="Children (0-17)"
+                value={(ageBands?.["0-17"]?.total ?? 0).toLocaleString()}
                 icon={<Baby size={16} />}
                 accent="#E67E22"
               />
               <KpiCard
-                label="Children (0–3)"
-                value={children03.toLocaleString()}
+                label="Children (0-3)"
+                value={(ageBands?.["0-3"]?.total ?? 0).toLocaleString()}
                 icon={<Baby size={16} />}
                 accent="#D97706"
               />
               <KpiCard
-                label="Youth (18–24)"
-                value={youth1824.toLocaleString()}
+                label="Youth (18-24)"
+                value={(ageBands?.["18-24"]?.total ?? 0).toLocaleString()}
                 icon={<User size={16} />}
                 accent="#059669"
               />
               <KpiCard
                 label="PLWD"
-                value={plwdTotal.toLocaleString()}
+                value={(
+                  currentRecord.extended?.health_v2?.plwd_total ?? 0
+                ).toLocaleString()}
                 icon={<Activity size={16} />}
                 accent="#DC2626"
               />
               <KpiCard
-                label="Children with Disabilities"
-                value={childrenPlwd.toLocaleString()}
+                label="Children with disabilities"
+                value={(
+                  currentRecord.extended?.health_v2?.children_plwd ?? 0
+                ).toLocaleString()}
                 icon={<Activity size={16} />}
                 accent="#B91C1C"
               />
               <KpiCard
-                label="Pregnant Women"
-                value={pregnantTotal.toLocaleString()}
+                label="Pregnant women"
+                value={(
+                  currentRecord.extended?.health_v2?.pregnant_total ?? 0
+                ).toLocaleString()}
                 icon={<Heart size={16} />}
                 accent="#9333EA"
               />
               <KpiCard
-                label="Lactating Mothers"
-                value={lactatingTotal.toLocaleString()}
+                label="Lactating mothers"
+                value={(
+                  currentRecord.extended?.health_v2?.lactating_total ?? 0
+                ).toLocaleString()}
                 icon={<ShieldCheck size={16} />}
                 accent="#0284C7"
               />
             </div>
           </div>
 
-          {/* —— Map + 4 Demographic Charts —— */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-            {/* Vector Map */}
             <div
               className="xl:col-span-1 rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card overflow-hidden"
               style={{ height: 640 }}
@@ -307,10 +251,9 @@ export default function App() {
               />
             </div>
 
-            {/* 4 Charts */}
             <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
               <ChartCard
-                title="Population Pyramid [0–24] (Boys & Girls)"
+                title="Population pyramid [0-24] (boys & girls)"
                 height={305}
               >
                 <ResponsiveContainer width="100%" height="100%">
@@ -318,6 +261,7 @@ export default function App() {
                     data={pyramidData}
                     layout="vertical"
                     margin={{ left: 10, right: 10, top: 10, bottom: 5 }}
+                    stackOffset="sign"
                   >
                     <XAxis type="number" hide />
                     <YAxis
@@ -330,6 +274,9 @@ export default function App() {
                     />
                     <Tooltip
                       cursor={{ fill: "transparent" }}
+                      formatter={(value: number) =>
+                        Math.abs(value).toLocaleString()
+                      }
                       contentStyle={{
                         borderRadius: "8px",
                         border: "none",
@@ -346,7 +293,7 @@ export default function App() {
                       name="Boys"
                       fill="#0284C7"
                       stackId="a"
-                      radius={[0, 0, 0, 4]}
+                      radius={[4, 0, 0, 4]}
                     />
                     <Bar
                       dataKey="female"
@@ -359,7 +306,7 @@ export default function App() {
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Gender Ratio (Boys & Girls, 0–17)" height={305}>
+              <ChartCard title="Gender ratio (boys and girls)" height={305}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -376,12 +323,12 @@ export default function App() {
                       ))}
                     </Pie>
                     <Tooltip
+                      formatter={(v: number) => v.toLocaleString()}
                       contentStyle={{
                         borderRadius: "8px",
                         border: "none",
                         boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                       }}
-                      formatter={(v: number) => v.toLocaleString()}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -391,7 +338,7 @@ export default function App() {
                 </ResponsiveContainer>
               </ChartCard>
 
-              <ChartCard title="Age Ratio (0–24 yrs)" height={305}>
+              <ChartCard title="Age ratio (0-24yrs)" height={305}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={pyramidData}
@@ -433,57 +380,17 @@ export default function App() {
               </ChartCard>
 
               <ChartCard
-                title="Disabilities Distribution Amongst Children"
+                title="Disabilities distribution amongst children"
                 height={305}
               >
-                {disabilityTypes.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={disabilityTypes}
-                      layout="vertical"
-                      margin={{ top: 10, right: 30, left: 10, bottom: 0 }}
-                    >
-                      <XAxis type="number" hide />
-                      <YAxis
-                        dataKey="name"
-                        type="category"
-                        width={100}
-                        tick={{ fontSize: 10, fill: "#64748b" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <Tooltip
-                        cursor={{ fill: "transparent" }}
-                        contentStyle={{
-                          borderRadius: "8px",
-                          border: "none",
-                          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                        }}
-                      />
-                      <Bar
-                        dataKey="count"
-                        name="Individuals"
-                        fill="#DC2626"
-                        radius={[0, 4, 4, 0]}
-                        label={{
-                          position: "right",
-                          fill: "#64748b",
-                          fontSize: 10,
-                          formatter: (v: number) => v.toLocaleString(),
-                        }}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-xs text-ink-muted italic">
-                    Disability type distribution not available at this level
-                  </div>
-                )}
+                <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50 dark:bg-surface-darker/50">
+                  Detailed cross-tabulation for child disabilities by age ranges
+                  (0-24) is not captured in the current JSON expansion schema.
+                </div>
               </ChartCard>
             </div>
           </div>
 
-          {/* —— Community Selection (NO Attention Flags / NO ranking scores) —— */}
           <div className="pt-4">
             <CommunityRankingPanel
               data={data}
@@ -493,7 +400,6 @@ export default function App() {
         </main>
       )}
 
-      {/* ===================== DOMAIN PAGES ===================== */}
       {domain !== "overview" && (
         <main className="max-w-[1600px] mx-auto px-4 md:px-6 pt-4 pb-8 space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-3">

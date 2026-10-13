@@ -1,149 +1,106 @@
-/**
- * Auto-Insight Engine
- * Generates flags (red/yellow/green) and rankings for the sidebar.
- */
-
+import type { DashboardData } from "./loadData";
 import type {
   GeoRecord,
+  DrilldownPath,
+  DashboardMode,
   InsightFlag,
   RankedItem,
-  DashboardMode,
-  DrilldownPath,
 } from "./types";
-import { formatNumber, formatPercent, titleCase } from "./formatters";
-
-function inScope(rec: GeoRecord, path: DrilldownPath): boolean {
-  if (path.state && rec.state !== path.state) return false;
-  if (path.lga && rec.lga !== path.lga) return false;
-  if (path.ward && rec.ward !== path.ward) return false;
-  return true;
-}
-
-export function generateInsights(
-  national: GeoRecord,
-  states: GeoRecord[],
-  lgas: GeoRecord[],
-  path: DrilldownPath,
-  mode: DashboardMode,
-): InsightFlag[] {
-  const flags: InsightFlag[] = [];
-  const nationalNinRate = national.nsr.nin_verification_rate;
-
-  if (mode === "nsr") {
-    states.forEach((s) => {
-      const rate = s.nsr.nin_verification_rate;
-      const gap = rate - nationalNinRate;
-
-      if (gap < -15) {
-        flags.push({
-          severity: "danger",
-          title: `${titleCase(s.state!)}: NIN rate ${formatPercent(rate)}`,
-          detail: `${Math.abs(gap).toFixed(1)}pp below national average (${formatPercent(nationalNinRate)})`,
-          location: s.state,
-        });
-      } else if (gap > 10) {
-        flags.push({
-          severity: "success",
-          title: `${titleCase(s.state!)}: strong NIN performance`,
-          detail: `${formatPercent(rate)} verified — ${gap.toFixed(1)}pp above average`,
-          location: s.state,
-        });
-      }
-    });
-  }
-
-  const scopedLgas = lgas.filter((l) => inScope(l, path));
-  const lowCount = scopedLgas.filter(
-    (l) => l.nsr.total_households < 100,
-  ).length;
-  if (lowCount > 0) {
-    flags.push({
-      severity: "warning",
-      title: `${lowCount} LGA${lowCount === 1 ? "" : "s"} with <100 households`,
-      detail: `Consider re-mobilization or verification of coverage`,
-    });
-  }
-
-  if (path.state) {
-    const stateLgas = lgas.filter((l) => l.state === path.state);
-    const withData = stateLgas.filter((l) => l.nsr.total_households > 0).length;
-    const coverage =
-      stateLgas.length > 0 ? (withData / stateLgas.length) * 100 : 0;
-
-    if (coverage >= 90) {
-      flags.push({
-        severity: "success",
-        title: `${titleCase(path.state)} at ${formatPercent(coverage, 0)} LGA coverage`,
-        detail: `${withData} of ${stateLgas.length} LGAs enumerated`,
-        location: path.state,
-      });
-    } else if (coverage < 50 && stateLgas.length > 0) {
-      flags.push({
-        severity: "warning",
-        title: `${titleCase(path.state)} LGA coverage low`,
-        detail: `Only ${withData} of ${stateLgas.length} LGAs enumerated (${formatPercent(coverage, 0)})`,
-        location: path.state,
-      });
-    }
-  }
-
-  const scopedRecord = path.state
-    ? states.find((s) => s.state === path.state)
-    : national;
-
-  if (scopedRecord && scopedRecord.vulnerability.poorest_pct > 20) {
-    flags.push({
-      severity: "info",
-      title: `High poverty concentration`,
-      detail: `${formatPercent(scopedRecord.vulnerability.poorest_pct)} of households in poorest 3 deciles`,
-      location: path.state,
-    });
-  }
-
-  return flags;
-}
-
-export function topLgas(
-  lgas: GeoRecord[],
-  path: DrilldownPath,
-  mode: DashboardMode,
-  n = 5,
-): RankedItem[] {
-  const scoped = lgas.filter((l) => inScope(l, path));
-
-  const getValue = (l: GeoRecord) =>
-    mode === "nsr" ? l.nsr.total_households : l.update.updated_hh;
-
-  return scoped
-    .sort((a, b) => getValue(b) - getValue(a))
-    .slice(0, n)
-    .map((l, i) => ({
-      rank: i + 1,
-      name: titleCase(l.lga || ""),
-      value: getValue(l),
-      sublabel: formatNumber(getValue(l)),
-      state: l.state,
-    }));
-}
 
 export interface DecileBar {
   decile: string;
   count: number;
-  pct: number;
+  isPoorest: boolean;
 }
 
-export function decileBars(
-  record: GeoRecord,
-  totalHouseholds: number,
-): DecileBar[] {
-  const dist = record.vulnerability.decile_distribution;
-  return Array.from({ length: 10 }, (_, i) => {
-    const key = `d${i + 1}`;
+function formatNumber(n: number): string {
+  return n.toLocaleString();
+}
+
+export function computeInsightFlags(
+  data: DashboardData,
+  _path: DrilldownPath,
+  _mode: DashboardMode = "nsr",
+): InsightFlag[] {
+  const flags: InsightFlag[] = [];
+  const stateRecs: GeoRecord[] = data.states || [];
+
+  stateRecs.forEach((st: GeoRecord) => {
+    const ninRate = st.nsr?.nin_verification_rate ?? 0;
+    if (ninRate > 55) {
+      flags.push({
+        id: `nin-high-${st.state}`,
+        severity: "success",
+        category: "Civil Registration",
+        title: `${st.state}: strong NIN performance`,
+        body: `${ninRate.toFixed(1)}% verified — ${(ninRate - data.national.nsr.nin_verification_rate).toFixed(1)}pp above average`,
+        location: st.state,
+        metric: "nin_verification_rate",
+        value: ninRate,
+        linkTab: "civil-registration",
+      });
+    } else if (ninRate < 25) {
+      flags.push({
+        id: `nin-low-${st.state}`,
+        severity: "danger",
+        category: "Civil Registration",
+        title: `${st.state}: NIN rate ${ninRate.toFixed(1)}%`,
+        body: `${(data.national.nsr.nin_verification_rate - ninRate).toFixed(1)}pp below national average (${data.national.nsr.nin_verification_rate.toFixed(1)}%)`,
+        location: st.state,
+        metric: "nin_verification_rate",
+        value: ninRate,
+        linkTab: "civil-registration",
+      });
+    }
+  });
+
+  return flags.slice(0, 4);
+}
+
+export const generateInsights = computeInsightFlags;
+
+export function computeVolumeLgas(
+  data: DashboardData,
+  mode: DashboardMode = "nsr",
+  limit = 5,
+): RankedItem[] {
+  const lgas: GeoRecord[] = data.lgas || [];
+
+  const getValue = (l: GeoRecord): number => {
+    if (mode === "nsr") {
+      return l.nsr?.total_households ?? 0;
+    }
+    return l.update?.updated_hh ?? 0;
+  };
+
+  const sorted = [...lgas]
+    .sort((a, b) => getValue(b) - getValue(a))
+    .slice(0, limit);
+
+  return sorted.map((l, i) => ({
+    rank: i + 1,
+    name: l.lga || "Unknown LGA",
+    state: l.state,
+    value: getValue(l),
+    sublabel: formatNumber(getValue(l)),
+  }));
+}
+
+export const topLgas = computeVolumeLgas;
+
+export function computeDecileDistribution(record: GeoRecord): DecileBar[] {
+  const dist = record.vulnerability?.decile_distribution ?? {};
+  const keys = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10"];
+
+  return keys.map((key) => {
     const count = dist[key] || 0;
+    const dNum = parseInt(key.replace("D", ""), 10);
     return {
-      decile: `D${i + 1}`,
+      decile: key,
       count,
-      pct: totalHouseholds > 0 ? (count / totalHouseholds) * 100 : 0,
+      isPoorest: dNum <= 3,
     };
   });
 }
+
+export const decileBars = computeDecileDistribution;
