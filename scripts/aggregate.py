@@ -30,32 +30,25 @@ def compute_metrics(sub_df):
     if total_records == 0:
         return {}
 
-    total_households = (
-        int(sub_df["hhno"].nunique())
-        if "hhno" in sub_df.columns
-        else total_records
-    )
+    # Correct Unique Household Identification (hhnsrrno)
+    hh_col = "hhnsrrno" if "hhnsrrno" in sub_df.columns else "hhno"
+    total_households = int(sub_df[hh_col].nunique())
 
-    # Top-level NSR Summary Object (Required by Frontend)
-    nsr_data = {
-        "total_households": total_households,
-        "total_individuals": total_records,
-        "children_0_17": int(sub_df["is_0_17"].sum()),
-        "children_0_5": int(sub_df["is_0_5"].sum()),
-        "youth_18_24": int(sub_df["is_18_24"].sum()),
-        "plwd": int(sub_df["is_disabled"].sum()),
-        "children_with_disabilities": int(
-            (sub_df["is_0_17"] & sub_df["is_disabled"]).sum()
-        ),
-        "pregnant_women": int(
-            (sub_df["is_female"] & sub_df["is_pregnant"]).sum()
-        ),
-        "lactating_mothers": int(
-            (sub_df["is_female"] & sub_df["is_lactating"]).sum()
-        ),
-    }
+    # 1. BASE COHORTS & GENDER COUNTS
+    total_males = int(sub_df["is_male"].sum())
+    total_females = int(sub_df["is_female"].sum())
 
-    # 1. DEMOGRAPHICS & POPULATION PYRAMID (0-24)
+    children_0_17 = int(sub_df["is_0_17"].sum())
+    children_0_5 = int(sub_df["is_0_5"].sum())
+    children_0_3 = int((sub_df["agey"] <= 3).sum())
+    youth_18_24 = int(sub_df["is_18_24"].sum())
+
+    plwd_total = int(sub_df["is_disabled"].sum())
+    children_plwd = int((sub_df["is_0_17"] & sub_df["is_disabled"]).sum())
+    pregnant_total = int((sub_df["is_female"] & sub_df["is_pregnant"]).sum())
+    lactating_total = int((sub_df["is_female"] & sub_df["is_lactating"]).sum())
+
+    # 2. DEMOGRAPHICS & POPULATION PYRAMID (0-24)
     pyramid_bands = [
         ("0-4", 0, 4),
         ("5-9", 5, 9),
@@ -64,31 +57,40 @@ def compute_metrics(sub_df):
         ("20-24", 20, 24),
     ]
 
+    age_sex_pyramid = []
     pyramid_0_24 = []
     for label, min_a, max_a in pyramid_bands:
         band_mask = (sub_df["agey"] >= min_a) & (sub_df["agey"] <= max_a)
         boys = int((band_mask & sub_df["is_male"]).sum())
         girls = int((band_mask & sub_df["is_female"]).sum())
-        pyramid_0_24.append(
-            {"ageGroup": label, "boys": boys, "girls": girls, "total": boys + girls}
-        )
+        item = {"band": label, "ageGroup": label, "male": boys, "female": girls, "boys": boys, "girls": girls, "total": boys + girls}
+        age_sex_pyramid.append(item)
+        pyramid_0_24.append(item)
 
-    age_ratio = [
-        {
-            "ageGroup": label,
-            "count": int(
-                (
-                    (sub_df["agey"] >= min_a) & (sub_df["agey"] <= max_a)
-                ).sum()
-            ),
-        }
-        for label, min_a, max_a in pyramid_bands
-    ]
+    age_bands_v2 = {
+        "0-17": {
+            "total": children_0_17,
+            "male": int((sub_df["is_0_17"] & sub_df["is_male"]).sum()),
+            "female": int((sub_df["is_0_17"] & sub_df["is_female"]).sum()),
+        },
+        "0-3": {
+            "total": children_0_3,
+            "male": int(((sub_df["agey"] <= 3) & sub_df["is_male"]).sum()),
+            "female": int(((sub_df["agey"] <= 3) & sub_df["is_female"]).sum()),
+        },
+        "0-5": {
+            "total": children_0_5,
+            "male": int((sub_df["is_0_5"] & sub_df["is_male"]).sum()),
+            "female": int((sub_df["is_0_5"] & sub_df["is_female"]).sum()),
+        },
+        "18-24": {
+            "total": youth_18_24,
+            "male": int((sub_df["is_18_24"] & sub_df["is_male"]).sum()),
+            "female": int((sub_df["is_18_24"] & sub_df["is_female"]).sum()),
+        },
+    }
 
-    total_boys_17 = int((sub_df["is_0_17"] & sub_df["is_male"]).sum())
-    total_girls_17 = int((sub_df["is_0_17"] & sub_df["is_female"]).sum())
-
-    # 2. CIVIL REGISTRATION CROSS-TABS
+    # 3. CIVIL REGISTRATION
     c_0_17_with_bc = int((sub_df["is_0_17"] & sub_df["has_bc"]).sum())
     c_0_5_with_bc = int((sub_df["is_0_5"] & sub_df["has_bc"]).sum())
     c_0_17_no_bc = int((sub_df["is_0_17"] & sub_df["no_bc"]).sum())
@@ -99,225 +101,159 @@ def compute_metrics(sub_df):
     c_0_17_no_nin = int((sub_df["is_0_17"] & sub_df["no_nin"]).sum())
     c_0_5_no_nin = int((sub_df["is_0_5"] & sub_df["no_nin"]).sum())
 
-    c_0_17_no_bc_no_nin = int(
-        (sub_df["is_0_17"] & sub_df["no_bc"] & sub_df["no_nin"]).sum()
-    )
-    c_0_5_no_bc_no_nin = int(
-        (sub_df["is_0_5"] & sub_df["no_bc"] & sub_df["no_nin"]).sum()
-    )
-    c_0_17_bc_no_nin = int(
-        (sub_df["is_0_17"] & sub_df["has_bc"] & sub_df["no_nin"]).sum()
-    )
-    c_0_5_bc_no_nin = int(
-        (sub_df["is_0_5"] & sub_df["has_bc"] & sub_df["no_nin"]).sum()
-    )
-    c_0_17_nin_no_bc = int(
-        (sub_df["is_0_17"] & sub_df["has_nin"] & sub_df["no_bc"]).sum()
-    )
-    c_0_5_nin_no_bc = int(
-        (sub_df["is_0_5"] & sub_df["has_nin"] & sub_df["no_bc"]).sum()
-    )
+    c_0_17_no_bc_no_nin = int((sub_df["is_0_17"] & sub_df["no_bc"] & sub_df["no_nin"]).sum())
+    c_0_5_no_bc_no_nin = int((sub_df["is_0_5"] & sub_df["no_bc"] & sub_df["no_nin"]).sum())
+    c_0_17_bc_no_nin = int((sub_df["is_0_17"] & sub_df["has_bc"] & sub_df["no_nin"]).sum())
+    c_0_5_bc_no_nin = int((sub_df["is_0_5"] & sub_df["has_bc"] & sub_df["no_nin"]).sum())
+    c_0_17_nin_no_bc = int((sub_df["is_0_17"] & sub_df["has_nin"] & sub_df["no_bc"]).sum())
+    c_0_5_nin_no_bc = int((sub_df["is_0_5"] & sub_df["has_nin"] & sub_df["no_bc"]).sum())
 
-    bc_by_gender = {
-        "boys_with_bc": int(
-            (sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_bc"]).sum()
-        ),
-        "girls_with_bc": int(
-            (sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_bc"]).sum()
-        ),
-        "boys_no_bc": int(
-            (sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_bc"]).sum()
-        ),
-        "girls_no_bc": int(
-            (sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_bc"]).sum()
-        ),
+    civil_reg_dict = {
+        "c_0_17_with_bc": c_0_17_with_bc,
+        "c_0_5_with_bc": c_0_5_with_bc,
+        "c_0_17_no_bc": c_0_17_no_bc,
+        "c_0_5_no_bc": c_0_5_no_bc,
+        "c_0_17_with_nin": c_0_17_with_nin,
+        "c_0_5_with_nin": c_0_5_with_nin,
+        "c_0_17_no_nin": c_0_17_no_nin,
+        "c_0_5_no_nin": c_0_5_no_nin,
+        "c_0_17_no_bc_no_nin": c_0_17_no_bc_no_nin,
+        "c_0_5_no_bc_no_nin": c_0_5_no_bc_no_nin,
+        "c_0_17_bc_no_nin": c_0_17_bc_no_nin,
+        "c_0_5_bc_no_nin": c_0_5_bc_no_nin,
+        "c_0_17_nin_no_bc": c_0_17_nin_no_bc,
+        "c_0_5_nin_no_bc": c_0_5_nin_no_bc,
+        "bc_by_gender": {
+            "boys_with_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_bc"]).sum()),
+            "girls_with_bc": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_bc"]).sum()),
+            "boys_no_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_bc"]).sum()),
+            "girls_no_bc": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_bc"]).sum()),
+        },
+        "nin_by_gender": {
+            "boys_with_nin": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_nin"]).sum()),
+            "girls_with_nin": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_nin"]).sum()),
+            "boys_no_nin": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_nin"]).sum()),
+            "girls_no_nin": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_nin"]).sum()),
+        },
     }
 
-    nin_by_gender = {
-        "boys_with_nin": int(
-            (sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_nin"]).sum()
-        ),
-        "girls_with_nin": int(
-            (sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_nin"]).sum()
-        ),
-        "boys_no_nin": int(
-            (sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_nin"]).sum()
-        ),
-        "girls_no_nin": int(
-            (sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_nin"]).sum()
-        ),
+    # 4. EDUCATION
+    education_dict = {
+        "out_of_school_6_9": int((sub_df["is_6_9"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_10_14": int((sub_df["is_10_14"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_15_17": int((sub_df["is_15_17"] & sub_df["is_out_of_school"]).sum()),
+        "disabled_never_enrolled_0_17": int((sub_df["is_0_17"] & sub_df["is_disabled"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_6_9_boys": int((sub_df["is_6_9"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_6_9_girls": int((sub_df["is_6_9"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_10_14_boys": int((sub_df["is_10_14"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_10_14_girls": int((sub_df["is_10_14"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_15_17_boys": int((sub_df["is_15_17"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
+        "out_of_school_15_17_girls": int((sub_df["is_15_17"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
+        "not_attending_0_17_boys": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
+        "not_attending_0_17_girls": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
     }
 
-    # 3. EDUCATION / OUT OF SCHOOL
-    out_6_9 = int((sub_df["is_6_9"] & sub_df["is_out_of_school"]).sum())
-    out_10_14 = int((sub_df["is_10_14"] & sub_df["is_out_of_school"]).sum())
-    out_15_17 = int((sub_df["is_15_17"] & sub_df["is_out_of_school"]).sum())
-    disabled_never_enrolled = int(
-        (
-            sub_df["is_0_17"]
-            & sub_df["is_disabled"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-
-    out_6_9_boys = int(
-        (
-            sub_df["is_6_9"]
-            & sub_df["is_male"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    out_6_9_girls = int(
-        (
-            sub_df["is_6_9"]
-            & sub_df["is_female"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    out_10_14_boys = int(
-        (
-            sub_df["is_10_14"]
-            & sub_df["is_male"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    out_10_14_girls = int(
-        (
-            sub_df["is_10_14"]
-            & sub_df["is_female"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    out_15_17_boys = int(
-        (
-            sub_df["is_15_17"]
-            & sub_df["is_male"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    out_15_17_girls = int(
-        (
-            sub_df["is_15_17"]
-            & sub_df["is_female"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-
-    not_attending_0_17_boys = int(
-        (
-            sub_df["is_0_17"]
-            & sub_df["is_male"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-    not_attending_0_17_girls = int(
-        (
-            sub_df["is_0_17"]
-            & sub_df["is_female"]
-            & sub_df["is_out_of_school"]
-        ).sum()
-    )
-
-    # 4. HEALTH & NUTRITION
+    # 5. HEALTH & NUTRITION
     sam_children = int((sub_df["muac_cat"] == 1.0).sum())
     mam_children = int((sub_df["muac_cat"] == 2.0).sum())
     normal_children = int((sub_df["muac_cat"] == 3.0).sum())
 
-    # 5. LIVELIHOODS & SHOCKS
-    female_headed_hhs = int(
-        sub_df[sub_df["is_female_head"]]["hhno"].nunique()
-    )
-    shock_prone_hhs = int(sub_df[sub_df["has_shock"]]["hhno"].nunique())
-    children_in_risk_hhs = int(
-        (sub_df["is_0_17"] & sub_df["has_shock"]).sum()
-    )
+    health_dict = {
+        "pregnant_total": pregnant_total,
+        "pregnant_women": pregnant_total,
+        "lactating_total": lactating_total,
+        "lactating_mothers": lactating_total,
+        "plwd_total": plwd_total,
+        "plwd": plwd_total,
+        "children_plwd": children_plwd,
+        "children_with_disabilities": children_plwd,
+        "health_insurance_0_7_covered": 0,
+        "health_insurance_0_7_not_covered": int((sub_df["agey"] <= 7).sum()),
+        "health_insurance_0_5_covered": 0,
+        "health_insurance_0_5_not_covered": children_0_5,
+    }
 
-    youth_employed = int(
-        (sub_df["is_18_24"] & (sub_df["b5labour_clean"] != "Unemployed")).sum()
-    )
-    youth_unemployed = int(
-        (sub_df["is_18_24"] & (sub_df["b5labour_clean"] == "Unemployed")).sum()
-    )
+    nutrition_dict = {
+        "pregnant_total": pregnant_total,
+        "pregnant_women": pregnant_total,
+        "lactating_total": lactating_total,
+        "lactating_mothers": lactating_total,
+        "sam_children": sam_children,
+        "mam_children": mam_children,
+        "normal_children": normal_children,
+    }
 
-    return {
-        "nsr": nsr_data,  # EXPLICITLY WRAPPED FOR FRONTEND
+    # 6. LIVELIHOODS & SHOCKS
+    female_headed_hhs = int(sub_df[sub_df["is_female_head"]][hh_col].nunique())
+    shock_prone_hhs = int(sub_df[sub_df["has_shock"]][hh_col].nunique())
+    children_in_risk_hhs = int((sub_df["is_0_17"] & sub_df["has_shock"]).sum())
+
+    livelihoods_dict = {
+        "female_headed_hhs": female_headed_hhs,
+        "youth_employed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] != "Unemployed")).sum()),
+        "youth_unemployed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] == "Unemployed")).sum()),
+        "shock_prone_hhs": shock_prone_hhs,
+        "children_in_risk_hhs": children_in_risk_hhs,
+    }
+
+    # Top-Level NSR Summary Object
+    nsr_data = {
         "total_households": total_households,
         "total_individuals": total_records,
-        "children_0_17": nsr_data["children_0_17"],
-        "children_0_5": nsr_data["children_0_5"],
-        "youth_18_24": nsr_data["youth_18_24"],
-        "plwd": nsr_data["plwd"],
-        "children_with_disabilities": nsr_data["children_with_disabilities"],
-        "pregnant_women": nsr_data["pregnant_women"],
-        "lactating_mothers": nsr_data["lactating_mothers"],
+        "total_male": total_males,
+        "total_female": total_females,
+        "children_under18": children_0_17,
+        "children_under5": children_0_5,
+        "children_0_17": children_0_17,
+        "children_0_5": children_0_5,
+        "youth_18_24": youth_18_24,
+        "pwd": plwd_total,
+        "plwd": plwd_total,
+        "children_plwd": children_plwd,
+        "children_with_disabilities": children_plwd,
+        "pregnant_total": pregnant_total,
+        "pregnant_women": pregnant_total,
+        "lactating_total": lactating_total,
+        "lactating_mothers": lactating_total,
+    }
+
+    # Construct complete payload satisfying BOTH legacy `extended.*` and root structures
+    return {
+        "nsr": nsr_data,
+        "total_households": total_households,
+        "total_individuals": total_records,
+        "children_0_17": children_0_17,
+        "children_0_5": children_0_5,
+        "youth_18_24": youth_18_24,
+        "plwd": plwd_total,
+        "children_with_disabilities": children_plwd,
+        "pregnant_women": pregnant_total,
+        "lactating_mothers": lactating_total,
         "pyramid_0_24": pyramid_0_24,
-        "gender_ratio": {"boys": total_boys_17, "girls": total_girls_17},
-        "age_ratio": age_ratio,
-        "civil_registration": {
-            "c_0_17_with_bc": c_0_17_with_bc,
-            "c_0_5_with_bc": c_0_5_with_bc,
-            "c_0_17_no_bc": c_0_17_no_bc,
-            "c_0_5_no_bc": c_0_5_no_bc,
-            "c_0_17_with_nin": c_0_17_with_nin,
-            "c_0_5_with_nin": c_0_5_with_nin,
-            "c_0_17_no_nin": c_0_17_no_nin,
-            "c_0_5_no_nin": c_0_5_no_nin,
-            "c_0_17_no_bc_no_nin": c_0_17_no_bc_no_nin,
-            "c_0_5_no_bc_no_nin": c_0_5_no_bc_no_nin,
-            "c_0_17_bc_no_nin": c_0_17_bc_no_nin,
-            "c_0_5_bc_no_nin": c_0_5_bc_no_nin,
-            "c_0_17_nin_no_bc": c_0_17_nin_no_bc,
-            "c_0_5_nin_no_bc": c_0_5_nin_no_bc,
-            "bc_by_gender": bc_by_gender,
-            "nin_by_gender": nin_by_gender,
-        },
-        "education": {
-            "out_of_school_6_9": out_6_9,
-            "out_of_school_10_14": out_10_14,
-            "out_of_school_15_17": out_15_17,
-            "disabled_never_enrolled_0_17": disabled_never_enrolled,
-            "out_of_school_6_9_boys": out_6_9_boys,
-            "out_of_school_6_9_girls": out_6_9_girls,
-            "out_of_school_10_14_boys": out_10_14_boys,
-            "out_of_school_10_14_girls": out_10_14_girls,
-            "out_of_school_15_17_boys": out_15_17_boys,
-            "out_of_school_15_17_girls": out_15_17_girls,
-            "not_attending_0_17_boys": not_attending_0_17_boys,
-            "not_attending_0_17_girls": not_attending_0_17_girls,
-        },
-        "health_nutrition": {
-            "pregnant_women": nsr_data["pregnant_women"],
-            "lactating_mothers": nsr_data["lactating_mothers"],
-            "sam_children": sam_children,
-            "mam_children": mam_children,
-            "normal_children": normal_children,
-            "health_insurance_0_7_covered": 0,
-            "health_insurance_0_7_not_covered": int(
-                (sub_df["agey"] <= 7).sum()
-            ),
-            "health_insurance_0_5_covered": 0,
-            "health_insurance_0_5_not_covered": int(sub_df["is_0_5"].sum()),
-        },
-        "livelihoods": {
-            "female_headed_hhs": female_headed_hhs,
-            "youth_employed": youth_employed,
-            "youth_unemployed": youth_unemployed,
-            "shock_prone_hhs": shock_prone_hhs,
-            "children_in_risk_hhs": children_in_risk_hhs,
+        "gender_ratio": {"boys": age_bands_v2["0-17"]["male"], "girls": age_bands_v2["0-17"]["female"]},
+        "civil_registration": civil_reg_dict,
+        "education": education_dict,
+        "health_nutrition": health_dict,
+        "nutrition": nutrition_dict,
+        "livelihoods": livelihoods_dict,
+
+        # EXTENDED OBJECT (Eliminates `t.extended is undefined` errors on tabs)
+        "extended": {
+            "age_sex_pyramid": age_sex_pyramid,
+            "age_bands_v2": age_bands_v2,
+            "civil_registration": civil_reg_dict,
+            "education_v2": education_dict,
+            "health_v2": health_dict,
+            "nutrition_v2": nutrition_dict,
+            "livelihoods_resilience_v2": livelihoods_dict,
         },
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Process NASSCO MDP Survey Data"
-    )
-    parser.add_argument(
-        "--input", default=DEFAULT_INPUT, help="Path to input .dta or .csv file"
-    )
-    parser.add_argument(
-        "--outdir", default=DEFAULT_OUTDIR, help="Path to output directory"
-    )
+    parser = argparse.ArgumentParser(description="Process NASSCO MDP Survey Data")
+    parser.add_argument("--input", default=DEFAULT_INPUT, help="Path to input .dta or .csv file")
+    parser.add_argument("--outdir", default=DEFAULT_OUTDIR, help="Path to output directory")
     args = parser.parse_args()
 
     input_path = args.input
@@ -345,9 +281,7 @@ def main():
 
     print("⏳ Cleaning and pre-indexing survey variables...")
 
-    df["agey"] = (
-        pd.to_numeric(df["agey"], errors="coerce").fillna(0).astype(int)
-    )
+    df["agey"] = pd.to_numeric(df["agey"], errors="coerce").fillna(0).astype(int)
 
     clean_sex = clean_str_series(df["sex"])
     clean_bc = clean_str_series(df["birthcertificate"])
@@ -383,7 +317,6 @@ def main():
     df["is_female_head"] = df["is_head"] & df["is_female"]
 
     df["has_shock"] = clean_shock == "Yes"
-
     df["b5labour_clean"] = clean_str_series(df["b5labour"])
 
     if "muac_category" in df.columns:
@@ -413,9 +346,7 @@ def main():
 
     print("⏳ Generating LGA Summaries...")
     lga_list = []
-    for (state_name, lga_name), group in df.groupby(
-        ["state_clean", "lga_clean"]
-    ):
+    for (state_name, lga_name), group in df.groupby(["state_clean", "lga_clean"]):
         l_data = compute_metrics(group)
         l_data["state"] = state_name
         l_data["lga"] = lga_name
@@ -426,9 +357,7 @@ def main():
 
     print("⏳ Generating Ward Summaries...")
     ward_list = []
-    for (state_name, lga_name, ward_name), group in df.groupby(
-        ["state_clean", "lga_clean", "ward_clean"]
-    ):
+    for (state_name, lga_name, ward_name), group in df.groupby(["state_clean", "lga_clean", "ward_clean"]):
         w_data = compute_metrics(group)
         w_data["state"] = state_name
         w_data["lga"] = lga_name
@@ -440,16 +369,15 @@ def main():
 
     print("⏳ Generating Community Selection & Demographics Table...")
     community_list = []
-    for (state_name, lga_name, ward_name, comm_name), group in df.groupby(
-        ["state_clean", "lga_clean", "ward_clean", "community_clean"]
-    ):
+    hh_col = "hhnsrrno" if "hhnsrrno" in df.columns else "hhno"
+    for (state_name, lga_name, ward_name, comm_name), group in df.groupby(["state_clean", "lga_clean", "ward_clean", "community_clean"]):
         c_data = compute_metrics(group)
         c_data["state"] = state_name
         c_data["lga"] = lga_name
         c_data["ward"] = ward_name
         c_data["community"] = comm_name
 
-        c_data["pvhhs"] = int(group["hhno"].nunique())
+        c_data["pvhhs"] = int(group[hh_col].nunique())
         c_data["males"] = int(group["is_male"].sum())
         c_data["females"] = int(group["is_female"].sum())
         c_data["ages_0_17"] = int(group["is_0_17"].sum())
