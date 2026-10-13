@@ -36,50 +36,76 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
 }) => {
   const theme = useChartTheme();
 
-  const ageBands = record.extended?.age_bands_v2;
+  // Cast record to any for safe, flexible property lookup across schemas
+  const rec = (record || {}) as any;
+  const nsr = rec.nsr || {};
+
+  // Safe Metric Extractions with Nullish Fallbacks
+  const totalHouseholds = nsr.total_households ?? rec.total_households ?? 0;
+  const totalIndividuals = nsr.total_individuals ?? rec.total_individuals ?? 0;
   const children017 =
-    ageBands?.["0-17"]?.total ?? record.nsr?.children_under18 ?? 0;
-  const children03 = ageBands?.["0-3"]?.total ?? 0;
-  const youth1824 = ageBands?.["18-24"]?.total ?? 0;
-  const plwdTotal =
-    record.extended?.health_v2?.plwd_total ??
-    record.extended?.disability?.rate?.n ??
+    rec.children_0_17 ??
+    rec.extended?.age_bands_v2?.["0-17"]?.total ??
+    nsr.children_under18 ??
     0;
-  const childrenPlwd = record.extended?.health_v2?.children_plwd ?? 0;
+  const children05 =
+    rec.children_0_5 ?? rec.extended?.age_bands_v2?.["0-3"]?.total ?? 0;
+  const youth1824 =
+    rec.youth_18_24 ?? rec.extended?.age_bands_v2?.["18-24"]?.total ?? 0;
+  const plwdTotal =
+    rec.plwd ??
+    nsr.pwd ??
+    rec.extended?.health_v2?.plwd_total ??
+    rec.extended?.disability?.rate?.n ??
+    0;
+  const childrenPlwd =
+    rec.children_with_disabilities ??
+    rec.extended?.health_v2?.children_plwd ??
+    0;
   const pregnantTotal =
-    record.extended?.health_v2?.pregnant_total ??
-    record.extended?.plw?.pregnant?.n ??
+    rec.pregnant_women ??
+    rec.extended?.health_v2?.pregnant_total ??
+    rec.extended?.plw?.pregnant?.n ??
     0;
   const lactatingTotal =
-    record.extended?.health_v2?.lactating_total ??
-    record.extended?.plw?.lactating?.n ??
+    rec.lactating_mothers ??
+    rec.extended?.health_v2?.lactating_total ??
+    rec.extended?.plw?.lactating?.n ??
     0;
 
-  const pyramidRaw = record.extended?.age_sex_pyramid ?? [];
-  const targetBands = [
-    "0-4",
-    "5-9",
-    "10-14",
-    "15-19",
-    "20-24",
-    "0–4",
-    "5–9",
-    "10–14",
-    "15–19",
-    "20–24",
-  ];
+  // Process Diverging Population Pyramid Data (Males = negative, Females = positive)
+  const targetBands = ["0-4", "5-9", "10-14", "15-19", "20-24"];
+  const rawPyramid = rec.pyramid_0_24 ?? rec.extended?.age_sex_pyramid ?? [];
 
-  const pyramidData = pyramidRaw
-    .filter((b) => targetBands.includes(b.band))
-    .map((b) => ({
-      band: b.band,
-      male: -(b.male || 0),
-      female: b.female || 0,
-      total: b.total || 0,
-    }));
+  const pyramidData = targetBands.map((band) => {
+    const found = rawPyramid.find(
+      (b: any) =>
+        (b.ageGroup || b.band) === band ||
+        (b.ageGroup || b.band) === band.replace("-", "–"),
+    );
+    const maleVal = found?.boys ?? found?.male ?? 0;
+    const femaleVal = found?.girls ?? found?.female ?? 0;
 
-  const boys017 = ageBands?.["0-17"]?.male ?? record.nsr?.total_male ?? 0;
-  const girls017 = ageBands?.["0-17"]?.female ?? record.nsr?.total_female ?? 0;
+    return {
+      band,
+      male: -Math.abs(maleVal),
+      female: Math.abs(femaleVal),
+      total: Math.abs(maleVal) + Math.abs(femaleVal),
+    };
+  });
+
+  // Process Gender Ratio Data
+  const boys017 =
+    rec.gender_ratio?.boys ??
+    rec.extended?.age_bands_v2?.["0-17"]?.male ??
+    nsr.total_male ??
+    0;
+  const girls017 =
+    rec.gender_ratio?.girls ??
+    rec.extended?.age_bands_v2?.["0-17"]?.female ??
+    nsr.total_female ??
+    0;
+
   const genderRatio = [
     { name: "Boys", value: boys017, color: "#0284C7" },
     { name: "Girls", value: girls017, color: "#E67E22" },
@@ -94,13 +120,13 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
           <KpiCard
             label="Total Households Registered"
-            value={record.nsr.total_households.toLocaleString()}
+            value={totalHouseholds.toLocaleString()}
             icon={<Users size={16} />}
             accent="#075E54"
           />
           <KpiCard
             label="Total Individuals"
-            value={record.nsr.total_individuals.toLocaleString()}
+            value={totalIndividuals.toLocaleString()}
             icon={<User size={16} />}
             accent="#128C7E"
           />
@@ -111,8 +137,8 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             accent="#E67E22"
           />
           <KpiCard
-            label="Children (0-3)"
-            value={children03.toLocaleString()}
+            label="Children (0-5)"
+            value={children05.toLocaleString()}
             icon={<Baby size={16} />}
             accent="#D97706"
           />
@@ -180,16 +206,16 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   dataKey="band"
                   type="category"
                   width={50}
-                  tick={{ fontSize: 11, fill: theme.axisTick }}
+                  tick={{ fontSize: 11, fill: theme?.axisTick || "#64748b" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
                   cursor={{ fill: "transparent" }}
-                  formatter={(value: number) =>
-                    Math.abs(value).toLocaleString()
+                  formatter={(value: any) =>
+                    Math.abs(Number(value)).toLocaleString()
                   }
-                  contentStyle={theme.tooltip}
+                  contentStyle={theme?.tooltip}
                 />
                 <Legend
                   verticalAlign="top"
@@ -231,8 +257,8 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(v: number) => v.toLocaleString()}
-                  contentStyle={theme.tooltip}
+                  formatter={(v: any) => Number(v).toLocaleString()}
+                  contentStyle={theme?.tooltip}
                 />
                 <Legend
                   verticalAlign="bottom"
@@ -250,18 +276,18 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
               >
                 <XAxis
                   dataKey="band"
-                  tick={{ fontSize: 11, fill: theme.axisTick }}
+                  tick={{ fontSize: 11, fill: theme?.axisTick || "#64748b" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: theme.axisTick }}
+                  tick={{ fontSize: 11, fill: theme?.axisTick || "#64748b" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
                   cursor={{ fill: "#f1f5f9" }}
-                  contentStyle={theme.tooltip}
+                  contentStyle={theme?.tooltip}
                 />
                 <Bar
                   dataKey="total"
@@ -270,9 +296,9 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   radius={[4, 4, 0, 0]}
                   label={{
                     position: "top",
-                    fill: theme.axisTick,
+                    fill: theme?.axisTick || "#64748b",
                     fontSize: 10,
-                    formatter: (v: number) => v.toLocaleString(),
+                    formatter: (v: any) => Number(v).toLocaleString(),
                   }}
                 />
               </BarChart>
