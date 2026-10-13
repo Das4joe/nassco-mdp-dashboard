@@ -1,5 +1,16 @@
 [
   {
+    "nsr": {
+      "total_households": 259,
+      "total_individuals": 10033,
+      "children_0_17": 3845,
+      "children_0_5": 840,
+      "youth_18_24": 1223,
+      "plwd": 69,
+      "children_with_disabilities": 5,
+      "pregnant_women": 98,
+      "lactating_mothers": 9
+    },
     "total_households": 259,
     "total_individuals": 10033,
     "children_0_17": 3845,
@@ -130,6 +141,17 @@
     "state": "ABIA"
   },
   {
+    "nsr": {
+      "total_households": 563,
+      "total_individuals": 28707,
+      "children_0_17": 10945,
+      "children_0_5": 2412,
+      "youth_18_24": 4608,
+      "plwd": 642,
+      "children_with_disabilities": 77,
+      "pregnant_women": 1066,
+      "lactating_mothers": 300
+    },
     "total_households": 563,
     "total_individuals": 28707,
     "children_0_17": 10945,
@@ -260,6 +282,17 @@
     "state": "BENUE"
   },
   {
+    "nsr": {
+      "total_households": 490,
+      "total_individuals": 76442,
+      "children_0_17": 31668,
+      "children_0_5": 8074,
+      "youth_18_24": 10328,
+      "plwd": 436,
+      "children_with_disabilities": 47,
+      "pregnant_women": 620,
+      "lactating_mothers": 149
+    },
     "total_households": 490,
     "total_individuals": 76442,
     "children_0_17": 31668,
@@ -390,6 +423,17 @@
     "state": "OYO"
   },
   {
+    "nsr": {
+      "total_households": 402,
+      "total_individuals": 23494,
+      "children_0_17": 11230,
+      "children_0_5": 3857,
+      "youth_18_24": 2853,
+      "plwd": 229,
+      "children_with_disabilities": 92,
+      "pregnant_women": 699,
+      "lactating_mothers": 260
+    },
     "total_households": 402,
     "total_individuals": 23494,
     "children_0_17": 11230,

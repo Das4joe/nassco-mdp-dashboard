@@ -1,4 +1,15 @@
 {
+  "nsr": {
+    "total_households": 594,
+    "total_individuals": 138676,
+    "children_0_17": 57688,
+    "children_0_5": 15183,
+    "youth_18_24": 19012,
+    "plwd": 1376,
+    "children_with_disabilities": 221,
+    "pregnant_women": 2483,
+    "lactating_mothers": 718
+  },
   "total_households": 594,
   "total_individuals": 138676,
   "children_0_17": 57688,
