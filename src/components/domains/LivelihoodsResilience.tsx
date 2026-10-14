@@ -1,10 +1,12 @@
 import React from "react";
 import type { GeoRecord, DrilldownPath } from "../../lib/types";
 import type { DashboardData } from "../../lib/loadData";
+import KpiCard from "../KpiCard";
 import { ChartCard } from "./ChartCard";
 import DrilldownMap from "../maps/DrilldownMap";
+import { Briefcase, UserX, Home, AlertTriangle, Users } from "lucide-react";
 
-interface LivelihoodsResilienceProps {
+interface Props {
   data: DashboardData;
   record: GeoRecord;
   path: DrilldownPath;
@@ -12,124 +14,114 @@ interface LivelihoodsResilienceProps {
   stateFilter?: string;
 }
 
-export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
+export const LivelihoodsResilience: React.FC<Props> = ({
   data,
   record,
   path,
   onPathChange,
   stateFilter,
 }) => {
-  const liv = record.extended.livelihoods_resilience_v2 ?? {
-    shock_exposure: { shock_hh_count: 0 },
-  };
+  const rec = (record || {}) as any;
+  const ext = rec.extended || {};
+  const liv =
+    ext.livelihoods_resilience_v2 || ext.livelihoods || rec.livelihoods || {};
 
-  const youth = record.extended.youth ?? { employed: 0, unemployed: 0 };
-  const femaleHeaded = record.extended.female_primary_respondent?.n || 0;
-  const childrenRiskProne = record.extended.children_in_risk_hh?.n || 0;
+  const femaleHeaded = Number(liv.female_headed_hhs ?? 0);
+  const youthEmployed = Number(liv.youth_employed ?? 0);
+  const youthUnemployed = Number(liv.youth_unemployed ?? 0);
+  const shockProne = Number(liv.shock_prone_hhs ?? 0);
+  const childrenInRisk = Number(liv.children_in_risk_hhs ?? 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
-        <div>
-          <h2 className="text-xl font-bold text-ink-primary dark:text-ink-onDark">
-            Livelihoods
-          </h2>
-        </div>
-      </div>
-
       <div>
         <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
-          Indicator
+          Livelihoods
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          {[
-            { l: "Female-Headed Households", v: femaleHeaded, c: "#9333EA" },
-            { l: "Source of Livelihood (HHs)", v: 0, c: "#64748b", ph: true },
-            { l: "Youth employment", v: youth.employed, c: "#059669" },
-            { l: "Youth unemployment", v: youth.unemployed, c: "#DC2626" },
-            {
-              l: "Shock-Prone Households",
-              v: liv.shock_exposure.shock_hh_count,
-              c: "#D97706",
-            },
-            {
-              l: "Children in Risk-Prone Households",
-              v: childrenRiskProne,
-              c: "#E67E22",
-            },
-            { l: "Household Coping mechanisms", v: 0, c: "#64748b", ph: true },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-lg p-3 shadow-sm flex flex-col justify-between"
-            >
-              <div className="text-[10px] uppercase font-bold text-ink-muted dark:text-ink-onDarkMuted mb-2 leading-tight">
-                {item.l}
-              </div>
-              {item.ph ? (
-                <div className="text-[10px] italic text-ink-faint">
-                  Not isolated in export
-                </div>
-              ) : (
-                <div className="text-xl font-black" style={{ color: item.c }}>
-                  {item.v.toLocaleString()}
-                </div>
-              )}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <KpiCard
+            label="Female-Headed Households"
+            value={femaleHeaded.toLocaleString()}
+            icon={<Home size={16} />}
+            accent="#7C3AED"
+          />
+          <KpiCard
+            label="Youth Employment"
+            value={youthEmployed.toLocaleString()}
+            icon={<Briefcase size={16} />}
+            accent="#059669"
+          />
+          <KpiCard
+            label="Youth Unemployment"
+            value={youthUnemployed.toLocaleString()}
+            icon={<UserX size={16} />}
+            accent="#DC2626"
+          />
+          <KpiCard
+            label="Shock-Prone Households"
+            value={shockProne.toLocaleString()}
+            icon={<AlertTriangle size={16} />}
+            accent="#D97706"
+          />
+          <KpiCard
+            label="Children in Risk-Prone Households"
+            value={childrenInRisk.toLocaleString()}
+            icon={<Users size={16} />}
+            accent="#B91C1C"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        <div
+          className="xl:col-span-1 rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card overflow-hidden"
+          style={{ height: 420 }}
+        >
+          <DrilldownMap
+            data={data}
+            path={path}
+            onPathChange={onPathChange}
+            selectedStateFilter={stateFilter}
+            metric="vulnerability"
+          />
+        </div>
+        <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ChartCard title="Children in Risk-Prone Households" height={260}>
+            <div className="h-full min-h-[180px] flex items-center justify-center text-3xl font-bold text-emerald-400">
+              {childrenInRisk.toLocaleString()}
             </div>
-          ))}
+          </ChartCard>
+          <ChartCard
+            title="Female-headed households (shock prone)"
+            height={260}
+          >
+            <div className="h-full min-h-[180px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
+              Cross-tabulation of female-headed × shock-prone households is
+              staged for the next data expansion.
+            </div>
+          </ChartCard>
+          <ChartCard
+            title="Households with disabilities (shock prone)"
+            height={260}
+          >
+            <div className="h-full min-h-[180px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
+              Disability × shock-prone household cross-tab is not captured in
+              the current survey wave.
+            </div>
+          </ChartCard>
+          <ChartCard
+            title="Households with multiple vulnerable members"
+            height={260}
+          >
+            <div className="h-full min-h-[180px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
+              Multiple vulnerability member counts require additional
+              household-level scoring in a future wave.
+            </div>
+          </ChartCard>
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
-          Shock Exposure Map
-        </div>
-        <DrilldownMap
-          data={data}
-          path={path}
-          onPathChange={onPathChange}
-          selectedStateFilter={stateFilter}
-          metric="shocks"
-          height={400}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ChartCard title="Children in Risk-Prone Households" height={280}>
-          <div className="h-full flex items-center justify-center text-3xl font-black text-brand-600">
-            {childrenRiskProne.toLocaleString()}
-          </div>
-        </ChartCard>
-        <ChartCard title="Female-headed households (shock prone)" height={280}>
-          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
-            Cross-tabulation (Female Headed × Shock Exposure) not captured in
-            backend export.
-          </div>
-        </ChartCard>
-        <ChartCard
-          title="Households with disabilities (shock prone)"
-          height={280}
-        >
-          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
-            Cross-tabulation (Disabilities × Shock Exposure) not captured in
-            backend export.
-          </div>
-        </ChartCard>
-        <ChartCard
-          title="Households with multiple vulnerable members"
-          height={280}
-        >
-          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
-            Indicator logic not captured in backend export.
-          </div>
-        </ChartCard>
-        <ChartCard title="Large households" height={280}>
-          <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
-            Indicator logic not captured in backend export.
-          </div>
-        </ChartCard>
       </div>
     </div>
   );
 };
+
 export default LivelihoodsResilience;

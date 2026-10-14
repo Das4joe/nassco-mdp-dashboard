@@ -25,12 +25,12 @@ def clean_geo_name(val):
 
 
 def compute_metrics(sub_df):
-    """Computes all UNICEF MDP metrics for a given subset of data."""
+    """Computes all UNICEF MDP metrics matching the exact nested structure expected by React."""
     total_records = len(sub_df)
     if total_records == 0:
         return {}
 
-    # Correct Unique Household Identification (hhnsrrno)
+    # Unique Registered Household Identification (hhnsrrno)
     hh_col = "hhnsrrno" if "hhnsrrno" in sub_df.columns else "hhno"
     total_households = int(sub_df[hh_col].nunique())
 
@@ -48,7 +48,7 @@ def compute_metrics(sub_df):
     pregnant_total = int((sub_df["is_female"] & sub_df["is_pregnant"]).sum())
     lactating_total = int((sub_df["is_female"] & sub_df["is_lactating"]).sum())
 
-    # 2. DEMOGRAPHICS & POPULATION PYRAMID (0-24)
+    # 2. POPULATION PYRAMID (0-24)
     pyramid_bands = [
         ("0-4", 0, 4),
         ("5-9", 5, 9),
@@ -63,7 +63,15 @@ def compute_metrics(sub_df):
         band_mask = (sub_df["agey"] >= min_a) & (sub_df["agey"] <= max_a)
         boys = int((band_mask & sub_df["is_male"]).sum())
         girls = int((band_mask & sub_df["is_female"]).sum())
-        item = {"band": label, "ageGroup": label, "male": boys, "female": girls, "boys": boys, "girls": girls, "total": boys + girls}
+        item = {
+            "band": label,
+            "ageGroup": label,
+            "male": boys,
+            "female": girls,
+            "boys": boys,
+            "girls": girls,
+            "total": boys + girls,
+        }
         age_sex_pyramid.append(item)
         pyramid_0_24.append(item)
 
@@ -90,7 +98,52 @@ def compute_metrics(sub_df):
         },
     }
 
-    # 3. CIVIL REGISTRATION
+    # 3. EDUCATION_V2 (EXACT NESTED SCHEMA EXPECTED BY Education.tsx)
+    oos_6_9_m = int((sub_df["is_6_9"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum())
+    oos_6_9_f = int((sub_df["is_6_9"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum())
+    oos_6_9_tot = oos_6_9_m + oos_6_9_f
+
+    oos_10_14_m = int((sub_df["is_10_14"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum())
+    oos_10_14_f = int((sub_df["is_10_14"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum())
+    oos_10_14_tot = oos_10_14_m + oos_10_14_f
+
+    oos_15_17_m = int((sub_df["is_15_17"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum())
+    oos_15_17_f = int((sub_df["is_15_17"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum())
+    oos_15_17_tot = oos_15_17_m + oos_15_17_f
+
+    oos_6_17_m = oos_6_9_m + oos_10_14_m + oos_15_17_m
+    oos_6_17_f = oos_6_9_f + oos_10_14_f + oos_15_17_f
+    oos_6_17_tot = oos_6_17_m + oos_6_17_f
+
+    disabled_oos = int((sub_df["is_0_17"] & sub_df["is_disabled"] & sub_df["is_out_of_school"]).sum())
+
+    education_v2 = {
+        "oos_6_17": {
+            "oos": oos_6_17_tot,
+            "male": {"oos": oos_6_17_m},
+            "female": {"oos": oos_6_17_f},
+        },
+        "oos_6_9": {
+            "oos": oos_6_9_tot,
+            "male": {"oos": oos_6_9_m},
+            "female": {"oos": oos_6_9_f},
+        },
+        "oos_10_14": {
+            "oos": oos_10_14_tot,
+            "male": {"oos": oos_10_14_m},
+            "female": {"oos": oos_10_14_f},
+        },
+        "oos_15_17": {
+            "oos": oos_15_17_tot,
+            "male": {"oos": oos_15_17_m},
+            "female": {"oos": oos_15_17_f},
+        },
+        "disabled_children": {
+            "oos": disabled_oos
+        },
+    }
+
+    # 4. CIVIL REGISTRATION
     c_0_17_with_bc = int((sub_df["is_0_17"] & sub_df["has_bc"]).sum())
     c_0_5_with_bc = int((sub_df["is_0_5"] & sub_df["has_bc"]).sum())
     c_0_17_no_bc = int((sub_df["is_0_17"] & sub_df["no_bc"]).sum())
@@ -123,34 +176,6 @@ def compute_metrics(sub_df):
         "c_0_5_bc_no_nin": c_0_5_bc_no_nin,
         "c_0_17_nin_no_bc": c_0_17_nin_no_bc,
         "c_0_5_nin_no_bc": c_0_5_nin_no_bc,
-        "bc_by_gender": {
-            "boys_with_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_bc"]).sum()),
-            "girls_with_bc": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_bc"]).sum()),
-            "boys_no_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_bc"]).sum()),
-            "girls_no_bc": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_bc"]).sum()),
-        },
-        "nin_by_gender": {
-            "boys_with_nin": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_nin"]).sum()),
-            "girls_with_nin": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["has_nin"]).sum()),
-            "boys_no_nin": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_nin"]).sum()),
-            "girls_no_nin": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["no_nin"]).sum()),
-        },
-    }
-
-    # 4. EDUCATION
-    education_dict = {
-        "out_of_school_6_9": int((sub_df["is_6_9"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_10_14": int((sub_df["is_10_14"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_15_17": int((sub_df["is_15_17"] & sub_df["is_out_of_school"]).sum()),
-        "disabled_never_enrolled_0_17": int((sub_df["is_0_17"] & sub_df["is_disabled"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_6_9_boys": int((sub_df["is_6_9"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_6_9_girls": int((sub_df["is_6_9"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_10_14_boys": int((sub_df["is_10_14"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_10_14_girls": int((sub_df["is_10_14"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_15_17_boys": int((sub_df["is_15_17"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
-        "out_of_school_15_17_girls": int((sub_df["is_15_17"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
-        "not_attending_0_17_boys": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["is_out_of_school"]).sum()),
-        "not_attending_0_17_girls": int((sub_df["is_0_17"] & sub_df["is_female"] & sub_df["is_out_of_school"]).sum()),
     }
 
     # 5. HEALTH & NUTRITION
@@ -158,37 +183,31 @@ def compute_metrics(sub_df):
     mam_children = int((sub_df["muac_cat"] == 2.0).sum())
     normal_children = int((sub_df["muac_cat"] == 3.0).sum())
 
-    health_dict = {
+    health_v2 = {
         "pregnant_total": pregnant_total,
-        "pregnant_women": pregnant_total,
         "lactating_total": lactating_total,
-        "lactating_mothers": lactating_total,
         "plwd_total": plwd_total,
-        "plwd": plwd_total,
         "children_plwd": children_plwd,
-        "children_with_disabilities": children_plwd,
         "health_insurance_0_7_covered": 0,
         "health_insurance_0_7_not_covered": int((sub_df["agey"] <= 7).sum()),
         "health_insurance_0_5_covered": 0,
         "health_insurance_0_5_not_covered": children_0_5,
     }
 
-    nutrition_dict = {
+    nutrition_v2 = {
         "pregnant_total": pregnant_total,
-        "pregnant_women": pregnant_total,
         "lactating_total": lactating_total,
-        "lactating_mothers": lactating_total,
         "sam_children": sam_children,
         "mam_children": mam_children,
         "normal_children": normal_children,
     }
 
-    # 6. LIVELIHOODS & SHOCKS
+    # 6. LIVELIHOODS
     female_headed_hhs = int(sub_df[sub_df["is_female_head"]][hh_col].nunique())
     shock_prone_hhs = int(sub_df[sub_df["has_shock"]][hh_col].nunique())
     children_in_risk_hhs = int((sub_df["is_0_17"] & sub_df["has_shock"]).sum())
 
-    livelihoods_dict = {
+    livelihoods_resilience_v2 = {
         "female_headed_hhs": female_headed_hhs,
         "youth_employed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] != "Unemployed")).sum()),
         "youth_unemployed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] == "Unemployed")).sum()),
@@ -217,7 +236,6 @@ def compute_metrics(sub_df):
         "lactating_mothers": lactating_total,
     }
 
-    # Construct complete payload satisfying BOTH legacy `extended.*` and root structures
     return {
         "nsr": nsr_data,
         "total_households": total_households,
@@ -232,20 +250,20 @@ def compute_metrics(sub_df):
         "pyramid_0_24": pyramid_0_24,
         "gender_ratio": {"boys": age_bands_v2["0-17"]["male"], "girls": age_bands_v2["0-17"]["female"]},
         "civil_registration": civil_reg_dict,
-        "education": education_dict,
-        "health_nutrition": health_dict,
-        "nutrition": nutrition_dict,
-        "livelihoods": livelihoods_dict,
+        "education": education_v2,
+        "health_nutrition": health_v2,
+        "nutrition": nutrition_v2,
+        "livelihoods": livelihoods_resilience_v2,
 
         # EXTENDED OBJECT (Eliminates `t.extended is undefined` errors on tabs)
         "extended": {
             "age_sex_pyramid": age_sex_pyramid,
             "age_bands_v2": age_bands_v2,
             "civil_registration": civil_reg_dict,
-            "education_v2": education_dict,
-            "health_v2": health_dict,
-            "nutrition_v2": nutrition_dict,
-            "livelihoods_resilience_v2": livelihoods_dict,
+            "education_v2": education_v2,
+            "health_v2": health_v2,
+            "nutrition_v2": nutrition_v2,
+            "livelihoods_resilience_v2": livelihoods_resilience_v2,
         },
     }
 

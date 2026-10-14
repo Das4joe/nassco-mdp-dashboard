@@ -92,43 +92,54 @@
     "c_0_17_bc_no_nin": 9536,
     "c_0_5_bc_no_nin": 2743,
     "c_0_17_nin_no_bc": 1084,
-    "c_0_5_nin_no_bc": 26,
-    "bc_by_gender": {
-      "boys_with_bc": 5408,
-      "girls_with_bc": 4549,
-      "boys_no_bc": 25756,
-      "girls_no_bc": 21975
-    },
-    "nin_by_gender": {
-      "boys_with_nin": 701,
-      "girls_with_nin": 804,
-      "boys_no_nin": 30463,
-      "girls_no_nin": 25720
-    }
+    "c_0_5_nin_no_bc": 26
   },
   "education": {
-    "out_of_school_6_9": 5265,
-    "out_of_school_10_14": 4329,
-    "out_of_school_15_17": 2810,
-    "disabled_never_enrolled_0_17": 132,
-    "out_of_school_6_9_boys": 3051,
-    "out_of_school_6_9_girls": 2214,
-    "out_of_school_10_14_boys": 2592,
-    "out_of_school_10_14_girls": 1737,
-    "out_of_school_15_17_boys": 1543,
-    "out_of_school_15_17_girls": 1267,
-    "not_attending_0_17_boys": 12426,
-    "not_attending_0_17_girls": 9565
+    "oos_6_17": {
+      "oos": 12404,
+      "male": {
+        "oos": 7186
+      },
+      "female": {
+        "oos": 5218
+      }
+    },
+    "oos_6_9": {
+      "oos": 5265,
+      "male": {
+        "oos": 3051
+      },
+      "female": {
+        "oos": 2214
+      }
+    },
+    "oos_10_14": {
+      "oos": 4329,
+      "male": {
+        "oos": 2592
+      },
+      "female": {
+        "oos": 1737
+      }
+    },
+    "oos_15_17": {
+      "oos": 2810,
+      "male": {
+        "oos": 1543
+      },
+      "female": {
+        "oos": 1267
+      }
+    },
+    "disabled_children": {
+      "oos": 132
+    }
   },
   "health_nutrition": {
     "pregnant_total": 2483,
-    "pregnant_women": 2483,
     "lactating_total": 718,
-    "lactating_mothers": 718,
     "plwd_total": 1376,
-    "plwd": 1376,
     "children_plwd": 221,
-    "children_with_disabilities": 221,
     "health_insurance_0_7_covered": 0,
     "health_insurance_0_7_not_covered": 22960,
     "health_insurance_0_5_covered": 0,
@@ -136,9 +147,7 @@
   },
   "nutrition": {
     "pregnant_total": 2483,
-    "pregnant_women": 2483,
     "lactating_total": 718,
-    "lactating_mothers": 718,
     "sam_children": 7990,
     "mam_children": 2166,
     "normal_children": 982
@@ -234,43 +243,54 @@
       "c_0_17_bc_no_nin": 9536,
       "c_0_5_bc_no_nin": 2743,
       "c_0_17_nin_no_bc": 1084,
-      "c_0_5_nin_no_bc": 26,
-      "bc_by_gender": {
-        "boys_with_bc": 5408,
-        "girls_with_bc": 4549,
-        "boys_no_bc": 25756,
-        "girls_no_bc": 21975
-      },
-      "nin_by_gender": {
-        "boys_with_nin": 701,
-        "girls_with_nin": 804,
-        "boys_no_nin": 30463,
-        "girls_no_nin": 25720
-      }
+      "c_0_5_nin_no_bc": 26
     },
     "education_v2": {
-      "out_of_school_6_9": 5265,
-      "out_of_school_10_14": 4329,
-      "out_of_school_15_17": 2810,
-      "disabled_never_enrolled_0_17": 132,
-      "out_of_school_6_9_boys": 3051,
-      "out_of_school_6_9_girls": 2214,
-      "out_of_school_10_14_boys": 2592,
-      "out_of_school_10_14_girls": 1737,
-      "out_of_school_15_17_boys": 1543,
-      "out_of_school_15_17_girls": 1267,
-      "not_attending_0_17_boys": 12426,
-      "not_attending_0_17_girls": 9565
+      "oos_6_17": {
+        "oos": 12404,
+        "male": {
+          "oos": 7186
+        },
+        "female": {
+          "oos": 5218
+        }
+      },
+      "oos_6_9": {
+        "oos": 5265,
+        "male": {
+          "oos": 3051
+        },
+        "female": {
+          "oos": 2214
+        }
+      },
+      "oos_10_14": {
+        "oos": 4329,
+        "male": {
+          "oos": 2592
+        },
+        "female": {
+          "oos": 1737
+        }
+      },
+      "oos_15_17": {
+        "oos": 2810,
+        "male": {
+          "oos": 1543
+        },
+        "female": {
+          "oos": 1267
+        }
+      },
+      "disabled_children": {
+        "oos": 132
+      }
     },
     "health_v2": {
       "pregnant_total": 2483,
-      "pregnant_women": 2483,
       "lactating_total": 718,
-      "lactating_mothers": 718,
       "plwd_total": 1376,
-      "plwd": 1376,
       "children_plwd": 221,
-      "children_with_disabilities": 221,
       "health_insurance_0_7_covered": 0,
       "health_insurance_0_7_not_covered": 22960,
       "health_insurance_0_5_covered": 0,
@@ -278,9 +298,7 @@
     },
     "nutrition_v2": {
       "pregnant_total": 2483,
-      "pregnant_women": 2483,
       "lactating_total": 718,
-      "lactating_mothers": 718,
       "sam_children": 7990,
       "mam_children": 2166,
       "normal_children": 982

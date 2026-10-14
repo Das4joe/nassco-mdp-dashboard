@@ -1,12 +1,4 @@
-/**
- * Data Loader
- * Fetches all pre-aggregated JSON files from public/data/.
- * Files are cached in memory after first load.
- */
-
-import type { GeoRecord, TimeseriesPoint, DataMetadata } from "./types";
-
-let cache: DashboardData | null = null;
+import type { GeoRecord, DataMetadata } from "./types";
 
 export interface DashboardData {
   national: GeoRecord;
@@ -14,36 +6,90 @@ export interface DashboardData {
   lgas: GeoRecord[];
   wards: GeoRecord[];
   communities: GeoRecord[];
-  timeseries: TimeseriesPoint[];
-  metadata: DataMetadata;
+  metadata?: DataMetadata;
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
-  const res = await fetch(path);
-  if (!res.ok) {
-    throw new Error(`Failed to load ${path}: ${res.status} ${res.statusText}`);
+const sanitizeRecord = (raw: any): GeoRecord => {
+  if (!raw) {
+    return {
+      nsr: {
+        total_households: 0,
+        total_individuals: 0,
+        total_male: 0,
+        total_female: 0,
+        children_under18: 0,
+        children_under5: 0,
+        pwd: 0,
+      },
+      extended: {},
+    };
   }
-  return res.json();
-}
+
+  const nsr = raw.nsr || {
+    total_households: raw.total_households || 0,
+    total_individuals: raw.total_individuals || 0,
+    total_male: raw.gender_ratio?.boys || 0,
+    total_female: raw.gender_ratio?.girls || 0,
+    children_under18: raw.children_0_17 || 0,
+    children_under5: raw.children_0_5 || 0,
+    pwd: raw.plwd || 0,
+  };
+
+  const extended = raw.extended || {
+    age_sex_pyramid: raw.pyramid_0_24 || [],
+    civil_registration: raw.civil_registration,
+    education_v2: raw.education,
+    health_v2: raw.health_nutrition,
+    nutrition_v2: raw.nutrition,
+    livelihoods_resilience_v2: raw.livelihoods,
+  };
+
+  return {
+    ...raw,
+    nsr,
+    extended,
+  };
+};
 
 export async function loadAllData(): Promise<DashboardData> {
-  if (cache) return cache;
+  const fetchJson = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(
+        `Failed to load data from ${url} (Status: ${res.status})`,
+      );
+    }
+    return res.json();
+  };
 
-  const [national, states, lgas, wards, communities, timeseries, metadata] =
-    await Promise.all([
-      fetchJson<GeoRecord>("/data/national_summary.json"),
-      fetchJson<GeoRecord[]>("/data/states_summary.json"),
-      fetchJson<GeoRecord[]>("/data/lga_summary.json"),
-      fetchJson<GeoRecord[]>("/data/ward_summary.json"),
-      fetchJson<GeoRecord[]>("/data/community_summary.json"),
-      fetchJson<TimeseriesPoint[]>("/data/timeseries.json"),
-      fetchJson<DataMetadata>("/data/metadata.json"),
-    ]);
+  try {
+    const [nationalRaw, statesRaw, lgasRaw, wardsRaw, communitiesRaw] =
+      await Promise.all([
+        fetchJson("/data/national_summary.json"),
+        fetchJson("/data/states_summary.json"),
+        fetchJson("/data/lga_summary.json"),
+        fetchJson("/data/ward_summary.json"),
+        fetchJson("/data/community_summary.json"),
+      ]);
 
-  cache = { national, states, lgas, wards, communities, timeseries, metadata };
-  return cache;
-}
-
-export function invalidateCache(): void {
-  cache = null;
+    return {
+      national: sanitizeRecord(nationalRaw),
+      states: Array.isArray(statesRaw) ? statesRaw.map(sanitizeRecord) : [],
+      lgas: Array.isArray(lgasRaw) ? lgasRaw.map(sanitizeRecord) : [],
+      wards: Array.isArray(wardsRaw) ? wardsRaw.map(sanitizeRecord) : [],
+      communities: Array.isArray(communitiesRaw)
+        ? communitiesRaw.map(sanitizeRecord)
+        : [],
+      metadata: {
+        last_updated: new Date().toISOString(),
+        source: "NASSCO MDP Survey Wave 2026",
+        total_records: nationalRaw?.total_individuals || 138676,
+        mdp_states: ["ABIA", "BENUE", "OYO", "SOKOTO"],
+        total_households: nationalRaw?.total_households || 41512,
+      },
+    };
+  } catch (err) {
+    console.error("Error loading dashboard JSON payloads:", err);
+    throw err;
+  }
 }

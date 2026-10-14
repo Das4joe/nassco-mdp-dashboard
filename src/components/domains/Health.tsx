@@ -1,9 +1,4 @@
-import { type FC } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import type { DashboardData } from "../../lib/loadData";
-import { useChartTheme } from "../../lib/useChartTheme";
-import { ChartCard } from "./ChartCard";
-import DrilldownMap from "../maps/DrilldownMap";
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -11,10 +6,16 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  CartesianGrid,
 } from "recharts";
+import type { GeoRecord, DrilldownPath } from "../../lib/types";
+import type { DashboardData } from "../../lib/loadData";
+import KpiCard from "../KpiCard";
+import { ChartCard } from "./ChartCard";
+import DrilldownMap from "../maps/DrilldownMap";
+import { Heart, Activity, ShieldCheck, Baby } from "lucide-react";
 
-interface HealthProps {
+interface Props {
   data: DashboardData;
   record: GeoRecord;
   path: DrilldownPath;
@@ -22,186 +23,152 @@ interface HealthProps {
   stateFilter?: string;
 }
 
-export const Health: FC<HealthProps> = ({
+export const Health: React.FC<Props> = ({
   data,
   record,
   path,
   onPathChange,
   stateFilter,
 }) => {
-  const theme = useChartTheme();
-  const labelVal = {
-    position: "top" as const,
-    fill: theme.axisTick,
-    fontSize: 11,
-    formatter: (v: number) => (v > 0 ? v.toLocaleString() : ""),
-  };
+  const rec = (record || {}) as any;
+  const ext = rec.extended || {};
+  const health =
+    ext.health_v2 || ext.health_nutrition || rec.health_nutrition || {};
 
-  const h2 = record.extended.health_v2 ?? {
-    pregnant_total: 0,
-    lactating_total: 0,
-    plwd_total: 0,
-    children_plwd: 0,
-    children_0_5_insurance: 0,
-    children_0_7_insurance: 0,
-    children_0_5_no_insurance: 0,
-    children_0_7_no_insurance: 0,
-  };
+  const pregnant = Number(health.pregnant_total ?? health.pregnant_women ?? 0);
+  const lactating = Number(
+    health.lactating_total ?? health.lactating_mothers ?? 0,
+  );
+  const plwd = Number(health.plwd_total ?? health.plwd ?? 0);
+  const childrenPlwd = Number(
+    health.children_plwd ?? health.children_with_disabilities ?? 0,
+  );
+  const ins07Covered = Number(health.health_insurance_0_7_covered ?? 0);
+  const ins07Not = Number(health.health_insurance_0_7_not_covered ?? 0);
+  const ins05Covered = Number(health.health_insurance_0_5_covered ?? 0);
+  const ins05Not = Number(health.health_insurance_0_5_not_covered ?? 0);
 
-  const insuranceData07 = [
-    {
-      name: "Covered by Health Insurance",
-      count: h2.children_0_7_insurance ?? 0,
-      color: "#059669",
-    },
-    {
-      name: "No Health Insurance Cover",
-      count: h2.children_0_7_no_insurance ?? 0,
-      color: "#DC2626",
-    },
+  const chart07 = [
+    { name: "Covered by Health Insurance", value: ins07Covered },
+    { name: "No Health Insurance Cover", value: ins07Not },
   ];
-
-  const insuranceData05 = [
-    {
-      name: "Covered by Health Insurance",
-      count: h2.children_0_5_insurance ?? 0,
-      color: "#059669",
-    },
-    {
-      name: "No Health Insurance Cover",
-      count: h2.children_0_5_no_insurance ?? 0,
-      color: "#DC2626",
-    },
+  const chart05 = [
+    { name: "Covered by Health Insurance", value: ins05Covered },
+    { name: "No Health Insurance Cover", value: ins05Not },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
-        <div>
-          <h2 className="text-xl font-bold text-ink-primary dark:text-ink-onDark">
-            Health
-          </h2>
-        </div>
-      </div>
-
       <div>
         <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
-          Indicator
+          Health
         </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            {
-              l: "Currently Pregnant",
-              v: h2.pregnant_total || 0,
-              c: "#9333EA",
-            },
-            {
-              l: "Lactating Mothers",
-              v: h2.lactating_total || 0,
-              c: "#0284C7",
-            },
-            {
-              l: "Persons w/ Disabilities",
-              v: h2.plwd_total || 0,
-              c: "#128C7E",
-            },
-            {
-              l: "Children w/ Disabilities",
-              v: h2.children_plwd || 0,
-              c: "#D97706",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-lg p-3 shadow-sm flex flex-col justify-between"
-            >
-              <div className="text-[10px] uppercase font-bold text-ink-muted dark:text-ink-onDarkMuted mb-2 leading-tight">
-                {item.l}
-              </div>
-              <div className="text-xl font-black" style={{ color: item.c }}>
-                {item.v.toLocaleString()}
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <KpiCard
+            label="Currently Pregnant"
+            value={pregnant.toLocaleString()}
+            icon={<Heart size={16} />}
+            accent="#9333EA"
+          />
+          <KpiCard
+            label="Lactating Mothers"
+            value={lactating.toLocaleString()}
+            icon={<ShieldCheck size={16} />}
+            accent="#0284C7"
+          />
+          <KpiCard
+            label="Persons with Disabilities"
+            value={plwd.toLocaleString()}
+            icon={<Activity size={16} />}
+            accent="#DC2626"
+          />
+          <KpiCard
+            label="Children with Disabilities"
+            value={childrenPlwd.toLocaleString()}
+            icon={<Baby size={16} />}
+            accent="#B91C1C"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        <div
+          className="xl:col-span-1 rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card overflow-hidden"
+          style={{ height: 420 }}
+        >
+          <DrilldownMap
+            data={data}
+            path={path}
+            onPathChange={onPathChange}
+            selectedStateFilter={stateFilter}
+            metric="vulnerability"
+          />
+        </div>
+        <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ChartCard
+            title="Children (0-7) living in household health insurance status"
+            height={280}
+          >
+            <div style={{ width: "100%", height: 220 }}>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chart07}>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#334155"
+                    opacity={0.3}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#94a3b8", fontSize: 10 }}
+                  />
+                  <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #334155",
+                      borderRadius: 8,
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-          ))}
+          </ChartCard>
+          <ChartCard
+            title="Children (0-5) living in household health insurance status"
+            height={280}
+          >
+            <div style={{ width: "100%", height: 220 }}>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chart05}>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#334155"
+                    opacity={0.3}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: "#94a3b8", fontSize: 10 }}
+                  />
+                  <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0F172A",
+                      border: "1px solid #334155",
+                      borderRadius: 8,
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#F87171" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="text-xs font-semibold text-ink-primary dark:text-ink-onDark">
-          Vulnerability Map
-        </div>
-        <DrilldownMap
-          data={data}
-          path={path}
-          onPathChange={onPathChange}
-          selectedStateFilter={stateFilter}
-          metric="vulnerability"
-          height={400}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard
-          title="Children (0-7) living in household health insurance status"
-          height={300}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={insuranceData07}
-              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
-            >
-              <XAxis
-                dataKey="name"
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} label={labelVal}>
-                {insuranceData07.map((e, i) => (
-                  <Cell key={i} fill={e.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard
-          title="Children (0-5) living in household health insurance status"
-          height={300}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={insuranceData05}
-              margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
-            >
-              <XAxis
-                dataKey="name"
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: theme.axisTick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip contentStyle={theme.tooltip} />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} label={labelVal}>
-                {insuranceData05.map((e, i) => (
-                  <Cell key={i} fill={e.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
       </div>
     </div>
   );
 };
+
 export default Health;
