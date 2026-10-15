@@ -79,6 +79,25 @@ export const Education: React.FC<EducationProps> = ({
     { gender: "Girls not attending (0-17)", count: oos617Female },
   ];
 
+  // --- NEW: Disabled never enrolled by gender ---
+  const disabledByGender =
+    ext.disabled_never_enrolled_by_gender ??
+    rec.disabled_never_enrolled_by_gender ??
+    null;
+
+  const disabledOosGenderData = disabledByGender
+    ? [
+        {
+          gender: "Boys",
+          count: Number(disabledByGender.boys ?? 0),
+        },
+        {
+          gender: "Girls",
+          count: Number(disabledByGender.girls ?? 0),
+        },
+      ]
+    : null;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-line-light dark:border-line-dark">
@@ -285,14 +304,42 @@ export const Education: React.FC<EducationProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
-          title="Children with disabilities never enrolled (0-17)"
+          title="Children with disabilities never enrolled (6-17)"
           height={280}
         >
-          <div className="h-full min-h-[180px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
-            Gender disaggregation for non-enrolled children with disabilities is
-            not captured in the current JSON export. Total:{" "}
-            {disabledChildrenOos.toLocaleString()}
-          </div>
+          {disabledOosGenderData ? (
+            <div style={{ width: "100%", height: 220 }}>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart
+                  data={disabledOosGenderData}
+                  margin={{ top: 25, right: 12, left: -8, bottom: 4 }}
+                >
+                  <XAxis
+                    dataKey="gender"
+                    tick={{ fill: theme?.axisTick || "#94a3b8", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: theme?.axisTick || "#94a3b8", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip contentStyle={theme?.tooltip} />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} label={labelVal}>
+                    {disabledOosGenderData.map((_, i) => (
+                      <Cell key={i} fill={i === 0 ? "#0284C7" : "#E67E22"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-full min-h-[180px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/50">
+              Gender disaggregation will appear after running the updated
+              aggregator. Total: {disabledChildrenOos.toLocaleString()}
+            </div>
+          )}
         </ChartCard>
       </div>
     </div>

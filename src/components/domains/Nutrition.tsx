@@ -52,6 +52,40 @@ export const Nutrition: React.FC<Props> = ({
     { name: "Normal", value: normal, color: "#10B981" },
   ];
 
+  // --- NEW: Nutrition programme enrolment ---
+  const progData = ext.nutrition_programme ?? rec.nutrition_programme ?? null;
+
+  const progEnrolled = progData
+    ? [
+        {
+          programme: "RUTF",
+          count: Number(progData.rutf ?? 0),
+        },
+        {
+          programme: "Food",
+          count: Number(progData.food ?? 0),
+        },
+        {
+          programme: "Cash",
+          count: Number(progData.cash ?? 0),
+        },
+      ]
+    : null;
+
+  const totalEnrolled = Number(progData?.enrolled ?? 0);
+  const totalNotEnrolled = Number(progData?.not_enrolled ?? 0);
+  const totalSamMam = Number(progData?.total_sam_mam ?? 0);
+  const enrolledPct =
+    totalSamMam > 0 ? ((totalEnrolled / totalSamMam) * 100).toFixed(1) : "0.0";
+
+  const tooltipStyle = {
+    backgroundColor: "#0F172A",
+    border: "1px solid #334155",
+    borderRadius: 8,
+    color: "#F8FAFC",
+    fontSize: 12,
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -78,13 +112,13 @@ export const Nutrition: React.FC<Props> = ({
             accent="#DC2626"
           />
           <KpiCard
-            label="Children Moderately Acute Malnutrition - MAM"
+            label="Children with Moderate Acute Malnutrition - MAM"
             value={mam.toLocaleString()}
             icon={<Activity size={16} />}
             accent="#F59E0B"
           />
           <KpiCard
-            label="Children Moderately Acute Malnutrition - Normal"
+            label="Children with Normal Nutrition Status"
             value={normal.toLocaleString()}
             icon={<Activity size={16} />}
             accent="#10B981"
@@ -121,13 +155,7 @@ export const Nutrition: React.FC<Props> = ({
                     tick={{ fill: "#94a3b8", fontSize: 12 }}
                   />
                   <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0F172A",
-                      border: "1px solid #334155",
-                      borderRadius: 8,
-                    }}
-                  />
+                  <Tooltip contentStyle={tooltipStyle} />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {muacData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -137,23 +165,94 @@ export const Nutrition: React.FC<Props> = ({
               </ResponsiveContainer>
             </div>
           </ChartCard>
+
+          {/* Enrolled into nutrition programmes */}
           <ChartCard
-            title="Children with Malnutrition enrolled into food and nutrition programmes"
+            title="Malnourished children enrolled in nutrition programmes"
             height={300}
           >
-            <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
-              Enrolment into food and nutrition programmes is not captured in
-              the current survey wave.
-            </div>
+            {progEnrolled ? (
+              <div style={{ width: "100%", height: 230 }}>
+                <div className="px-2 pt-1 pb-2 flex items-baseline gap-2">
+                  <span className="text-2xl font-black text-emerald-400">
+                    {totalEnrolled.toLocaleString()}
+                  </span>
+                  <span className="text-xs text-ink-muted dark:text-ink-onDarkMuted">
+                    of {totalSamMam.toLocaleString()} SAM+MAM ({enrolledPct}%)
+                  </span>
+                </div>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart
+                    data={progEnrolled}
+                    margin={{ top: 10, right: 10, left: -5, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#334155"
+                      opacity={0.3}
+                    />
+                    <XAxis
+                      dataKey="programme"
+                      tick={{ fill: "#94a3b8", fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fill: "#94a3b8", fontSize: 11 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip contentStyle={tooltipStyle} />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                      {progEnrolled.map((_, i) => (
+                        <Cell
+                          key={i}
+                          fill={
+                            i === 0
+                              ? "#DC2626"
+                              : i === 1
+                                ? "#F59E0B"
+                                : "#10B981"
+                          }
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
+                Programme enrolment data will appear after running the updated
+                aggregator.
+              </div>
+            )}
           </ChartCard>
+
+          {/* Not enrolled */}
           <ChartCard
-            title="Children with Malnutrition not enrolled into food and nutrition programmes"
+            title="Malnourished children NOT enrolled in any programme"
             height={300}
           >
-            <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
-              Enrolment status for malnutrition programmes is not captured in
-              the current survey wave.
-            </div>
+            {progData ? (
+              <div className="h-full flex flex-col items-center justify-center p-6 space-y-3">
+                <div className="text-5xl font-black text-red-400">
+                  {totalNotEnrolled.toLocaleString()}
+                </div>
+                <div className="text-sm text-ink-muted dark:text-ink-onDarkMuted text-center">
+                  of {totalSamMam.toLocaleString()} SAM+MAM children
+                </div>
+                <div className="text-xs text-ink-faint dark:text-ink-onDarkMuted text-center">
+                  {(100 - Number(enrolledPct)).toFixed(1)}% of acutely
+                  malnourished children are not receiving programme support
+                </div>
+              </div>
+            ) : (
+              <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
+                Enrolment status will appear after running the updated
+                aggregator.
+              </div>
+            )}
           </ChartCard>
         </div>
       </div>

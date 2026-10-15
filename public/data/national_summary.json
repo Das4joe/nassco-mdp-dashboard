@@ -140,10 +140,10 @@
     "lactating_total": 718,
     "plwd_total": 1376,
     "children_plwd": 221,
-    "health_insurance_0_7_covered": 0,
-    "health_insurance_0_7_not_covered": 22960,
-    "health_insurance_0_5_covered": 0,
-    "health_insurance_0_5_not_covered": 15183
+    "health_insurance_0_7_covered": 3623,
+    "health_insurance_0_7_not_covered": 19337,
+    "health_insurance_0_5_covered": 2350,
+    "health_insurance_0_5_not_covered": 12833
   },
   "nutrition": {
     "pregnant_total": 2483,
@@ -158,6 +158,45 @@
     "youth_unemployed": 4450,
     "shock_prone_hhs": 4409,
     "children_in_risk_hhs": 6692
+  },
+  "bc_by_gender": {
+    "boys_with_bc": 5408,
+    "boys_without_bc": 25756,
+    "girls_with_bc": 4549,
+    "girls_without_bc": 21975
+  },
+  "nin_by_gender": {
+    "boys_with_nin": 701,
+    "boys_without_nin": 30463,
+    "girls_with_nin": 804,
+    "girls_without_nin": 25720
+  },
+  "disability_types_children": {
+    "blind": 36,
+    "deaf": 46,
+    "physicaldisability": 109,
+    "mentalill": 12,
+    "epilepsy": 5,
+    "dumb": 7,
+    "autism": 6,
+    "otherdisability": 11
+  },
+  "disabled_never_enrolled_by_gender": {
+    "boys": 50,
+    "girls": 41
+  },
+  "nutrition_programme": {
+    "total_sam_mam": 10156,
+    "enrolled": 0,
+    "not_enrolled": 10156,
+    "rutf": 0,
+    "food": 0,
+    "cash": 0
+  },
+  "hh_cross": {
+    "female_headed_shock": 1849,
+    "disability_shock": 426,
+    "multi_vulnerable": 4440
   },
   "extended": {
     "age_sex_pyramid": [
@@ -291,10 +330,10 @@
       "lactating_total": 718,
       "plwd_total": 1376,
       "children_plwd": 221,
-      "health_insurance_0_7_covered": 0,
-      "health_insurance_0_7_not_covered": 22960,
-      "health_insurance_0_5_covered": 0,
-      "health_insurance_0_5_not_covered": 15183
+      "health_insurance_0_7_covered": 3623,
+      "health_insurance_0_7_not_covered": 19337,
+      "health_insurance_0_5_covered": 2350,
+      "health_insurance_0_5_not_covered": 12833
     },
     "nutrition_v2": {
       "pregnant_total": 2483,
@@ -309,6 +348,45 @@
       "youth_unemployed": 4450,
       "shock_prone_hhs": 4409,
       "children_in_risk_hhs": 6692
+    },
+    "bc_by_gender": {
+      "boys_with_bc": 5408,
+      "boys_without_bc": 25756,
+      "girls_with_bc": 4549,
+      "girls_without_bc": 21975
+    },
+    "nin_by_gender": {
+      "boys_with_nin": 701,
+      "boys_without_nin": 30463,
+      "girls_with_nin": 804,
+      "girls_without_nin": 25720
+    },
+    "disability_types_children": {
+      "blind": 36,
+      "deaf": 46,
+      "physicaldisability": 109,
+      "mentalill": 12,
+      "epilepsy": 5,
+      "dumb": 7,
+      "autism": 6,
+      "otherdisability": 11
+    },
+    "disabled_never_enrolled_by_gender": {
+      "boys": 50,
+      "girls": 41
+    },
+    "nutrition_programme": {
+      "total_sam_mam": 10156,
+      "enrolled": 0,
+      "not_enrolled": 10156,
+      "rutf": 0,
+      "food": 0,
+      "cash": 0
+    },
+    "hh_cross": {
+      "female_headed_shock": 1849,
+      "disability_shock": 426,
+      "multi_vulnerable": 4440
     }
   }
 }

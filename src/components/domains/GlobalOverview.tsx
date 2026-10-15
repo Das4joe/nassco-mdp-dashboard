@@ -101,8 +101,8 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
     const femaleVal = Number(found?.girls ?? found?.female ?? 0);
     return {
       band,
-      male: -Math.abs(maleVal), // Diverging layout: Males negative (draws left)
-      female: Math.abs(femaleVal), // Females positive (draws right)
+      male: -Math.abs(maleVal),
+      female: Math.abs(femaleVal),
       total: Math.abs(maleVal) + Math.abs(femaleVal),
     };
   });
@@ -126,6 +126,31 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
   ];
 
   const formatAbs = (v: any) => Math.abs(Number(v || 0)).toLocaleString();
+
+  // --- NEW: Disability types data ---
+  const disabilityTypesRaw =
+    ext.disability_types_children ?? rec.disability_types_children ?? null;
+
+  const DISABILITY_LABELS: Record<string, string> = {
+    blind: "Blind",
+    deaf: "Deaf",
+    physicaldisability: "Physical",
+    mentalill: "Mental Illness",
+    epilepsy: "Epilepsy",
+    dumb: "Speech Impairment",
+    autism: "Autism",
+    otherdisability: "Other",
+  };
+
+  const disabilityData = disabilityTypesRaw
+    ? Object.entries(disabilityTypesRaw)
+        .map(([key, count]) => ({
+          type: DISABILITY_LABELS[key] || key,
+          count: Number(count ?? 0),
+        }))
+        .filter((d) => d.count > 0)
+        .sort((a, b) => b.count - a.count)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -369,15 +394,72 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             </div>
           </ChartCard>
 
-          {/* 4. DISABILITIES (Disclaimer Box) */}
+          {/* 4. DISABILITIES DISTRIBUTION AMONGST CHILDREN */}
           <ChartCard
             title="Disabilities distribution amongst children"
             height={320}
           >
-            <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted dark:text-ink-onDarkMuted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/40 dark:bg-surface-darker/40">
-              Detailed cross-tabulation for child disabilities by age ranges
-              (0-24) is not captured in the current survey wave.
-            </div>
+            {disabilityData && disabilityData.length > 0 ? (
+              <div style={{ width: "100%", height: 240 }}>
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart
+                    data={disabilityData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      horizontal={false}
+                      stroke="#475569"
+                      opacity={0.3}
+                    />
+                    <XAxis
+                      type="number"
+                      tick={{ fontSize: 10, fill: "#CBD5E1" }}
+                      tickFormatter={(v) => Number(v).toLocaleString()}
+                    />
+                    <YAxis
+                      dataKey="type"
+                      type="category"
+                      width={110}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: "#CBD5E1" }}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(255,255,255,0.06)" }}
+                      formatter={(v: any) => Number(v).toLocaleString()}
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        border: "1px solid #334155",
+                        borderRadius: 8,
+                        color: "#F8FAFC",
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar
+                      dataKey="count"
+                      name="Children"
+                      fill="#14B8A6"
+                      radius={[0, 4, 4, 0]}
+                      label={{
+                        position: "right",
+                        fill: "#CBD5E1",
+                        fontSize: 10,
+                        formatter: (v: any) =>
+                          v > 0 ? Number(v).toLocaleString() : "",
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-full min-h-[200px] flex items-center justify-center p-6 text-center text-xs text-ink-muted dark:text-ink-onDarkMuted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl bg-surface-page/40 dark:bg-surface-darker/40">
+                Disability type breakdown will appear after running the updated
+                data aggregator. Total children with disabilities:{" "}
+                {childrenPlwd.toLocaleString()}
+              </div>
+            )}
           </ChartCard>
         </div>
       </div>
