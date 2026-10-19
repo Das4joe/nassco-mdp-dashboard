@@ -21,6 +21,8 @@ export interface DrilldownMapProps {
 
 const MDP_STATES = new Set(["ABIA", "BENUE", "OYO", "SOKOTO"]);
 
+// --- Utility Functions ---
+
 function normName(val: any): string {
   if (!val) return "";
   let s = String(val).trim();
@@ -31,7 +33,7 @@ function normName(val: any): string {
   return s.toUpperCase().trim();
 }
 
-function getFeatureStateName(props: any): string {
+function getGeoStateName(props: any): string {
   return normName(
     props?.NAME_1 ||
       props?.state ||
@@ -41,13 +43,13 @@ function getFeatureStateName(props: any): string {
   );
 }
 
-function getFeatureLgaName(props: any): string {
+function getGeoLgaName(props: any): string {
   return normName(
     props?.NAME_2 || props?.lga || props?.LGA || props?.admin2Name,
   );
 }
 
-function getFeatureWardName(props: any): string {
+function getGeoWardName(props: any): string {
   return normName(
     props?.NAME_3 || props?.ward || props?.WARD || props?.admin3Name,
   );
@@ -74,6 +76,55 @@ function useDarkMode(): boolean {
 
   return isDark;
 }
+
+// --- Robust Geo Data Loader ---
+
+function useGeoData(initialData: any) {
+  const [geo, setGeo] = useState<any>(initialData?.geo || null);
+  const [loading, setLoading] = useState<boolean>(!initialData?.geo);
+
+  useEffect(() => {
+    if (geo?.states && geo?.lgas && geo?.wards) {
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    setLoading(true);
+
+    const basePath = import.meta.env?.BASE_URL || "/";
+
+    Promise.all([
+      fetch(`${basePath}data/nigeria-states.json`).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+      fetch(`${basePath}data/nigeria_lga.json`).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+      fetch(`${basePath}data/nigeria_ward.json`).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+    ])
+      .then(([states, lgas, wards]) => {
+        if (isMounted) {
+          setGeo({ states, lgas, wards });
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Map Boundary Load Error:", err);
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [geo]);
+
+  return { geo, loading };
+}
+
+// --- Metric Accessor ---
 
 function getMetricValue(rec: any, metric?: string): number {
   if (!rec) return 0;
@@ -144,15 +195,13 @@ function getColor(
   if (val === undefined || val === null || isNaN(val)) {
     return isDark ? "#1e293b" : "#e2e8f0";
   }
-  const ratio =
-    maxVal > minVal
-      ? Math.min(1, Math.max(0, (val - minVal) / (maxVal - minVal)))
-      : 0.5;
+  if (maxVal === minVal) return "#06b6d4"; // Cyan fallback if all match
+  const ratio = Math.min(1, Math.max(0, (val - minVal) / (maxVal - minVal)));
 
-  if (ratio < 0.25) return "#10b981"; // emerald-500
-  if (ratio < 0.5) return "#06b6d4"; // cyan-500
-  if (ratio < 0.75) return "#f59e0b"; // amber-500
-  return "#ef4444"; // red-500
+  if (ratio < 0.25) return "#10b981"; // Emerald
+  if (ratio < 0.5) return "#06b6d4"; // Cyan
+  if (ratio < 0.75) return "#f59e0b"; // Amber
+  return "#ef4444"; // Red
 }
 
 const MapController: React.FC<{ bounds: L.LatLngBoundsExpression | null }> = ({
@@ -164,12 +213,14 @@ const MapController: React.FC<{ bounds: L.LatLngBoundsExpression | null }> = ({
       try {
         map.fitBounds(bounds, { padding: [20, 20], maxZoom: 11 });
       } catch {
-        // ignore fit bounds errors
+        // Safe fail
       }
     }
   }, [bounds, map]);
   return null;
 };
+
+// --- Main Component ---
 
 export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   data,
@@ -185,7 +236,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   const handleNavigate = onPathChange || onNavigate;
   const activeStateFilter = selectedStateFilter || stateFilter;
 
-  // Infer drilldown level
+  // Infer geographic level
   const level = useMemo(() => {
     if (!path?.state) return "national";
     if (!path?.lga) return "state";
@@ -193,114 +244,113 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     return "ward";
   }, [path]);
 
-  const dAny = data as any;
+  // Load geo
+  const { geo, loading } = useGeoData(data);
 
-  // 1. Convert State TopoJSON/GeoJSON to GeoJSON FeatureCollection
-  const statesGeoJson = useMemo(() => {
-    const raw = dAny?.statesGeo || dAny?.geo?.states;
-    if (!raw) return null;
-    if (raw.type === "Topology" && raw.objects) {
-      const key = Object.keys(raw.objects)[0];
-      return topojson.feature(raw as any, raw.objects[key]) as any;
-    }
-    if (raw.type === "FeatureCollection") return raw;
-    return null;
-  }, [dAny]);
+  // Normalize TopoJSON to GeoJSON
+  const parsedGeo = useMemo(() => {
+    if (!geo) return { states: null, lgas: null, wards: null };
 
-  // 2. Select and filter features according to level
+    const parse = (raw: any) => {
+      if (!raw) return null;
+      if (raw.type === "Topology" && raw.objects) {
+        const key = Object.keys(raw.objects)[0];
+        return topojson.feature(raw as any, raw.objects[key]);
+      }
+      return raw.type === "FeatureCollection" ? raw : null;
+    };
+
+    return {
+      states: parse(geo.states),
+      lgas: parse(geo.lgas),
+      wards: parse(geo.wards),
+    };
+  }, [geo]);
+
+  // Extract relevant features based on current level
   const { geoData, bounds, minVal, maxVal } = useMemo(() => {
     let features: any[] = [];
-    let calculatedMin = Infinity;
-    let calculatedMax = -Infinity;
+    let cMin = Infinity;
+    let cMax = -Infinity;
 
-    if (level === "national") {
-      if (statesGeoJson?.features) {
-        features = statesGeoJson.features;
-        features.forEach((f: any) => {
-          const name = getFeatureStateName(f.properties);
-          if (MDP_STATES.has(name)) {
-            const rec = data.states?.find(
-              (s: any) => normName(s.state) === name,
-            );
-            const v = getMetricValue(rec, metric);
-            if (v < calculatedMin) calculatedMin = v;
-            if (v > calculatedMax) calculatedMax = v;
-          }
-        });
-      }
-    } else if (level === "state") {
-      const stateName = normName(path.state);
-      const lgaGeo = dAny?.lgasGeo || dAny?.geo?.lgas;
-      if (lgaGeo?.features) {
-        features = lgaGeo.features.filter((f: any) => {
-          const st = getFeatureStateName(f.properties);
-          return st === stateName;
-        });
-        features.forEach((f: any) => {
-          const lgaName = getFeatureLgaName(f.properties);
-          const rec = data.lgas?.find(
-            (l: any) =>
-              normName(l.state) === stateName && normName(l.lga) === lgaName,
-          );
+    if (level === "national" && parsedGeo.states?.features) {
+      features = parsedGeo.states.features;
+      features.forEach((f: any) => {
+        const name = getGeoStateName(f.properties);
+        if (MDP_STATES.has(name)) {
+          const rec = data.states?.find((s: any) => normName(s.state) === name);
           const v = getMetricValue(rec, metric);
-          if (v < calculatedMin) calculatedMin = v;
-          if (v > calculatedMax) calculatedMax = v;
-        });
-      }
-    } else if (level === "lga") {
-      const stateName = normName(path.state);
-      const lgaName = normName(path.lga);
-      const wardGeo = dAny?.wardsGeo || dAny?.geo?.wards;
-      if (wardGeo?.features) {
-        features = wardGeo.features.filter((f: any) => {
-          const st = getFeatureStateName(f.properties);
-          const lg = getFeatureLgaName(f.properties);
-          return st === stateName && lg === lgaName;
-        });
-        features.forEach((f: any) => {
-          const wardName = getFeatureWardName(f.properties);
-          const rec = data.wards?.find(
-            (w: any) =>
-              normName(w.state) === stateName &&
-              normName(w.lga) === lgaName &&
-              normName(w.ward) === wardName,
-          );
-          const v = getMetricValue(rec, metric);
-          if (v < calculatedMin) calculatedMin = v;
-          if (v > calculatedMax) calculatedMax = v;
-        });
-      }
+          if (v < cMin) cMin = v;
+          if (v > cMax) cMax = v;
+        }
+      });
+    } else if (level === "state" && parsedGeo.lgas?.features) {
+      const targetState = normName(path.state);
+      features = parsedGeo.lgas.features.filter(
+        (f: any) => getGeoStateName(f.properties) === targetState,
+      );
+      features.forEach((f: any) => {
+        const lgaName = getGeoLgaName(f.properties);
+        const rec = data.lgas?.find(
+          (l: any) =>
+            normName(l.state) === targetState && normName(l.lga) === lgaName,
+        );
+        const v = getMetricValue(rec, metric);
+        if (v < cMin) cMin = v;
+        if (v > cMax) cMax = v;
+      });
+    } else if (level === "lga" && parsedGeo.wards?.features) {
+      const targetState = normName(path.state);
+      const targetLga = normName(path.lga);
+      features = parsedGeo.wards.features.filter((f: any) => {
+        return (
+          getGeoStateName(f.properties) === targetState &&
+          getGeoLgaName(f.properties) === targetLga
+        );
+      });
+      features.forEach((f: any) => {
+        const wardName = getGeoWardName(f.properties);
+        const rec = data.wards?.find(
+          (w: any) =>
+            normName(w.state) === targetState &&
+            normName(w.lga) === targetLga &&
+            normName(w.ward) === wardName,
+        );
+        const v = getMetricValue(rec, metric);
+        if (v < cMin) cMin = v;
+        if (v > cMax) cMax = v;
+      });
     }
 
-    if (calculatedMin === Infinity) calculatedMin = 0;
-    if (calculatedMax === -Infinity) calculatedMax = 100;
+    if (cMin === Infinity) cMin = 0;
+    if (cMax === -Infinity) cMax = 100;
 
     const collection = { type: "FeatureCollection", features };
-    let calculatedBounds: L.LatLngBoundsExpression | null = null;
+    let calcBounds: L.LatLngBoundsExpression | null = null;
+
     if (features.length > 0) {
       try {
         const lGroup = L.geoJSON(collection as any);
-        if (lGroup.getBounds().isValid()) {
-          calculatedBounds = lGroup.getBounds();
-        }
-      } catch {
-        calculatedBounds = null;
+        const b = lGroup.getBounds();
+        if (b.isValid()) calcBounds = b;
+      } catch (e) {
+        // Safe fail
       }
     }
 
     return {
       geoData: collection,
-      bounds: calculatedBounds,
-      minVal: calculatedMin,
-      maxVal: calculatedMax,
+      bounds: calcBounds,
+      minVal: cMin,
+      maxVal: cMax,
     };
-  }, [data, path, level, statesGeoJson, dAny, metric]);
+  }, [level, path, parsedGeo, data, metric]);
 
-  // 3. Feature Styling
+  // Style Features
   const styleFeature = useCallback(
     (feature: any) => {
       const props = feature?.properties || {};
-      const stateName = getFeatureStateName(props);
+      const stateName = getGeoStateName(props);
       const isMdpState = MDP_STATES.has(stateName);
 
       if (level === "national") {
@@ -317,6 +367,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
           activeStateFilter &&
           activeStateFilter !== "ALL" &&
           normName(activeStateFilter) !== stateName;
+
         const rec = data.states?.find(
           (s: any) => normName(s.state) === stateName,
         );
@@ -333,7 +384,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
 
       let val = 0;
       if (level === "state") {
-        const lgaName = getFeatureLgaName(props);
+        const lgaName = getGeoLgaName(props);
         const rec = data.lgas?.find(
           (l: any) =>
             normName(l.state) === normName(path.state) &&
@@ -341,7 +392,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         );
         val = getMetricValue(rec, metric);
       } else if (level === "lga") {
-        const wardName = getFeatureWardName(props);
+        const wardName = getGeoWardName(props);
         const rec = data.wards?.find(
           (w: any) =>
             normName(w.state) === normName(path.state) &&
@@ -361,13 +412,13 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     [level, path, data, metric, minVal, maxVal, isDark, activeStateFilter],
   );
 
-  // 4. Feature Events (Hover & Drilldown Click)
+  // Feature Events (Hover & Click)
   const onEachFeature = useCallback(
     (feature: any, layer: L.Layer) => {
       const props = feature?.properties || {};
-      const stateName = getFeatureStateName(props);
-      const lgaName = getFeatureLgaName(props);
-      const wardName = getFeatureWardName(props);
+      const stateName = getGeoStateName(props);
+      const lgaName = getGeoLgaName(props);
+      const wardName = getGeoWardName(props);
 
       let displayName = stateName;
       let val = 0;
@@ -433,27 +484,38 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   );
 
   const containerBg = isDark ? "#0f172a" : "#f8fafc";
+  const hasFeatures = geoData && geoData.features.length > 0;
 
   return (
     <div
       className="relative w-full overflow-hidden rounded-xl border border-line-light dark:border-line-dark shadow-card"
       style={{ height }}
     >
+      {/* Fallback Loader Overlay */}
+      {(!hasFeatures || loading) && (
+        <div className="absolute inset-0 z-[2000] flex flex-col items-center justify-center bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm">
+          <div className="w-8 h-8 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin mb-3"></div>
+          <div className="text-sm font-bold text-ink-muted dark:text-ink-onDarkMuted tracking-wider animate-pulse">
+            LOADING MAP BOUNDARIES...
+          </div>
+        </div>
+      )}
+
       <MapContainer
         center={[9.082, 8.6753]}
         zoom={6}
         minZoom={5}
-        maxBounds={[
-          [2.0, 0.0],
-          [15.0, 16.0],
-        ]}
-        maxBoundsViscosity={1.0}
-        style={{ height: "100%", width: "100%", backgroundColor: containerBg }}
+        style={{
+          height: "100%",
+          width: "100%",
+          backgroundColor: containerBg,
+          zIndex: 1,
+        }}
         zoomControl={true}
         attributionControl={false}
       >
         <MapController bounds={bounds} />
-        {geoData && geoData.features.length > 0 && (
+        {hasFeatures && (
           <GeoJSON
             key={`${level}-${path.state || ""}-${path.lga || ""}-${metric}-${isDark ? "dark" : "light"}-${geoData.features.length}`}
             data={geoData as any}
