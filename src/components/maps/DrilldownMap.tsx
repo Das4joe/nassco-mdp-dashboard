@@ -53,6 +53,36 @@ function useDarkMode(): boolean {
   return isDark;
 }
 
+// Self-healing hook to fetch geojson if it's missing from the main data payload
+function useGeoData(data: any) {
+  const [geo, setGeo] = useState<any>(data?.geo || data?.geoData || null);
+
+  useEffect(() => {
+    if (geo) return;
+    let isMounted = true;
+    Promise.all([
+      fetch("/data/nigeria-states.json")
+        .then((r) => r.json())
+        .catch(() => null),
+      fetch("/data/nigeria_lga.json")
+        .then((r) => r.json())
+        .catch(() => null),
+      fetch("/data/nigeria_ward.json")
+        .then((r) => r.json())
+        .catch(() => null),
+    ]).then(([states, lgas, wards]) => {
+      if (isMounted) {
+        setGeo({ states, lgas, wards });
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [geo]);
+
+  return geo;
+}
+
 function getMetricValue(rec: any, metric?: string): number {
   if (!rec) return 0;
   const ext = rec.extended || {};
@@ -171,19 +201,19 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     return "ward";
   }, [path]);
 
-  const dAny = data as any;
+  const activeGeo = useGeoData(data);
 
   // 1. Convert State TopoJSON to GeoJSON
   const statesGeoJson = useMemo(() => {
-    const obj = dAny?.statesGeo || dAny?.geo?.states;
-    if (!obj) return null;
+    if (!activeGeo?.states) return null;
+    const obj = activeGeo.states;
     if (obj.type === "Topology" && obj.objects) {
       const key = Object.keys(obj.objects)[0];
       return topojson.feature(obj as any, obj.objects[key]) as any;
     }
     if (obj.type === "FeatureCollection") return obj;
     return null;
-  }, [dAny]);
+  }, [activeGeo]);
 
   // 2. Filter features based on path level
   const { geoData, bounds, minVal, maxVal } = useMemo(() => {
@@ -210,7 +240,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       }
     } else if (level === "state") {
       const stateName = normName(path.state);
-      const lgaGeo = dAny?.lgasGeo || dAny?.geo?.lgas;
+      const lgaGeo = activeGeo?.lgas;
       if (lgaGeo?.features) {
         features = lgaGeo.features.filter((f: any) => {
           const st = normName(
@@ -234,7 +264,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     } else if (level === "lga") {
       const stateName = normName(path.state);
       const lgaName = normName(path.lga);
-      const wardGeo = dAny?.wardsGeo || dAny?.geo?.wards;
+      const wardGeo = activeGeo?.wards;
       if (wardGeo?.features) {
         features = wardGeo.features.filter((f: any) => {
           const st = normName(
@@ -284,7 +314,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       minVal: calculatedMin,
       maxVal: calculatedMax,
     };
-  }, [data, path, level, statesGeoJson, dAny, metric]);
+  }, [data, path, level, statesGeoJson, activeGeo, metric]);
 
   // 3. Polygon Styling Callback
   const styleFeature = useCallback(
@@ -433,14 +463,20 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       <MapContainer
         center={[9.082, 8.6753]}
         zoom={6}
-        style={{ height: "100%", width: "100%", background: containerBg }}
+        minZoom={5}
+        maxBounds={[
+          [2.0, 0.0], // South West boundary
+          [15.0, 16.0], // North East boundary
+        ]}
+        maxBoundsViscosity={1.0}
+        style={{ height: "100%", width: "100%", backgroundColor: containerBg }}
         zoomControl={true}
         attributionControl={false}
       >
         <MapController bounds={bounds} />
         {geoData && geoData.features.length > 0 && (
           <GeoJSON
-            key={`${level}-${path.state || ""}-${path.lga || ""}-${metric}-${isDark ? "dark" : "light"}`}
+            key={`${level}-${path.state || ""}-${path.lga || ""}-${metric}-${isDark ? "dark" : "light"}-${geoData.features.length}`}
             data={geoData as any}
             style={styleFeature}
             onEachFeature={onEachFeature}
