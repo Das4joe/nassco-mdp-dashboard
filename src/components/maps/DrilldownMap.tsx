@@ -25,10 +25,32 @@ function normName(val: any): string {
   if (!val) return "";
   let s = String(val).trim();
   if (s.includes(".")) {
-    const parts = s.split(".", 2);
-    s = parts[1] || parts[0];
+    const parts = s.split(".");
+    s = parts[parts.length - 1].trim();
   }
   return s.toUpperCase().trim();
+}
+
+function getFeatureStateName(props: any): string {
+  return normName(
+    props?.NAME_1 ||
+      props?.state ||
+      props?.STATE ||
+      props?.admin1Name ||
+      props?.NAME_0,
+  );
+}
+
+function getFeatureLgaName(props: any): string {
+  return normName(
+    props?.NAME_2 || props?.lga || props?.LGA || props?.admin2Name,
+  );
+}
+
+function getFeatureWardName(props: any): string {
+  return normName(
+    props?.NAME_3 || props?.ward || props?.WARD || props?.admin3Name,
+  );
 }
 
 function useDarkMode(): boolean {
@@ -51,36 +73,6 @@ function useDarkMode(): boolean {
   }, []);
 
   return isDark;
-}
-
-// Self-healing hook to fetch geojson if it's missing from the main data payload
-function useGeoData(data: any) {
-  const [geo, setGeo] = useState<any>(data?.geo || data?.geoData || null);
-
-  useEffect(() => {
-    if (geo) return;
-    let isMounted = true;
-    Promise.all([
-      fetch("/data/nigeria-states.json")
-        .then((r) => r.json())
-        .catch(() => null),
-      fetch("/data/nigeria_lga.json")
-        .then((r) => r.json())
-        .catch(() => null),
-      fetch("/data/nigeria_ward.json")
-        .then((r) => r.json())
-        .catch(() => null),
-    ]).then(([states, lgas, wards]) => {
-      if (isMounted) {
-        setGeo({ states, lgas, wards });
-      }
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [geo]);
-
-  return geo;
 }
 
 function getMetricValue(rec: any, metric?: string): number {
@@ -172,7 +164,7 @@ const MapController: React.FC<{ bounds: L.LatLngBoundsExpression | null }> = ({
       try {
         map.fitBounds(bounds, { padding: [20, 20], maxZoom: 11 });
       } catch {
-        // ignore bounds fit errors
+        // ignore fit bounds errors
       }
     }
   }, [bounds, map]);
@@ -193,7 +185,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   const handleNavigate = onPathChange || onNavigate;
   const activeStateFilter = selectedStateFilter || stateFilter;
 
-  // Infer geographic drilldown level from path object
+  // Infer drilldown level
   const level = useMemo(() => {
     if (!path?.state) return "national";
     if (!path?.lga) return "state";
@@ -201,21 +193,21 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     return "ward";
   }, [path]);
 
-  const activeGeo = useGeoData(data);
+  const dAny = data as any;
 
-  // 1. Convert State TopoJSON to GeoJSON
+  // 1. Convert State TopoJSON/GeoJSON to GeoJSON FeatureCollection
   const statesGeoJson = useMemo(() => {
-    if (!activeGeo?.states) return null;
-    const obj = activeGeo.states;
-    if (obj.type === "Topology" && obj.objects) {
-      const key = Object.keys(obj.objects)[0];
-      return topojson.feature(obj as any, obj.objects[key]) as any;
+    const raw = dAny?.statesGeo || dAny?.geo?.states;
+    if (!raw) return null;
+    if (raw.type === "Topology" && raw.objects) {
+      const key = Object.keys(raw.objects)[0];
+      return topojson.feature(raw as any, raw.objects[key]) as any;
     }
-    if (obj.type === "FeatureCollection") return obj;
+    if (raw.type === "FeatureCollection") return raw;
     return null;
-  }, [activeGeo]);
+  }, [dAny]);
 
-  // 2. Filter features based on path level
+  // 2. Select and filter features according to level
   const { geoData, bounds, minVal, maxVal } = useMemo(() => {
     let features: any[] = [];
     let calculatedMin = Infinity;
@@ -225,9 +217,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       if (statesGeoJson?.features) {
         features = statesGeoJson.features;
         features.forEach((f: any) => {
-          const name = normName(
-            f.properties?.NAME_1 || f.properties?.state || f.properties?.STATE,
-          );
+          const name = getFeatureStateName(f.properties);
           if (MDP_STATES.has(name)) {
             const rec = data.states?.find(
               (s: any) => normName(s.state) === name,
@@ -240,18 +230,14 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       }
     } else if (level === "state") {
       const stateName = normName(path.state);
-      const lgaGeo = activeGeo?.lgas;
+      const lgaGeo = dAny?.lgasGeo || dAny?.geo?.lgas;
       if (lgaGeo?.features) {
         features = lgaGeo.features.filter((f: any) => {
-          const st = normName(
-            f.properties?.NAME_1 || f.properties?.state || f.properties?.STATE,
-          );
+          const st = getFeatureStateName(f.properties);
           return st === stateName;
         });
         features.forEach((f: any) => {
-          const lgaName = normName(
-            f.properties?.NAME_2 || f.properties?.lga || f.properties?.LGA,
-          );
+          const lgaName = getFeatureLgaName(f.properties);
           const rec = data.lgas?.find(
             (l: any) =>
               normName(l.state) === stateName && normName(l.lga) === lgaName,
@@ -264,21 +250,15 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     } else if (level === "lga") {
       const stateName = normName(path.state);
       const lgaName = normName(path.lga);
-      const wardGeo = activeGeo?.wards;
+      const wardGeo = dAny?.wardsGeo || dAny?.geo?.wards;
       if (wardGeo?.features) {
         features = wardGeo.features.filter((f: any) => {
-          const st = normName(
-            f.properties?.NAME_1 || f.properties?.state || f.properties?.STATE,
-          );
-          const lg = normName(
-            f.properties?.NAME_2 || f.properties?.lga || f.properties?.LGA,
-          );
+          const st = getFeatureStateName(f.properties);
+          const lg = getFeatureLgaName(f.properties);
           return st === stateName && lg === lgaName;
         });
         features.forEach((f: any) => {
-          const wardName = normName(
-            f.properties?.NAME_3 || f.properties?.ward || f.properties?.WARD,
-          );
+          const wardName = getFeatureWardName(f.properties);
           const rec = data.wards?.find(
             (w: any) =>
               normName(w.state) === stateName &&
@@ -314,13 +294,13 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       minVal: calculatedMin,
       maxVal: calculatedMax,
     };
-  }, [data, path, level, statesGeoJson, activeGeo, metric]);
+  }, [data, path, level, statesGeoJson, dAny, metric]);
 
-  // 3. Polygon Styling Callback
+  // 3. Feature Styling
   const styleFeature = useCallback(
     (feature: any) => {
       const props = feature?.properties || {};
-      const stateName = normName(props.NAME_1 || props.state || props.STATE);
+      const stateName = getFeatureStateName(props);
       const isMdpState = MDP_STATES.has(stateName);
 
       if (level === "national") {
@@ -351,10 +331,9 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         };
       }
 
-      // State / LGA level
       let val = 0;
       if (level === "state") {
-        const lgaName = normName(props.NAME_2 || props.lga || props.LGA);
+        const lgaName = getFeatureLgaName(props);
         const rec = data.lgas?.find(
           (l: any) =>
             normName(l.state) === normName(path.state) &&
@@ -362,7 +341,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         );
         val = getMetricValue(rec, metric);
       } else if (level === "lga") {
-        const wardName = normName(props.NAME_3 || props.ward || props.WARD);
+        const wardName = getFeatureWardName(props);
         const rec = data.wards?.find(
           (w: any) =>
             normName(w.state) === normName(path.state) &&
@@ -382,13 +361,13 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     [level, path, data, metric, minVal, maxVal, isDark, activeStateFilter],
   );
 
-  // 4. Feature Events Callback
+  // 4. Feature Events (Hover & Drilldown Click)
   const onEachFeature = useCallback(
     (feature: any, layer: L.Layer) => {
       const props = feature?.properties || {};
-      const stateName = normName(props.NAME_1 || props.state || props.STATE);
-      const lgaName = normName(props.NAME_2 || props.lga || props.LGA);
-      const wardName = normName(props.NAME_3 || props.ward || props.WARD);
+      const stateName = getFeatureStateName(props);
+      const lgaName = getFeatureLgaName(props);
+      const wardName = getFeatureWardName(props);
 
       let displayName = stateName;
       let val = 0;
@@ -465,8 +444,8 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         zoom={6}
         minZoom={5}
         maxBounds={[
-          [2.0, 0.0], // South West boundary
-          [15.0, 16.0], // North East boundary
+          [2.0, 0.0],
+          [15.0, 16.0],
         ]}
         maxBoundsViscosity={1.0}
         style={{ height: "100%", width: "100%", backgroundColor: containerBg }}
