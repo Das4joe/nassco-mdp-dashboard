@@ -40,8 +40,10 @@ export const LivelihoodsResilience: React.FC<Props> = ({
   const youthUnemployed = Number(liv.youth_unemployed ?? 0);
   const shockProne = Number(liv.shock_prone_hhs ?? 0);
   const childrenInRisk = Number(liv.children_in_risk_hhs ?? 0);
+  const largeHouseholds = Number(
+    liv.large_households ?? ext.large_households ?? rec.large_households ?? 0,
+  );
 
-  // --- NEW: Household cross-tab data ---
   const hhCross = ext.hh_cross ?? rec.hh_cross ?? null;
 
   const femaleHeadedShock = Number(hhCross?.female_headed_shock ?? 0);
@@ -51,6 +53,18 @@ export const LivelihoodsResilience: React.FC<Props> = ({
   const totalHh = Number(
     rec.total_households ?? rec.nsr?.total_households ?? 0,
   );
+  const children0_17 = Number(
+    rec.children_0_17 ??
+      rec.nsr?.children_0_17 ??
+      rec.nsr?.children_under18 ??
+      0,
+  );
+
+  // % of children 0-17 living in shock-prone (risk) households
+  const childrenInRiskPct =
+    children0_17 > 0
+      ? Number(((childrenInRisk / children0_17) * 100).toFixed(1))
+      : 0;
 
   const femaleShockPct =
     femaleHeaded > 0
@@ -59,6 +73,9 @@ export const LivelihoodsResilience: React.FC<Props> = ({
 
   const disabilityShockPct =
     shockProne > 0 ? ((disabilityShock / shockProne) * 100).toFixed(1) : "0.0";
+
+  const largeHhPct =
+    totalHh > 0 ? ((largeHouseholds / totalHh) * 100).toFixed(1) : "0.0";
 
   const tooltipStyle = {
     backgroundColor: "#0F172A",
@@ -74,7 +91,7 @@ export const LivelihoodsResilience: React.FC<Props> = ({
         <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
           Livelihoods
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <KpiCard
             label="Female-Headed Households"
             value={femaleHeaded.toLocaleString()}
@@ -105,6 +122,12 @@ export const LivelihoodsResilience: React.FC<Props> = ({
             icon={<Users size={16} />}
             accent="#B91C1C"
           />
+          <KpiCard
+            label="Large Households (7+ members)"
+            value={largeHouseholds.toLocaleString()}
+            icon={<Home size={16} />}
+            accent="#0D9488"
+          />
         </div>
       </div>
 
@@ -122,9 +145,19 @@ export const LivelihoodsResilience: React.FC<Props> = ({
           />
         </div>
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ChartCard title="Children in Risk-Prone Households" height={260}>
-            <div className="h-full min-h-[180px] flex items-center justify-center text-3xl font-bold text-emerald-400">
-              {childrenInRisk.toLocaleString()}
+          <ChartCard
+            title="Children in Risk-Prone Households (% in risk prone)"
+            height={260}
+          >
+            <div className="h-full min-h-[180px] flex flex-col items-center justify-center p-4 space-y-2">
+              <div className="text-4xl font-black text-emerald-400">
+                {childrenInRiskPct}%
+              </div>
+              <div className="text-xs text-ink-muted dark:text-ink-onDarkMuted text-center">
+                {childrenInRisk.toLocaleString()} of{" "}
+                {children0_17.toLocaleString()} children (0–17) live in
+                shock-prone households
+              </div>
             </div>
           </ChartCard>
 
@@ -260,6 +293,19 @@ export const LivelihoodsResilience: React.FC<Props> = ({
                 updated aggregator.
               </div>
             )}
+          </ChartCard>
+
+          {/* Large households detail */}
+          <ChartCard title="Large Households (7+ members)" height={260}>
+            <div className="h-full min-h-[180px] flex flex-col items-center justify-center p-4 space-y-2">
+              <div className="text-4xl font-black text-teal-400">
+                {largeHouseholds.toLocaleString()}
+              </div>
+              <div className="text-xs text-ink-muted dark:text-ink-onDarkMuted text-center">
+                {largeHhPct}% of {totalHh.toLocaleString()} total households
+                have 7 or more members
+              </div>
+            </div>
           </ChartCard>
         </div>
       </div>

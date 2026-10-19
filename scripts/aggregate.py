@@ -178,7 +178,7 @@ def compute_metrics(sub_df):
         "c_0_5_nin_no_bc": c_0_5_nin_no_bc,
     }
 
-    # --- NEW: Civil Registration by Gender (0-17) ---
+    # Civil Registration by Gender (0-17)
     bc_by_gender = {
         "boys_with_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["has_bc"]).sum()),
         "boys_without_bc": int((sub_df["is_0_17"] & sub_df["is_male"] & sub_df["no_bc"]).sum()),
@@ -198,7 +198,7 @@ def compute_metrics(sub_df):
     mam_children = int((sub_df["muac_cat"] == 2.0).sum())
     normal_children = int((sub_df["muac_cat"] == 3.0).sum())
 
-    # --- FIX: Health Insurance from real data (benefitfromhealthcare) ---
+    # Health Insurance from real data (benefitfromhealthcare)
     children_0_7 = int((sub_df["agey"] <= 7).sum())
     if "has_healthcare_benefit" in sub_df.columns:
         hi_0_7_covered = int(((sub_df["agey"] <= 7) & sub_df["has_healthcare_benefit"]).sum())
@@ -226,7 +226,7 @@ def compute_metrics(sub_df):
         "normal_children": normal_children,
     }
 
-    # --- NEW: Nutrition Programme Enrolment (among SAM+MAM children) ---
+    # Nutrition Programme Enrolment (among SAM+MAM children)
     sam_mam_mask = (sub_df["muac_cat"] == 1.0) | (sub_df["muac_cat"] == 2.0)
     total_sam_mam = int(sam_mam_mask.sum())
 
@@ -257,15 +257,22 @@ def compute_metrics(sub_df):
     shock_prone_hhs = int(sub_df[sub_df["has_shock"]][hh_col].nunique())
     children_in_risk_hhs = int((sub_df["is_0_17"] & sub_df["has_shock"]).sum())
 
+    # Large households: unique HHs with 7+ members
+    if "hh_size" in sub_df.columns:
+        large_households = int(sub_df.loc[sub_df["hh_size"] >= 7, hh_col].nunique())
+    else:
+        large_households = 0
+
     livelihoods_resilience_v2 = {
         "female_headed_hhs": female_headed_hhs,
         "youth_employed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] != "Unemployed")).sum()),
         "youth_unemployed": int((sub_df["is_18_24"] & (sub_df["b5labour_clean"] == "Unemployed")).sum()),
         "shock_prone_hhs": shock_prone_hhs,
         "children_in_risk_hhs": children_in_risk_hhs,
+        "large_households": large_households,
     }
 
-    # --- NEW: Household Cross-Tabs ---
+    # Household Cross-Tabs
     if "hh_is_female_headed" in sub_df.columns and "hh_has_shock" in sub_df.columns:
         female_headed_shock_hhs = int(
             sub_df[sub_df["hh_is_female_headed"] & sub_df["hh_has_shock"]][hh_col].nunique()
@@ -293,7 +300,7 @@ def compute_metrics(sub_df):
         "multi_vulnerable": multi_vulnerable_hhs,
     }
 
-    # --- NEW: Disability Types (children 0-17) ---
+    # Disability Types (children 0-17)
     disability_type_cols = [
         "blind", "deaf", "physicaldisability", "mentalill",
         "epilepsy", "dumb", "autism", "otherdisability"
@@ -308,7 +315,7 @@ def compute_metrics(sub_df):
         else:
             disability_types_children[dtype] = 0
 
-    # --- NEW: Disabled Never Enrolled by Gender (ages 6-17) ---
+    # Disabled Never Enrolled by Gender (ages 6-17)
     is_6_17 = (sub_df["agey"] >= 6) & (sub_df["agey"] <= 17)
     disabled_never_enrolled_by_gender = {
         "boys": int((is_6_17 & sub_df["is_male"] & sub_df["is_disabled"] & sub_df["is_out_of_school"]).sum()),
@@ -355,13 +362,14 @@ def compute_metrics(sub_df):
         "nutrition": nutrition_v2,
         "livelihoods": livelihoods_resilience_v2,
 
-        # --- NEW: Additional top-level keys for UI ---
+        # Additional top-level keys for UI
         "bc_by_gender": bc_by_gender,
         "nin_by_gender": nin_by_gender,
         "disability_types_children": disability_types_children,
         "disabled_never_enrolled_by_gender": disabled_never_enrolled_by_gender,
         "nutrition_programme": nutrition_programme,
         "hh_cross": hh_cross,
+        "large_households": large_households,
 
         # EXTENDED OBJECT (Eliminates `t.extended is undefined` errors on tabs)
         "extended": {
@@ -372,13 +380,13 @@ def compute_metrics(sub_df):
             "health_v2": health_v2,
             "nutrition_v2": nutrition_v2,
             "livelihoods_resilience_v2": livelihoods_resilience_v2,
-            # --- NEW: Mirror new keys into extended for consistency ---
             "bc_by_gender": bc_by_gender,
             "nin_by_gender": nin_by_gender,
             "disability_types_children": disability_types_children,
             "disabled_never_enrolled_by_gender": disabled_never_enrolled_by_gender,
             "nutrition_programme": nutrition_programme,
             "hh_cross": hh_cross,
+            "large_households": large_households,
         },
     }
 
@@ -457,8 +465,6 @@ def main():
     else:
         df["muac_cat"] = np.nan
 
-    # --- NEW: Clean additional columns ---
-
     # Disability type flags (Yes/No categoricals, nulls become False)
     disability_type_cols = [
         "blind", "deaf", "physicaldisability", "mentalill",
@@ -495,7 +501,10 @@ def main():
     else:
         df["is_chronically_ill"] = False
 
-    # --- NEW: Pre-compute household-level flags (once, on full dataframe) ---
+    # Prevent Pandas DataFrame fragmentation warning
+    df = df.copy()
+
+    # Pre-compute household-level flags (once, on full dataframe)
     hh_col = "hhnsrrno" if "hhnsrrno" in df.columns else "hhno"
 
     print("Computing household-level flags...")
@@ -511,7 +520,18 @@ def main():
     )
     df["hh_vulnerable_count"] = df.groupby(hh_col)["is_vulnerable_member"].transform("sum")
 
-    # --- Geo cleaning ---
+    # Large household flag (7+ members). hhsize is constant within a household.
+    if "hhsize" in df.columns:
+        df["hh_size"] = (
+            pd.to_numeric(df["hhsize"], errors="coerce")
+            .fillna(0)
+            .groupby(df[hh_col])
+            .transform("first")
+        )
+    else:
+        df["hh_size"] = 0
+
+    # Geo cleaning
     df["state_clean"] = df["state"].apply(clean_geo_name)
     df["lga_clean"] = df["lga"].apply(clean_geo_name)
     df["ward_clean"] = df["ward"].apply(clean_geo_name)

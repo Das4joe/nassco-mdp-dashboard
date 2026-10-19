@@ -158,7 +158,8 @@
       "youth_employed": 3,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 5,
@@ -199,6 +200,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 2
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -348,7 +350,8 @@
         "youth_employed": 3,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 5,
@@ -388,7 +391,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 2
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -553,7 +557,8 @@
       "youth_employed": 1,
       "youth_unemployed": 1,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 1,
@@ -594,6 +599,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 1
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -743,7 +749,8 @@
         "youth_employed": 1,
         "youth_unemployed": 1,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 1,
@@ -783,7 +790,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 1
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -948,7 +956,8 @@
       "youth_employed": 11,
       "youth_unemployed": 2,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -989,6 +998,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 3
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -1138,7 +1148,8 @@
         "youth_employed": 11,
         "youth_unemployed": 2,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -1178,7 +1189,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 3
-      }
+      },
+      "large_households": 1
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -1343,7 +1355,8 @@
       "youth_employed": 49,
       "youth_unemployed": 3,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 1
+      "children_in_risk_hhs": 1,
+      "large_households": 3
     },
     "bc_by_gender": {
       "boys_with_bc": 6,
@@ -1384,6 +1397,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 14
     },
+    "large_households": 3,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -1533,7 +1547,8 @@
         "youth_employed": 49,
         "youth_unemployed": 3,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 1
+        "children_in_risk_hhs": 1,
+        "large_households": 3
       },
       "bc_by_gender": {
         "boys_with_bc": 6,
@@ -1573,7 +1588,8 @@
         "female_headed_shock": 0,
         "disability_shock": 1,
         "multi_vulnerable": 14
-      }
+      },
+      "large_households": 3
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -1738,7 +1754,8 @@
       "youth_employed": 90,
       "youth_unemployed": 18,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 10
     },
     "bc_by_gender": {
       "boys_with_bc": 54,
@@ -1779,6 +1796,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 42
     },
+    "large_households": 10,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -1928,7 +1946,8 @@
         "youth_employed": 90,
         "youth_unemployed": 18,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 10
       },
       "bc_by_gender": {
         "boys_with_bc": 54,
@@ -1968,7 +1987,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 42
-      }
+      },
+      "large_households": 10
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -2133,7 +2153,8 @@
       "youth_employed": 72,
       "youth_unemployed": 16,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 8
     },
     "bc_by_gender": {
       "boys_with_bc": 102,
@@ -2174,6 +2195,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 41
     },
+    "large_households": 8,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -2323,7 +2345,8 @@
         "youth_employed": 72,
         "youth_unemployed": 16,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 8
       },
       "bc_by_gender": {
         "boys_with_bc": 102,
@@ -2363,7 +2386,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 41
-      }
+      },
+      "large_households": 8
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -2528,7 +2552,8 @@
       "youth_employed": 2,
       "youth_unemployed": 0,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -2569,6 +2594,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -2718,7 +2744,8 @@
         "youth_employed": 2,
         "youth_unemployed": 0,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -2758,7 +2785,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "BENDE",
@@ -2923,7 +2951,8 @@
       "youth_employed": 71,
       "youth_unemployed": 11,
       "shock_prone_hhs": 12,
-      "children_in_risk_hhs": 35
+      "children_in_risk_hhs": 35,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 63,
@@ -2964,6 +2993,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 22
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -3113,7 +3143,8 @@
         "youth_employed": 71,
         "youth_unemployed": 11,
         "shock_prone_hhs": 12,
-        "children_in_risk_hhs": 35
+        "children_in_risk_hhs": 35,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 63,
@@ -3153,7 +3184,8 @@
         "female_headed_shock": 10,
         "disability_shock": 1,
         "multi_vulnerable": 22
-      }
+      },
+      "large_households": 1
     },
     "state": "ABIA",
     "lga": "IKWUANO",
@@ -3318,7 +3350,8 @@
       "youth_employed": 86,
       "youth_unemployed": 29,
       "shock_prone_hhs": 4,
-      "children_in_risk_hhs": 7
+      "children_in_risk_hhs": 7,
+      "large_households": 20
     },
     "bc_by_gender": {
       "boys_with_bc": 61,
@@ -3359,6 +3392,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 38
     },
+    "large_households": 20,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -3508,7 +3542,8 @@
         "youth_employed": 86,
         "youth_unemployed": 29,
         "shock_prone_hhs": 4,
-        "children_in_risk_hhs": 7
+        "children_in_risk_hhs": 7,
+        "large_households": 20
       },
       "bc_by_gender": {
         "boys_with_bc": 61,
@@ -3548,7 +3583,8 @@
         "female_headed_shock": 2,
         "disability_shock": 0,
         "multi_vulnerable": 38
-      }
+      },
+      "large_households": 20
     },
     "state": "ABIA",
     "lga": "IKWUANO",
@@ -3713,7 +3749,8 @@
       "youth_employed": 2,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -3754,6 +3791,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -3903,7 +3941,8 @@
         "youth_employed": 2,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -3943,7 +3982,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "IKWUANO",
@@ -4108,7 +4148,8 @@
       "youth_employed": 1,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -4149,6 +4190,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -4298,7 +4340,8 @@
         "youth_employed": 1,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -4338,7 +4381,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "IKWUANO",
@@ -4503,7 +4547,8 @@
       "youth_employed": 0,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 1,
@@ -4544,6 +4589,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -4693,7 +4739,8 @@
         "youth_employed": 0,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 1,
@@ -4733,7 +4780,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "ABIA",
     "lga": "ISUIKWUATO",
@@ -4898,7 +4946,8 @@
       "youth_employed": 52,
       "youth_unemployed": 22,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 3
+      "children_in_risk_hhs": 3,
+      "large_households": 3
     },
     "bc_by_gender": {
       "boys_with_bc": 10,
@@ -4939,6 +4988,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 20
     },
+    "large_households": 3,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -5088,7 +5138,8 @@
         "youth_employed": 52,
         "youth_unemployed": 22,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 3
+        "children_in_risk_hhs": 3,
+        "large_households": 3
       },
       "bc_by_gender": {
         "boys_with_bc": 10,
@@ -5128,7 +5179,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 20
-      }
+      },
+      "large_households": 3
     },
     "state": "ABIA",
     "lga": "ISUIKWUATO",
@@ -5293,7 +5345,8 @@
       "youth_employed": 89,
       "youth_unemployed": 57,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 9
     },
     "bc_by_gender": {
       "boys_with_bc": 45,
@@ -5334,6 +5387,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 3
     },
+    "large_households": 9,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -5483,7 +5537,8 @@
         "youth_employed": 89,
         "youth_unemployed": 57,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 9
       },
       "bc_by_gender": {
         "boys_with_bc": 45,
@@ -5523,7 +5578,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 3
-      }
+      },
+      "large_households": 9
     },
     "state": "ABIA",
     "lga": "ISUIKWUATO",
@@ -5688,7 +5744,8 @@
       "youth_employed": 64,
       "youth_unemployed": 26,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 33
     },
     "bc_by_gender": {
       "boys_with_bc": 41,
@@ -5729,6 +5786,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 16
     },
+    "large_households": 33,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -5878,7 +5936,8 @@
         "youth_employed": 64,
         "youth_unemployed": 26,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 33
       },
       "bc_by_gender": {
         "boys_with_bc": 41,
@@ -5918,7 +5977,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 33
     },
     "state": "ABIA",
     "lga": "UKWA EAST",
@@ -6083,7 +6143,8 @@
       "youth_employed": 113,
       "youth_unemployed": 42,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 27
     },
     "bc_by_gender": {
       "boys_with_bc": 62,
@@ -6124,6 +6185,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 6
     },
+    "large_households": 27,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -6273,7 +6335,8 @@
         "youth_employed": 113,
         "youth_unemployed": 42,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 27
       },
       "bc_by_gender": {
         "boys_with_bc": 62,
@@ -6313,7 +6376,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 6
-      }
+      },
+      "large_households": 27
     },
     "state": "ABIA",
     "lga": "UKWA EAST",
@@ -6478,7 +6542,8 @@
       "youth_employed": 12,
       "youth_unemployed": 65,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 22
     },
     "bc_by_gender": {
       "boys_with_bc": 48,
@@ -6519,6 +6584,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 21
     },
+    "large_households": 22,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -6668,7 +6734,8 @@
         "youth_employed": 12,
         "youth_unemployed": 65,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 22
       },
       "bc_by_gender": {
         "boys_with_bc": 48,
@@ -6708,7 +6775,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 21
-      }
+      },
+      "large_households": 22
     },
     "state": "ABIA",
     "lga": "UKWA EAST",
@@ -6873,7 +6941,8 @@
       "youth_employed": 57,
       "youth_unemployed": 5,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 7
     },
     "bc_by_gender": {
       "boys_with_bc": 50,
@@ -6914,6 +6983,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 7,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -7063,7 +7133,8 @@
         "youth_employed": 57,
         "youth_unemployed": 5,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 7
       },
       "bc_by_gender": {
         "boys_with_bc": 50,
@@ -7103,7 +7174,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 7
     },
     "state": "ABIA",
     "lga": "UKWA EAST",
@@ -7268,7 +7340,8 @@
       "youth_employed": 68,
       "youth_unemployed": 1,
       "shock_prone_hhs": 6,
-      "children_in_risk_hhs": 5
+      "children_in_risk_hhs": 5,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 13,
@@ -7309,6 +7382,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 12
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -7458,7 +7532,8 @@
         "youth_employed": 68,
         "youth_unemployed": 1,
         "shock_prone_hhs": 6,
-        "children_in_risk_hhs": 5
+        "children_in_risk_hhs": 5,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 13,
@@ -7498,7 +7573,8 @@
         "female_headed_shock": 4,
         "disability_shock": 0,
         "multi_vulnerable": 12
-      }
+      },
+      "large_households": 1
     },
     "state": "ABIA",
     "lga": "UKWA WEST",
@@ -7663,7 +7739,8 @@
       "youth_employed": 42,
       "youth_unemployed": 40,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 9
     },
     "bc_by_gender": {
       "boys_with_bc": 69,
@@ -7704,6 +7781,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 9
     },
+    "large_households": 9,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -7853,7 +7931,8 @@
         "youth_employed": 42,
         "youth_unemployed": 40,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 9
       },
       "bc_by_gender": {
         "boys_with_bc": 69,
@@ -7893,7 +7972,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 9
-      }
+      },
+      "large_households": 9
     },
     "state": "ABIA",
     "lga": "UKWA WEST",
@@ -8058,7 +8138,8 @@
       "youth_employed": 3,
       "youth_unemployed": 1,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 3
+      "children_in_risk_hhs": 3,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -8099,6 +8180,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -8248,7 +8330,8 @@
         "youth_employed": 3,
         "youth_unemployed": 1,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 3
+        "children_in_risk_hhs": 3,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -8288,7 +8371,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "AGATU",
@@ -8453,7 +8537,8 @@
       "youth_employed": 98,
       "youth_unemployed": 33,
       "shock_prone_hhs": 47,
-      "children_in_risk_hhs": 76
+      "children_in_risk_hhs": 76,
+      "large_households": 2
     },
     "bc_by_gender": {
       "boys_with_bc": 51,
@@ -8494,6 +8579,7 @@
       "disability_shock": 3,
       "multi_vulnerable": 16
     },
+    "large_households": 2,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -8643,7 +8729,8 @@
         "youth_employed": 98,
         "youth_unemployed": 33,
         "shock_prone_hhs": 47,
-        "children_in_risk_hhs": 76
+        "children_in_risk_hhs": 76,
+        "large_households": 2
       },
       "bc_by_gender": {
         "boys_with_bc": 51,
@@ -8683,7 +8770,8 @@
         "female_headed_shock": 21,
         "disability_shock": 3,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 2
     },
     "state": "BENUE",
     "lga": "AGATU",
@@ -8848,7 +8936,8 @@
       "youth_employed": 353,
       "youth_unemployed": 87,
       "shock_prone_hhs": 436,
-      "children_in_risk_hhs": 573
+      "children_in_risk_hhs": 573,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 10,
@@ -8889,6 +8978,7 @@
       "disability_shock": 148,
       "multi_vulnerable": 76
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -9038,7 +9128,8 @@
         "youth_employed": 353,
         "youth_unemployed": 87,
         "shock_prone_hhs": 436,
-        "children_in_risk_hhs": 573
+        "children_in_risk_hhs": 573,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 10,
@@ -9078,7 +9169,8 @@
         "female_headed_shock": 245,
         "disability_shock": 148,
         "multi_vulnerable": 76
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "APA",
@@ -9243,7 +9335,8 @@
       "youth_employed": 11,
       "youth_unemployed": 219,
       "shock_prone_hhs": 9,
-      "children_in_risk_hhs": 12
+      "children_in_risk_hhs": 12,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -9284,6 +9377,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 24
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -9433,7 +9527,8 @@
         "youth_employed": 11,
         "youth_unemployed": 219,
         "shock_prone_hhs": 9,
-        "children_in_risk_hhs": 12
+        "children_in_risk_hhs": 12,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -9473,7 +9568,8 @@
         "female_headed_shock": 4,
         "disability_shock": 0,
         "multi_vulnerable": 24
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "APA",
@@ -9638,7 +9734,8 @@
       "youth_employed": 106,
       "youth_unemployed": 280,
       "shock_prone_hhs": 458,
-      "children_in_risk_hhs": 339
+      "children_in_risk_hhs": 339,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -9679,6 +9776,7 @@
       "disability_shock": 102,
       "multi_vulnerable": 168
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -9828,7 +9926,8 @@
         "youth_employed": 106,
         "youth_unemployed": 280,
         "shock_prone_hhs": 458,
-        "children_in_risk_hhs": 339
+        "children_in_risk_hhs": 339,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -9868,7 +9967,8 @@
         "female_headed_shock": 224,
         "disability_shock": 102,
         "multi_vulnerable": 168
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "APA",
@@ -10033,7 +10133,8 @@
       "youth_employed": 139,
       "youth_unemployed": 6,
       "shock_prone_hhs": 12,
-      "children_in_risk_hhs": 14
+      "children_in_risk_hhs": 14,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -10074,6 +10175,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 27
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -10223,7 +10325,8 @@
         "youth_employed": 139,
         "youth_unemployed": 6,
         "shock_prone_hhs": 12,
-        "children_in_risk_hhs": 14
+        "children_in_risk_hhs": 14,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -10263,7 +10366,8 @@
         "female_headed_shock": 6,
         "disability_shock": 0,
         "multi_vulnerable": 27
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "GWER EAST",
@@ -10428,7 +10532,8 @@
       "youth_employed": 237,
       "youth_unemployed": 18,
       "shock_prone_hhs": 19,
-      "children_in_risk_hhs": 41
+      "children_in_risk_hhs": 41,
+      "large_households": 26
     },
     "bc_by_gender": {
       "boys_with_bc": 23,
@@ -10469,6 +10574,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 71
     },
+    "large_households": 26,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -10618,7 +10724,8 @@
         "youth_employed": 237,
         "youth_unemployed": 18,
         "shock_prone_hhs": 19,
-        "children_in_risk_hhs": 41
+        "children_in_risk_hhs": 41,
+        "large_households": 26
       },
       "bc_by_gender": {
         "boys_with_bc": 23,
@@ -10658,7 +10765,8 @@
         "female_headed_shock": 8,
         "disability_shock": 2,
         "multi_vulnerable": 71
-      }
+      },
+      "large_households": 26
     },
     "state": "BENUE",
     "lga": "GWER EAST",
@@ -10823,7 +10931,8 @@
       "youth_employed": 336,
       "youth_unemployed": 71,
       "shock_prone_hhs": 4,
-      "children_in_risk_hhs": 4
+      "children_in_risk_hhs": 4,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 10,
@@ -10864,6 +10973,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 102
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -11013,7 +11123,8 @@
         "youth_employed": 336,
         "youth_unemployed": 71,
         "shock_prone_hhs": 4,
-        "children_in_risk_hhs": 4
+        "children_in_risk_hhs": 4,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 10,
@@ -11053,7 +11164,8 @@
         "female_headed_shock": 2,
         "disability_shock": 0,
         "multi_vulnerable": 102
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "GWER EAST",
@@ -11218,7 +11330,8 @@
       "youth_employed": 460,
       "youth_unemployed": 77,
       "shock_prone_hhs": 375,
-      "children_in_risk_hhs": 647
+      "children_in_risk_hhs": 647,
+      "large_households": 71
     },
     "bc_by_gender": {
       "boys_with_bc": 215,
@@ -11259,6 +11372,7 @@
       "disability_shock": 4,
       "multi_vulnerable": 148
     },
+    "large_households": 71,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -11408,7 +11522,8 @@
         "youth_employed": 460,
         "youth_unemployed": 77,
         "shock_prone_hhs": 375,
-        "children_in_risk_hhs": 647
+        "children_in_risk_hhs": 647,
+        "large_households": 71
       },
       "bc_by_gender": {
         "boys_with_bc": 215,
@@ -11448,7 +11563,8 @@
         "female_headed_shock": 164,
         "disability_shock": 4,
         "multi_vulnerable": 148
-      }
+      },
+      "large_households": 71
     },
     "state": "BENUE",
     "lga": "GWER EAST",
@@ -11613,7 +11729,8 @@
       "youth_employed": 80,
       "youth_unemployed": 31,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 2
+      "children_in_risk_hhs": 2,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 9,
@@ -11654,6 +11771,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 16
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -11803,7 +11921,8 @@
         "youth_employed": 80,
         "youth_unemployed": 31,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 2
+        "children_in_risk_hhs": 2,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 9,
@@ -11843,7 +11962,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 1
     },
     "state": "BENUE",
     "lga": "LOGO",
@@ -12008,7 +12128,8 @@
       "youth_employed": 183,
       "youth_unemployed": 23,
       "shock_prone_hhs": 84,
-      "children_in_risk_hhs": 14
+      "children_in_risk_hhs": 14,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 24,
@@ -12049,6 +12170,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 21
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -12198,7 +12320,8 @@
         "youth_employed": 183,
         "youth_unemployed": 23,
         "shock_prone_hhs": 84,
-        "children_in_risk_hhs": 14
+        "children_in_risk_hhs": 14,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 24,
@@ -12238,7 +12361,8 @@
         "female_headed_shock": 12,
         "disability_shock": 1,
         "multi_vulnerable": 21
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "LOGO",
@@ -12403,7 +12527,8 @@
       "youth_employed": 126,
       "youth_unemployed": 35,
       "shock_prone_hhs": 16,
-      "children_in_risk_hhs": 12
+      "children_in_risk_hhs": 12,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 12,
@@ -12444,6 +12569,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 16
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -12593,7 +12719,8 @@
         "youth_employed": 126,
         "youth_unemployed": 35,
         "shock_prone_hhs": 16,
-        "children_in_risk_hhs": 12
+        "children_in_risk_hhs": 12,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 12,
@@ -12633,7 +12760,8 @@
         "female_headed_shock": 7,
         "disability_shock": 0,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "LOGO",
@@ -12798,7 +12926,8 @@
       "youth_employed": 129,
       "youth_unemployed": 36,
       "shock_prone_hhs": 4,
-      "children_in_risk_hhs": 2
+      "children_in_risk_hhs": 2,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 37,
@@ -12839,6 +12968,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 22
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -12988,7 +13118,8 @@
         "youth_employed": 129,
         "youth_unemployed": 36,
         "shock_prone_hhs": 4,
-        "children_in_risk_hhs": 2
+        "children_in_risk_hhs": 2,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 37,
@@ -13028,7 +13159,8 @@
         "female_headed_shock": 3,
         "disability_shock": 0,
         "multi_vulnerable": 22
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OBI",
@@ -13193,7 +13325,8 @@
       "youth_employed": 287,
       "youth_unemployed": 50,
       "shock_prone_hhs": 9,
-      "children_in_risk_hhs": 7
+      "children_in_risk_hhs": 7,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 107,
@@ -13234,6 +13367,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 22
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -13383,7 +13517,8 @@
         "youth_employed": 287,
         "youth_unemployed": 50,
         "shock_prone_hhs": 9,
-        "children_in_risk_hhs": 7
+        "children_in_risk_hhs": 7,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 107,
@@ -13423,7 +13558,8 @@
         "female_headed_shock": 4,
         "disability_shock": 0,
         "multi_vulnerable": 22
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OBI",
@@ -13588,7 +13724,8 @@
       "youth_employed": 174,
       "youth_unemployed": 36,
       "shock_prone_hhs": 49,
-      "children_in_risk_hhs": 47
+      "children_in_risk_hhs": 47,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 51,
@@ -13629,6 +13766,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 26
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -13778,7 +13916,8 @@
         "youth_employed": 174,
         "youth_unemployed": 36,
         "shock_prone_hhs": 49,
-        "children_in_risk_hhs": 47
+        "children_in_risk_hhs": 47,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 51,
@@ -13818,7 +13957,8 @@
         "female_headed_shock": 25,
         "disability_shock": 2,
         "multi_vulnerable": 26
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OBI",
@@ -13983,7 +14123,8 @@
       "youth_employed": 176,
       "youth_unemployed": 22,
       "shock_prone_hhs": 8,
-      "children_in_risk_hhs": 5
+      "children_in_risk_hhs": 5,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 48,
@@ -14024,6 +14165,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 23
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -14173,7 +14315,8 @@
         "youth_employed": 176,
         "youth_unemployed": 22,
         "shock_prone_hhs": 8,
-        "children_in_risk_hhs": 5
+        "children_in_risk_hhs": 5,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 48,
@@ -14213,7 +14356,8 @@
         "female_headed_shock": 5,
         "disability_shock": 1,
         "multi_vulnerable": 23
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OBI",
@@ -14378,7 +14522,8 @@
       "youth_employed": 100,
       "youth_unemployed": 49,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 5
+      "children_in_risk_hhs": 5,
+      "large_households": 26
     },
     "bc_by_gender": {
       "boys_with_bc": 72,
@@ -14419,6 +14564,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 20
     },
+    "large_households": 26,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -14568,7 +14714,8 @@
         "youth_employed": 100,
         "youth_unemployed": 49,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 5
+        "children_in_risk_hhs": 5,
+        "large_households": 26
       },
       "bc_by_gender": {
         "boys_with_bc": 72,
@@ -14608,7 +14755,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 20
-      }
+      },
+      "large_households": 26
     },
     "state": "BENUE",
     "lga": "OHIMINI",
@@ -14773,7 +14921,8 @@
       "youth_employed": 140,
       "youth_unemployed": 14,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -14814,6 +14963,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 24
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -14963,7 +15113,8 @@
         "youth_employed": 140,
         "youth_unemployed": 14,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -15003,7 +15154,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 24
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OHIMINI",
@@ -15168,7 +15320,8 @@
       "youth_employed": 19,
       "youth_unemployed": 28,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 1,
@@ -15209,6 +15362,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -15358,7 +15512,8 @@
         "youth_employed": 19,
         "youth_unemployed": 28,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 1,
@@ -15398,7 +15553,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "OHIMINI",
@@ -15563,7 +15719,8 @@
       "youth_employed": 89,
       "youth_unemployed": 20,
       "shock_prone_hhs": 16,
-      "children_in_risk_hhs": 15
+      "children_in_risk_hhs": 15,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 55,
@@ -15604,6 +15761,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 5
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -15753,7 +15911,8 @@
         "youth_employed": 89,
         "youth_unemployed": 20,
         "shock_prone_hhs": 16,
-        "children_in_risk_hhs": 15
+        "children_in_risk_hhs": 15,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 55,
@@ -15793,7 +15952,8 @@
         "female_headed_shock": 6,
         "disability_shock": 1,
         "multi_vulnerable": 5
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "TARKA",
@@ -15958,7 +16118,8 @@
       "youth_employed": 139,
       "youth_unemployed": 46,
       "shock_prone_hhs": 23,
-      "children_in_risk_hhs": 23
+      "children_in_risk_hhs": 23,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 115,
@@ -15999,6 +16160,7 @@
       "disability_shock": 3,
       "multi_vulnerable": 8
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -16148,7 +16310,8 @@
         "youth_employed": 139,
         "youth_unemployed": 46,
         "shock_prone_hhs": 23,
-        "children_in_risk_hhs": 23
+        "children_in_risk_hhs": 23,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 115,
@@ -16188,7 +16351,8 @@
         "female_headed_shock": 9,
         "disability_shock": 3,
         "multi_vulnerable": 8
-      }
+      },
+      "large_households": 1
     },
     "state": "BENUE",
     "lga": "TARKA",
@@ -16353,7 +16517,8 @@
       "youth_employed": 34,
       "youth_unemployed": 7,
       "shock_prone_hhs": 11,
-      "children_in_risk_hhs": 6
+      "children_in_risk_hhs": 6,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 37,
@@ -16394,6 +16559,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 3
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -16543,7 +16709,8 @@
         "youth_employed": 34,
         "youth_unemployed": 7,
         "shock_prone_hhs": 11,
-        "children_in_risk_hhs": 6
+        "children_in_risk_hhs": 6,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 37,
@@ -16583,7 +16750,8 @@
         "female_headed_shock": 4,
         "disability_shock": 1,
         "multi_vulnerable": 3
-      }
+      },
+      "large_households": 0
     },
     "state": "BENUE",
     "lga": "TARKA",
@@ -16748,7 +16916,8 @@
       "youth_employed": 82,
       "youth_unemployed": 60,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 24
     },
     "bc_by_gender": {
       "boys_with_bc": 72,
@@ -16789,6 +16958,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 60
     },
+    "large_households": 24,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -16938,7 +17108,8 @@
         "youth_employed": 82,
         "youth_unemployed": 60,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 24
       },
       "bc_by_gender": {
         "boys_with_bc": 72,
@@ -16978,7 +17149,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 60
-      }
+      },
+      "large_households": 24
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -17143,7 +17315,8 @@
       "youth_employed": 287,
       "youth_unemployed": 211,
       "shock_prone_hhs": 13,
-      "children_in_risk_hhs": 27
+      "children_in_risk_hhs": 27,
+      "large_households": 95
     },
     "bc_by_gender": {
       "boys_with_bc": 86,
@@ -17184,6 +17357,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 130
     },
+    "large_households": 95,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -17333,7 +17507,8 @@
         "youth_employed": 287,
         "youth_unemployed": 211,
         "shock_prone_hhs": 13,
-        "children_in_risk_hhs": 27
+        "children_in_risk_hhs": 27,
+        "large_households": 95
       },
       "bc_by_gender": {
         "boys_with_bc": 86,
@@ -17373,7 +17548,8 @@
         "female_headed_shock": 7,
         "disability_shock": 1,
         "multi_vulnerable": 130
-      }
+      },
+      "large_households": 95
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -17538,7 +17714,8 @@
       "youth_employed": 148,
       "youth_unemployed": 76,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 35
     },
     "bc_by_gender": {
       "boys_with_bc": 48,
@@ -17579,6 +17756,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 72
     },
+    "large_households": 35,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -17728,7 +17906,8 @@
         "youth_employed": 148,
         "youth_unemployed": 76,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 35
       },
       "bc_by_gender": {
         "boys_with_bc": 48,
@@ -17768,7 +17947,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 72
-      }
+      },
+      "large_households": 35
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -17933,7 +18113,8 @@
       "youth_employed": 19,
       "youth_unemployed": 18,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 12
     },
     "bc_by_gender": {
       "boys_with_bc": 10,
@@ -17974,6 +18155,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 7
     },
+    "large_households": 12,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -18123,7 +18305,8 @@
         "youth_employed": 19,
         "youth_unemployed": 18,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 12
       },
       "bc_by_gender": {
         "boys_with_bc": 10,
@@ -18163,7 +18346,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 7
-      }
+      },
+      "large_households": 12
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -18328,7 +18512,8 @@
       "youth_employed": 222,
       "youth_unemployed": 115,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 7
+      "children_in_risk_hhs": 7,
+      "large_households": 43
     },
     "bc_by_gender": {
       "boys_with_bc": 51,
@@ -18369,6 +18554,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 82
     },
+    "large_households": 43,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -18518,7 +18704,8 @@
         "youth_employed": 222,
         "youth_unemployed": 115,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 7
+        "children_in_risk_hhs": 7,
+        "large_households": 43
       },
       "bc_by_gender": {
         "boys_with_bc": 51,
@@ -18558,7 +18745,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 82
-      }
+      },
+      "large_households": 43
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -18723,7 +18911,8 @@
       "youth_employed": 191,
       "youth_unemployed": 116,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 49
     },
     "bc_by_gender": {
       "boys_with_bc": 124,
@@ -18764,6 +18953,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 67
     },
+    "large_households": 49,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -18913,7 +19103,8 @@
         "youth_employed": 191,
         "youth_unemployed": 116,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 49
       },
       "bc_by_gender": {
         "boys_with_bc": 124,
@@ -18953,7 +19144,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 67
-      }
+      },
+      "large_households": 49
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -19118,7 +19310,8 @@
       "youth_employed": 124,
       "youth_unemployed": 72,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 23
     },
     "bc_by_gender": {
       "boys_with_bc": 43,
@@ -19159,6 +19352,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 28
     },
+    "large_households": 23,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -19308,7 +19502,8 @@
         "youth_employed": 124,
         "youth_unemployed": 72,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 23
       },
       "bc_by_gender": {
         "boys_with_bc": 43,
@@ -19348,7 +19543,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 28
-      }
+      },
+      "large_households": 23
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -19513,7 +19709,8 @@
       "youth_employed": 63,
       "youth_unemployed": 41,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 4
+      "children_in_risk_hhs": 4,
+      "large_households": 25
     },
     "bc_by_gender": {
       "boys_with_bc": 30,
@@ -19554,6 +19751,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 19
     },
+    "large_households": 25,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -19703,7 +19901,8 @@
         "youth_employed": 63,
         "youth_unemployed": 41,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 4
+        "children_in_risk_hhs": 4,
+        "large_households": 25
       },
       "bc_by_gender": {
         "boys_with_bc": 30,
@@ -19743,7 +19942,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 19
-      }
+      },
+      "large_households": 25
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -19908,7 +20108,8 @@
       "youth_employed": 128,
       "youth_unemployed": 69,
       "shock_prone_hhs": 5,
-      "children_in_risk_hhs": 14
+      "children_in_risk_hhs": 14,
+      "large_households": 53
     },
     "bc_by_gender": {
       "boys_with_bc": 33,
@@ -19949,6 +20150,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 38
     },
+    "large_households": 53,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -20098,7 +20300,8 @@
         "youth_employed": 128,
         "youth_unemployed": 69,
         "shock_prone_hhs": 5,
-        "children_in_risk_hhs": 14
+        "children_in_risk_hhs": 14,
+        "large_households": 53
       },
       "bc_by_gender": {
         "boys_with_bc": 33,
@@ -20138,7 +20341,8 @@
         "female_headed_shock": 3,
         "disability_shock": 0,
         "multi_vulnerable": 38
-      }
+      },
+      "large_households": 53
     },
     "state": "OYO",
     "lga": "AFIJIO",
@@ -20303,7 +20507,8 @@
       "youth_employed": 167,
       "youth_unemployed": 37,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 6,
@@ -20344,6 +20549,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 29
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -20493,7 +20699,8 @@
         "youth_employed": 167,
         "youth_unemployed": 37,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 6,
@@ -20533,7 +20740,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 29
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "ATISBO",
@@ -20698,7 +20906,8 @@
       "youth_employed": 317,
       "youth_unemployed": 178,
       "shock_prone_hhs": 5,
-      "children_in_risk_hhs": 5
+      "children_in_risk_hhs": 5,
+      "large_households": 6
     },
     "bc_by_gender": {
       "boys_with_bc": 86,
@@ -20739,6 +20948,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 83
     },
+    "large_households": 6,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -20888,7 +21098,8 @@
         "youth_employed": 317,
         "youth_unemployed": 178,
         "shock_prone_hhs": 5,
-        "children_in_risk_hhs": 5
+        "children_in_risk_hhs": 5,
+        "large_households": 6
       },
       "bc_by_gender": {
         "boys_with_bc": 86,
@@ -20928,7 +21139,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 83
-      }
+      },
+      "large_households": 6
     },
     "state": "OYO",
     "lga": "ATISBO",
@@ -21093,7 +21305,8 @@
       "youth_employed": 1,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -21134,6 +21347,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -21283,7 +21497,8 @@
         "youth_employed": 1,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -21323,7 +21538,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "ATISBO",
@@ -21488,7 +21704,8 @@
       "youth_employed": 116,
       "youth_unemployed": 43,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 61,
@@ -21529,6 +21746,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 12
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -21678,7 +21896,8 @@
         "youth_employed": 116,
         "youth_unemployed": 43,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 61,
@@ -21718,7 +21937,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 12
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IBARAPA NORTH",
@@ -21883,7 +22103,8 @@
       "youth_employed": 36,
       "youth_unemployed": 13,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 15,
@@ -21924,6 +22145,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 6
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -22073,7 +22295,8 @@
         "youth_employed": 36,
         "youth_unemployed": 13,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 15,
@@ -22113,7 +22336,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 6
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IBARAPA NORTH",
@@ -22278,7 +22502,8 @@
       "youth_employed": 88,
       "youth_unemployed": 11,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 1
+      "children_in_risk_hhs": 1,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 19,
@@ -22319,6 +22544,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 13
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -22468,7 +22694,8 @@
         "youth_employed": 88,
         "youth_unemployed": 11,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 1
+        "children_in_risk_hhs": 1,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 19,
@@ -22508,7 +22735,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 13
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IBARAPA NORTH",
@@ -22673,7 +22901,8 @@
       "youth_employed": 172,
       "youth_unemployed": 29,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 23,
@@ -22714,6 +22943,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 23
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -22863,7 +23093,8 @@
         "youth_employed": 172,
         "youth_unemployed": 29,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 23,
@@ -22903,7 +23134,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 23
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IBARAPA NORTH",
@@ -23068,7 +23300,8 @@
       "youth_employed": 346,
       "youth_unemployed": 123,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 2
+      "children_in_risk_hhs": 2,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 145,
@@ -23109,6 +23342,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 61
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -23258,7 +23492,8 @@
         "youth_employed": 346,
         "youth_unemployed": 123,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 2
+        "children_in_risk_hhs": 2,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 145,
@@ -23298,7 +23533,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 61
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IBARAPA NORTH",
@@ -23463,7 +23699,8 @@
       "youth_employed": 90,
       "youth_unemployed": 17,
       "shock_prone_hhs": 7,
-      "children_in_risk_hhs": 9
+      "children_in_risk_hhs": 9,
+      "large_households": 10
     },
     "bc_by_gender": {
       "boys_with_bc": 23,
@@ -23504,6 +23741,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 31
     },
+    "large_households": 10,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -23653,7 +23891,8 @@
         "youth_employed": 90,
         "youth_unemployed": 17,
         "shock_prone_hhs": 7,
-        "children_in_risk_hhs": 9
+        "children_in_risk_hhs": 9,
+        "large_households": 10
       },
       "bc_by_gender": {
         "boys_with_bc": 23,
@@ -23693,7 +23932,8 @@
         "female_headed_shock": 4,
         "disability_shock": 0,
         "multi_vulnerable": 31
-      }
+      },
+      "large_households": 10
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -23858,7 +24098,8 @@
       "youth_employed": 24,
       "youth_unemployed": 14,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 2
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -23899,6 +24140,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 10
     },
+    "large_households": 2,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -24048,7 +24290,8 @@
         "youth_employed": 24,
         "youth_unemployed": 14,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 2
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -24088,7 +24331,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 10
-      }
+      },
+      "large_households": 2
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -24253,7 +24497,8 @@
       "youth_employed": 547,
       "youth_unemployed": 56,
       "shock_prone_hhs": 46,
-      "children_in_risk_hhs": 88
+      "children_in_risk_hhs": 88,
+      "large_households": 68
     },
     "bc_by_gender": {
       "boys_with_bc": 116,
@@ -24294,6 +24539,7 @@
       "disability_shock": 4,
       "multi_vulnerable": 147
     },
+    "large_households": 68,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -24443,7 +24689,8 @@
         "youth_employed": 547,
         "youth_unemployed": 56,
         "shock_prone_hhs": 46,
-        "children_in_risk_hhs": 88
+        "children_in_risk_hhs": 88,
+        "large_households": 68
       },
       "bc_by_gender": {
         "boys_with_bc": 116,
@@ -24483,7 +24730,8 @@
         "female_headed_shock": 27,
         "disability_shock": 4,
         "multi_vulnerable": 147
-      }
+      },
+      "large_households": 68
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -24648,7 +24896,8 @@
       "youth_employed": 143,
       "youth_unemployed": 32,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 2
+      "children_in_risk_hhs": 2,
+      "large_households": 35
     },
     "bc_by_gender": {
       "boys_with_bc": 1,
@@ -24689,6 +24938,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 67
     },
+    "large_households": 35,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -24838,7 +25088,8 @@
         "youth_employed": 143,
         "youth_unemployed": 32,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 2
+        "children_in_risk_hhs": 2,
+        "large_households": 35
       },
       "bc_by_gender": {
         "boys_with_bc": 1,
@@ -24878,7 +25129,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 67
-      }
+      },
+      "large_households": 35
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -25043,7 +25295,8 @@
       "youth_employed": 253,
       "youth_unemployed": 55,
       "shock_prone_hhs": 18,
-      "children_in_risk_hhs": 35
+      "children_in_risk_hhs": 35,
+      "large_households": 12
     },
     "bc_by_gender": {
       "boys_with_bc": 60,
@@ -25084,6 +25337,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 93
     },
+    "large_households": 12,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -25233,7 +25487,8 @@
         "youth_employed": 253,
         "youth_unemployed": 55,
         "shock_prone_hhs": 18,
-        "children_in_risk_hhs": 35
+        "children_in_risk_hhs": 35,
+        "large_households": 12
       },
       "bc_by_gender": {
         "boys_with_bc": 60,
@@ -25273,7 +25528,8 @@
         "female_headed_shock": 14,
         "disability_shock": 1,
         "multi_vulnerable": 93
-      }
+      },
+      "large_households": 12
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -25438,7 +25694,8 @@
       "youth_employed": 546,
       "youth_unemployed": 54,
       "shock_prone_hhs": 69,
-      "children_in_risk_hhs": 120
+      "children_in_risk_hhs": 120,
+      "large_households": 27
     },
     "bc_by_gender": {
       "boys_with_bc": 126,
@@ -25479,6 +25736,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 204
     },
+    "large_households": 27,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -25628,7 +25886,8 @@
         "youth_employed": 546,
         "youth_unemployed": 54,
         "shock_prone_hhs": 69,
-        "children_in_risk_hhs": 120
+        "children_in_risk_hhs": 120,
+        "large_households": 27
       },
       "bc_by_gender": {
         "boys_with_bc": 126,
@@ -25668,7 +25927,8 @@
         "female_headed_shock": 33,
         "disability_shock": 0,
         "multi_vulnerable": 204
-      }
+      },
+      "large_households": 27
     },
     "state": "OYO",
     "lga": "ITESIWAJU",
@@ -25833,7 +26093,8 @@
       "youth_employed": 67,
       "youth_unemployed": 10,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 17,
@@ -25874,6 +26135,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 4
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -26023,7 +26285,8 @@
         "youth_employed": 67,
         "youth_unemployed": 10,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 17,
@@ -26063,7 +26326,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 4
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -26228,7 +26492,8 @@
       "youth_employed": 15,
       "youth_unemployed": 6,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 14,
@@ -26269,6 +26534,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -26418,7 +26684,8 @@
         "youth_employed": 15,
         "youth_unemployed": 6,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 14,
@@ -26458,7 +26725,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -26623,7 +26891,8 @@
       "youth_employed": 67,
       "youth_unemployed": 5,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 19,
@@ -26664,6 +26933,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -26813,7 +27083,8 @@
         "youth_employed": 67,
         "youth_unemployed": 5,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 19,
@@ -26853,7 +27124,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 1
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -27018,7 +27290,8 @@
       "youth_employed": 24,
       "youth_unemployed": 3,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 4,
@@ -27059,6 +27332,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 1
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -27208,7 +27482,8 @@
         "youth_employed": 24,
         "youth_unemployed": 3,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 4,
@@ -27248,7 +27523,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 1
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -27413,7 +27689,8 @@
       "youth_employed": 5,
       "youth_unemployed": 4,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 18,
@@ -27454,6 +27731,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 1
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -27603,7 +27881,8 @@
         "youth_employed": 5,
         "youth_unemployed": 4,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 18,
@@ -27643,7 +27922,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 1
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -27808,7 +28088,8 @@
       "youth_employed": 38,
       "youth_unemployed": 9,
       "shock_prone_hhs": 1,
-      "children_in_risk_hhs": 3
+      "children_in_risk_hhs": 3,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 20,
@@ -27849,6 +28130,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -27998,7 +28280,8 @@
         "youth_employed": 38,
         "youth_unemployed": 9,
         "shock_prone_hhs": 1,
-        "children_in_risk_hhs": 3
+        "children_in_risk_hhs": 3,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 20,
@@ -28038,7 +28321,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 1
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -28203,7 +28487,8 @@
       "youth_employed": 108,
       "youth_unemployed": 52,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 2
     },
     "bc_by_gender": {
       "boys_with_bc": 119,
@@ -28244,6 +28529,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 9
     },
+    "large_households": 2,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -28393,7 +28679,8 @@
         "youth_employed": 108,
         "youth_unemployed": 52,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 2
       },
       "bc_by_gender": {
         "boys_with_bc": 119,
@@ -28433,7 +28720,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 9
-      }
+      },
+      "large_households": 2
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -28598,7 +28886,8 @@
       "youth_employed": 135,
       "youth_unemployed": 13,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 4
     },
     "bc_by_gender": {
       "boys_with_bc": 98,
@@ -28639,6 +28928,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 1
     },
+    "large_households": 4,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -28788,7 +29078,8 @@
         "youth_employed": 135,
         "youth_unemployed": 13,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 4
       },
       "bc_by_gender": {
         "boys_with_bc": 98,
@@ -28828,7 +29119,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 1
-      }
+      },
+      "large_households": 4
     },
     "state": "OYO",
     "lga": "IWAJOWA",
@@ -28993,7 +29285,8 @@
       "youth_employed": 105,
       "youth_unemployed": 16,
       "shock_prone_hhs": 35,
-      "children_in_risk_hhs": 60
+      "children_in_risk_hhs": 60,
+      "large_households": 4
     },
     "bc_by_gender": {
       "boys_with_bc": 10,
@@ -29034,6 +29327,7 @@
       "disability_shock": 7,
       "multi_vulnerable": 28
     },
+    "large_households": 4,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -29183,7 +29477,8 @@
         "youth_employed": 105,
         "youth_unemployed": 16,
         "shock_prone_hhs": 35,
-        "children_in_risk_hhs": 60
+        "children_in_risk_hhs": 60,
+        "large_households": 4
       },
       "bc_by_gender": {
         "boys_with_bc": 10,
@@ -29223,7 +29518,8 @@
         "female_headed_shock": 11,
         "disability_shock": 7,
         "multi_vulnerable": 28
-      }
+      },
+      "large_households": 4
     },
     "state": "OYO",
     "lga": "LAGELU",
@@ -29388,7 +29684,8 @@
       "youth_employed": 58,
       "youth_unemployed": 4,
       "shock_prone_hhs": 15,
-      "children_in_risk_hhs": 11
+      "children_in_risk_hhs": 11,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -29429,6 +29726,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 2
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -29578,7 +29876,8 @@
         "youth_employed": 58,
         "youth_unemployed": 4,
         "shock_prone_hhs": 15,
-        "children_in_risk_hhs": 11
+        "children_in_risk_hhs": 11,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -29618,7 +29917,8 @@
         "female_headed_shock": 8,
         "disability_shock": 2,
         "multi_vulnerable": 2
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "LAGELU",
@@ -29783,7 +30083,8 @@
       "youth_employed": 72,
       "youth_unemployed": 18,
       "shock_prone_hhs": 18,
-      "children_in_risk_hhs": 23
+      "children_in_risk_hhs": 23,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 4,
@@ -29824,6 +30125,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 23
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -29973,7 +30275,8 @@
         "youth_employed": 72,
         "youth_unemployed": 18,
         "shock_prone_hhs": 18,
-        "children_in_risk_hhs": 23
+        "children_in_risk_hhs": 23,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 4,
@@ -30013,7 +30316,8 @@
         "female_headed_shock": 8,
         "disability_shock": 1,
         "multi_vulnerable": 23
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "LAGELU",
@@ -30178,7 +30482,8 @@
       "youth_employed": 55,
       "youth_unemployed": 4,
       "shock_prone_hhs": 12,
-      "children_in_risk_hhs": 12
+      "children_in_risk_hhs": 12,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 5,
@@ -30219,6 +30524,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 5
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -30368,7 +30674,8 @@
         "youth_employed": 55,
         "youth_unemployed": 4,
         "shock_prone_hhs": 12,
-        "children_in_risk_hhs": 12
+        "children_in_risk_hhs": 12,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 5,
@@ -30408,7 +30715,8 @@
         "female_headed_shock": 6,
         "disability_shock": 0,
         "multi_vulnerable": 5
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "LAGELU",
@@ -30573,7 +30881,8 @@
       "youth_employed": 37,
       "youth_unemployed": 11,
       "shock_prone_hhs": 3,
-      "children_in_risk_hhs": 4
+      "children_in_risk_hhs": 4,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 3,
@@ -30614,6 +30923,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 9
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -30763,7 +31073,8 @@
         "youth_employed": 37,
         "youth_unemployed": 11,
         "shock_prone_hhs": 3,
-        "children_in_risk_hhs": 4
+        "children_in_risk_hhs": 4,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 3,
@@ -30803,7 +31114,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 9
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "LAGELU",
@@ -30968,7 +31280,8 @@
       "youth_employed": 104,
       "youth_unemployed": 2,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 18
     },
     "bc_by_gender": {
       "boys_with_bc": 75,
@@ -31009,6 +31322,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 27
     },
+    "large_households": 18,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -31158,7 +31472,8 @@
         "youth_employed": 104,
         "youth_unemployed": 2,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 18
       },
       "bc_by_gender": {
         "boys_with_bc": 75,
@@ -31198,7 +31513,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 27
-      }
+      },
+      "large_households": 18
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -31363,7 +31679,8 @@
       "youth_employed": 259,
       "youth_unemployed": 35,
       "shock_prone_hhs": 6,
-      "children_in_risk_hhs": 12
+      "children_in_risk_hhs": 12,
+      "large_households": 43
     },
     "bc_by_gender": {
       "boys_with_bc": 134,
@@ -31404,6 +31721,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 67
     },
+    "large_households": 43,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -31553,7 +31871,8 @@
         "youth_employed": 259,
         "youth_unemployed": 35,
         "shock_prone_hhs": 6,
-        "children_in_risk_hhs": 12
+        "children_in_risk_hhs": 12,
+        "large_households": 43
       },
       "bc_by_gender": {
         "boys_with_bc": 134,
@@ -31593,7 +31912,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 67
-      }
+      },
+      "large_households": 43
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -31758,7 +32078,8 @@
       "youth_employed": 305,
       "youth_unemployed": 30,
       "shock_prone_hhs": 5,
-      "children_in_risk_hhs": 14
+      "children_in_risk_hhs": 14,
+      "large_households": 51
     },
     "bc_by_gender": {
       "boys_with_bc": 213,
@@ -31799,6 +32120,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 70
     },
+    "large_households": 51,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -31948,7 +32270,8 @@
         "youth_employed": 305,
         "youth_unemployed": 30,
         "shock_prone_hhs": 5,
-        "children_in_risk_hhs": 14
+        "children_in_risk_hhs": 14,
+        "large_households": 51
       },
       "bc_by_gender": {
         "boys_with_bc": 213,
@@ -31988,7 +32311,8 @@
         "female_headed_shock": 4,
         "disability_shock": 2,
         "multi_vulnerable": 70
-      }
+      },
+      "large_households": 51
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -32153,7 +32477,8 @@
       "youth_employed": 362,
       "youth_unemployed": 39,
       "shock_prone_hhs": 6,
-      "children_in_risk_hhs": 15
+      "children_in_risk_hhs": 15,
+      "large_households": 105
     },
     "bc_by_gender": {
       "boys_with_bc": 347,
@@ -32194,6 +32519,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 161
     },
+    "large_households": 105,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -32343,7 +32669,8 @@
         "youth_employed": 362,
         "youth_unemployed": 39,
         "shock_prone_hhs": 6,
-        "children_in_risk_hhs": 15
+        "children_in_risk_hhs": 15,
+        "large_households": 105
       },
       "bc_by_gender": {
         "boys_with_bc": 347,
@@ -32383,7 +32710,8 @@
         "female_headed_shock": 5,
         "disability_shock": 1,
         "multi_vulnerable": 161
-      }
+      },
+      "large_households": 105
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -32548,7 +32876,8 @@
       "youth_employed": 119,
       "youth_unemployed": 22,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 27
     },
     "bc_by_gender": {
       "boys_with_bc": 78,
@@ -32589,6 +32918,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 31
     },
+    "large_households": 27,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -32738,7 +33068,8 @@
         "youth_employed": 119,
         "youth_unemployed": 22,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 27
       },
       "bc_by_gender": {
         "boys_with_bc": 78,
@@ -32778,7 +33109,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 31
-      }
+      },
+      "large_households": 27
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -32943,7 +33275,8 @@
       "youth_employed": 223,
       "youth_unemployed": 5,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 4
+      "children_in_risk_hhs": 4,
+      "large_households": 56
     },
     "bc_by_gender": {
       "boys_with_bc": 205,
@@ -32984,6 +33317,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 58
     },
+    "large_households": 56,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -33133,7 +33467,8 @@
         "youth_employed": 223,
         "youth_unemployed": 5,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 4
+        "children_in_risk_hhs": 4,
+        "large_households": 56
       },
       "bc_by_gender": {
         "boys_with_bc": 205,
@@ -33173,7 +33508,8 @@
         "female_headed_shock": 2,
         "disability_shock": 0,
         "multi_vulnerable": 58
-      }
+      },
+      "large_households": 56
     },
     "state": "OYO",
     "lga": "OGO-OLUWA",
@@ -33338,7 +33674,8 @@
       "youth_employed": 576,
       "youth_unemployed": 27,
       "shock_prone_hhs": 35,
-      "children_in_risk_hhs": 52
+      "children_in_risk_hhs": 52,
+      "large_households": 47
     },
     "bc_by_gender": {
       "boys_with_bc": 95,
@@ -33379,6 +33716,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 36
     },
+    "large_households": 47,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -33528,7 +33866,8 @@
         "youth_employed": 576,
         "youth_unemployed": 27,
         "shock_prone_hhs": 35,
-        "children_in_risk_hhs": 52
+        "children_in_risk_hhs": 52,
+        "large_households": 47
       },
       "bc_by_gender": {
         "boys_with_bc": 95,
@@ -33568,7 +33907,8 @@
         "female_headed_shock": 6,
         "disability_shock": 0,
         "multi_vulnerable": 36
-      }
+      },
+      "large_households": 47
     },
     "state": "OYO",
     "lga": "ORI-IRE",
@@ -33733,7 +34073,8 @@
       "youth_employed": 65,
       "youth_unemployed": 5,
       "shock_prone_hhs": 4,
-      "children_in_risk_hhs": 9
+      "children_in_risk_hhs": 9,
+      "large_households": 11
     },
     "bc_by_gender": {
       "boys_with_bc": 23,
@@ -33774,6 +34115,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 3
     },
+    "large_households": 11,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -33923,7 +34265,8 @@
         "youth_employed": 65,
         "youth_unemployed": 5,
         "shock_prone_hhs": 4,
-        "children_in_risk_hhs": 9
+        "children_in_risk_hhs": 9,
+        "large_households": 11
       },
       "bc_by_gender": {
         "boys_with_bc": 23,
@@ -33963,7 +34306,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 3
-      }
+      },
+      "large_households": 11
     },
     "state": "OYO",
     "lga": "ORI-IRE",
@@ -34128,7 +34472,8 @@
       "youth_employed": 13,
       "youth_unemployed": 0,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 15,
@@ -34169,6 +34514,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -34318,7 +34664,8 @@
         "youth_employed": 13,
         "youth_unemployed": 0,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 15,
@@ -34358,7 +34705,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "ORI-IRE",
@@ -34523,7 +34871,8 @@
       "youth_employed": 91,
       "youth_unemployed": 14,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 22,
@@ -34564,6 +34913,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -34713,7 +35063,8 @@
         "youth_employed": 91,
         "youth_unemployed": 14,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 22,
@@ -34753,7 +35104,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "ORI-IRE",
@@ -34918,7 +35270,8 @@
       "youth_employed": 1,
       "youth_unemployed": 1,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -34959,6 +35312,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 0
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -35108,7 +35462,8 @@
         "youth_employed": 1,
         "youth_unemployed": 1,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -35148,7 +35503,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 0
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "ORI-IRE",
@@ -35313,7 +35669,8 @@
       "youth_employed": 404,
       "youth_unemployed": 41,
       "shock_prone_hhs": 225,
-      "children_in_risk_hhs": 344
+      "children_in_risk_hhs": 344,
+      "large_households": 3
     },
     "bc_by_gender": {
       "boys_with_bc": 43,
@@ -35354,6 +35711,7 @@
       "disability_shock": 10,
       "multi_vulnerable": 98
     },
+    "large_households": 3,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -35503,7 +35861,8 @@
         "youth_employed": 404,
         "youth_unemployed": 41,
         "shock_prone_hhs": 225,
-        "children_in_risk_hhs": 344
+        "children_in_risk_hhs": 344,
+        "large_households": 3
       },
       "bc_by_gender": {
         "boys_with_bc": 43,
@@ -35543,7 +35902,8 @@
         "female_headed_shock": 138,
         "disability_shock": 10,
         "multi_vulnerable": 98
-      }
+      },
+      "large_households": 3
     },
     "state": "OYO",
     "lga": "SAKI EAST",
@@ -35708,7 +36068,8 @@
       "youth_employed": 281,
       "youth_unemployed": 26,
       "shock_prone_hhs": 221,
-      "children_in_risk_hhs": 372
+      "children_in_risk_hhs": 372,
+      "large_households": 6
     },
     "bc_by_gender": {
       "boys_with_bc": 28,
@@ -35749,6 +36110,7 @@
       "disability_shock": 11,
       "multi_vulnerable": 78
     },
+    "large_households": 6,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -35898,7 +36260,8 @@
         "youth_employed": 281,
         "youth_unemployed": 26,
         "shock_prone_hhs": 221,
-        "children_in_risk_hhs": 372
+        "children_in_risk_hhs": 372,
+        "large_households": 6
       },
       "bc_by_gender": {
         "boys_with_bc": 28,
@@ -35938,7 +36301,8 @@
         "female_headed_shock": 143,
         "disability_shock": 11,
         "multi_vulnerable": 78
-      }
+      },
+      "large_households": 6
     },
     "state": "OYO",
     "lga": "SAKI EAST",
@@ -36103,7 +36467,8 @@
       "youth_employed": 22,
       "youth_unemployed": 3,
       "shock_prone_hhs": 19,
-      "children_in_risk_hhs": 45
+      "children_in_risk_hhs": 45,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 5,
@@ -36144,6 +36509,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 16
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -36293,7 +36659,8 @@
         "youth_employed": 22,
         "youth_unemployed": 3,
         "shock_prone_hhs": 19,
-        "children_in_risk_hhs": 45
+        "children_in_risk_hhs": 45,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 5,
@@ -36333,7 +36700,8 @@
         "female_headed_shock": 8,
         "disability_shock": 1,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 1
     },
     "state": "OYO",
     "lga": "SAKI EAST",
@@ -36498,7 +36866,8 @@
       "youth_employed": 95,
       "youth_unemployed": 19,
       "shock_prone_hhs": 76,
-      "children_in_risk_hhs": 147
+      "children_in_risk_hhs": 147,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 9,
@@ -36539,6 +36908,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 39
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -36688,7 +37058,8 @@
         "youth_employed": 95,
         "youth_unemployed": 19,
         "shock_prone_hhs": 76,
-        "children_in_risk_hhs": 147
+        "children_in_risk_hhs": 147,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 9,
@@ -36728,7 +37099,8 @@
         "female_headed_shock": 49,
         "disability_shock": 0,
         "multi_vulnerable": 39
-      }
+      },
+      "large_households": 0
     },
     "state": "OYO",
     "lga": "SAKI EAST",
@@ -36893,7 +37265,8 @@
       "youth_employed": 208,
       "youth_unemployed": 7,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 6
     },
     "bc_by_gender": {
       "boys_with_bc": 117,
@@ -36934,6 +37307,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 35
     },
+    "large_households": 6,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -37083,7 +37457,8 @@
         "youth_employed": 208,
         "youth_unemployed": 7,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 6
       },
       "bc_by_gender": {
         "boys_with_bc": 117,
@@ -37123,7 +37498,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 35
-      }
+      },
+      "large_households": 6
     },
     "state": "OYO",
     "lga": "SURULERE",
@@ -37288,7 +37664,8 @@
       "youth_employed": 45,
       "youth_unemployed": 11,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 26,
@@ -37329,6 +37706,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 8
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -37478,7 +37856,8 @@
         "youth_employed": 45,
         "youth_unemployed": 11,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 26,
@@ -37518,7 +37897,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 8
-      }
+      },
+      "large_households": 1
     },
     "state": "OYO",
     "lga": "SURULERE",
@@ -37683,7 +38063,8 @@
       "youth_employed": 328,
       "youth_unemployed": 49,
       "shock_prone_hhs": 6,
-      "children_in_risk_hhs": 5
+      "children_in_risk_hhs": 5,
+      "large_households": 7
     },
     "bc_by_gender": {
       "boys_with_bc": 198,
@@ -37724,6 +38105,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 67
     },
+    "large_households": 7,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -37873,7 +38255,8 @@
         "youth_employed": 328,
         "youth_unemployed": 49,
         "shock_prone_hhs": 6,
-        "children_in_risk_hhs": 5
+        "children_in_risk_hhs": 5,
+        "large_households": 7
       },
       "bc_by_gender": {
         "boys_with_bc": 198,
@@ -37913,7 +38296,8 @@
         "female_headed_shock": 2,
         "disability_shock": 0,
         "multi_vulnerable": 67
-      }
+      },
+      "large_households": 7
     },
     "state": "OYO",
     "lga": "SURULERE",
@@ -38078,7 +38462,8 @@
       "youth_employed": 38,
       "youth_unemployed": 10,
       "shock_prone_hhs": 4,
-      "children_in_risk_hhs": 7
+      "children_in_risk_hhs": 7,
+      "large_households": 14
     },
     "bc_by_gender": {
       "boys_with_bc": 70,
@@ -38119,6 +38504,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 12
     },
+    "large_households": 14,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -38268,7 +38654,8 @@
         "youth_employed": 38,
         "youth_unemployed": 10,
         "shock_prone_hhs": 4,
-        "children_in_risk_hhs": 7
+        "children_in_risk_hhs": 7,
+        "large_households": 14
       },
       "bc_by_gender": {
         "boys_with_bc": 70,
@@ -38308,7 +38695,8 @@
         "female_headed_shock": 1,
         "disability_shock": 1,
         "multi_vulnerable": 12
-      }
+      },
+      "large_households": 14
     },
     "state": "SOKOTO",
     "lga": "BINJI",
@@ -38473,7 +38861,8 @@
       "youth_employed": 83,
       "youth_unemployed": 19,
       "shock_prone_hhs": 98,
-      "children_in_risk_hhs": 252
+      "children_in_risk_hhs": 252,
+      "large_households": 32
     },
     "bc_by_gender": {
       "boys_with_bc": 5,
@@ -38514,6 +38903,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 14
     },
+    "large_households": 32,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -38663,7 +39053,8 @@
         "youth_employed": 83,
         "youth_unemployed": 19,
         "shock_prone_hhs": 98,
-        "children_in_risk_hhs": 252
+        "children_in_risk_hhs": 252,
+        "large_households": 32
       },
       "bc_by_gender": {
         "boys_with_bc": 5,
@@ -38703,7 +39094,8 @@
         "female_headed_shock": 61,
         "disability_shock": 0,
         "multi_vulnerable": 14
-      }
+      },
+      "large_households": 32
     },
     "state": "SOKOTO",
     "lga": "BINJI",
@@ -38868,7 +39260,8 @@
       "youth_employed": 149,
       "youth_unemployed": 13,
       "shock_prone_hhs": 66,
-      "children_in_risk_hhs": 225
+      "children_in_risk_hhs": 225,
+      "large_households": 72
     },
     "bc_by_gender": {
       "boys_with_bc": 84,
@@ -38909,6 +39302,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 20
     },
+    "large_households": 72,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -39058,7 +39452,8 @@
         "youth_employed": 149,
         "youth_unemployed": 13,
         "shock_prone_hhs": 66,
-        "children_in_risk_hhs": 225
+        "children_in_risk_hhs": 225,
+        "large_households": 72
       },
       "bc_by_gender": {
         "boys_with_bc": 84,
@@ -39098,7 +39493,8 @@
         "female_headed_shock": 18,
         "disability_shock": 0,
         "multi_vulnerable": 20
-      }
+      },
+      "large_households": 72
     },
     "state": "SOKOTO",
     "lga": "BINJI",
@@ -39263,7 +39659,8 @@
       "youth_employed": 232,
       "youth_unemployed": 61,
       "shock_prone_hhs": 71,
-      "children_in_risk_hhs": 261
+      "children_in_risk_hhs": 261,
+      "large_households": 143
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -39304,6 +39701,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 121
     },
+    "large_households": 143,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -39453,7 +39851,8 @@
         "youth_employed": 232,
         "youth_unemployed": 61,
         "shock_prone_hhs": 71,
-        "children_in_risk_hhs": 261
+        "children_in_risk_hhs": 261,
+        "large_households": 143
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -39493,7 +39892,8 @@
         "female_headed_shock": 17,
         "disability_shock": 2,
         "multi_vulnerable": 121
-      }
+      },
+      "large_households": 143
     },
     "state": "SOKOTO",
     "lga": "GUDU",
@@ -39658,7 +40058,8 @@
       "youth_employed": 90,
       "youth_unemployed": 15,
       "shock_prone_hhs": 34,
-      "children_in_risk_hhs": 111
+      "children_in_risk_hhs": 111,
+      "large_households": 57
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -39699,6 +40100,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 77
     },
+    "large_households": 57,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -39848,7 +40250,8 @@
         "youth_employed": 90,
         "youth_unemployed": 15,
         "shock_prone_hhs": 34,
-        "children_in_risk_hhs": 111
+        "children_in_risk_hhs": 111,
+        "large_households": 57
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -39888,7 +40291,8 @@
         "female_headed_shock": 8,
         "disability_shock": 1,
         "multi_vulnerable": 77
-      }
+      },
+      "large_households": 57
     },
     "state": "SOKOTO",
     "lga": "GUDU",
@@ -40053,7 +40457,8 @@
       "youth_employed": 37,
       "youth_unemployed": 103,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 4
+      "children_in_risk_hhs": 4,
+      "large_households": 14
     },
     "bc_by_gender": {
       "boys_with_bc": 8,
@@ -40094,6 +40499,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 73
     },
+    "large_households": 14,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -40243,7 +40649,8 @@
         "youth_employed": 37,
         "youth_unemployed": 103,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 4
+        "children_in_risk_hhs": 4,
+        "large_households": 14
       },
       "bc_by_gender": {
         "boys_with_bc": 8,
@@ -40283,7 +40690,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 73
-      }
+      },
+      "large_households": 14
     },
     "state": "SOKOTO",
     "lga": "KEBBE",
@@ -40448,7 +40856,8 @@
       "youth_employed": 1,
       "youth_unemployed": 49,
       "shock_prone_hhs": 137,
-      "children_in_risk_hhs": 90
+      "children_in_risk_hhs": 90,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 1,
@@ -40489,6 +40898,7 @@
       "disability_shock": 21,
       "multi_vulnerable": 36
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -40638,7 +41048,8 @@
         "youth_employed": 1,
         "youth_unemployed": 49,
         "shock_prone_hhs": 137,
-        "children_in_risk_hhs": 90
+        "children_in_risk_hhs": 90,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 1,
@@ -40678,7 +41089,8 @@
         "female_headed_shock": 41,
         "disability_shock": 21,
         "multi_vulnerable": 36
-      }
+      },
+      "large_households": 0
     },
     "state": "SOKOTO",
     "lga": "KEBBE",
@@ -40843,7 +41255,8 @@
       "youth_employed": 118,
       "youth_unemployed": 57,
       "shock_prone_hhs": 132,
-      "children_in_risk_hhs": 189
+      "children_in_risk_hhs": 189,
+      "large_households": 8
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -40884,6 +41297,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 107
     },
+    "large_households": 8,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -41033,7 +41447,8 @@
         "youth_employed": 118,
         "youth_unemployed": 57,
         "shock_prone_hhs": 132,
-        "children_in_risk_hhs": 189
+        "children_in_risk_hhs": 189,
+        "large_households": 8
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -41073,7 +41488,8 @@
         "female_headed_shock": 31,
         "disability_shock": 0,
         "multi_vulnerable": 107
-      }
+      },
+      "large_households": 8
     },
     "state": "SOKOTO",
     "lga": "KEBBE",
@@ -41238,7 +41654,8 @@
       "youth_employed": 6,
       "youth_unemployed": 76,
       "shock_prone_hhs": 17,
-      "children_in_risk_hhs": 23
+      "children_in_risk_hhs": 23,
+      "large_households": 2
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -41279,6 +41696,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 31
     },
+    "large_households": 2,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -41428,7 +41846,8 @@
         "youth_employed": 6,
         "youth_unemployed": 76,
         "shock_prone_hhs": 17,
-        "children_in_risk_hhs": 23
+        "children_in_risk_hhs": 23,
+        "large_households": 2
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -41468,7 +41887,8 @@
         "female_headed_shock": 5,
         "disability_shock": 0,
         "multi_vulnerable": 31
-      }
+      },
+      "large_households": 2
     },
     "state": "SOKOTO",
     "lga": "SHAGARI",
@@ -41633,7 +42053,8 @@
       "youth_employed": 76,
       "youth_unemployed": 144,
       "shock_prone_hhs": 497,
-      "children_in_risk_hhs": 538
+      "children_in_risk_hhs": 538,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 49,
@@ -41674,6 +42095,7 @@
       "disability_shock": 4,
       "multi_vulnerable": 100
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -41823,7 +42245,8 @@
         "youth_employed": 76,
         "youth_unemployed": 144,
         "shock_prone_hhs": 497,
-        "children_in_risk_hhs": 538
+        "children_in_risk_hhs": 538,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 49,
@@ -41863,7 +42286,8 @@
         "female_headed_shock": 191,
         "disability_shock": 4,
         "multi_vulnerable": 100
-      }
+      },
+      "large_households": 1
     },
     "state": "SOKOTO",
     "lga": "SHAGARI",
@@ -42028,7 +42452,8 @@
       "youth_employed": 4,
       "youth_unemployed": 48,
       "shock_prone_hhs": 67,
-      "children_in_risk_hhs": 42
+      "children_in_risk_hhs": 42,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 32,
@@ -42069,6 +42494,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 3
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -42218,7 +42644,8 @@
         "youth_employed": 4,
         "youth_unemployed": 48,
         "shock_prone_hhs": 67,
-        "children_in_risk_hhs": 42
+        "children_in_risk_hhs": 42,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 32,
@@ -42258,7 +42685,8 @@
         "female_headed_shock": 2,
         "disability_shock": 0,
         "multi_vulnerable": 3
-      }
+      },
+      "large_households": 0
     },
     "state": "SOKOTO",
     "lga": "SHAGARI",
@@ -42423,7 +42851,8 @@
       "youth_employed": 176,
       "youth_unemployed": 19,
       "shock_prone_hhs": 2,
-      "children_in_risk_hhs": 2
+      "children_in_risk_hhs": 2,
+      "large_households": 6
     },
     "bc_by_gender": {
       "boys_with_bc": 2,
@@ -42464,6 +42893,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 33
     },
+    "large_households": 6,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -42613,7 +43043,8 @@
         "youth_employed": 176,
         "youth_unemployed": 19,
         "shock_prone_hhs": 2,
-        "children_in_risk_hhs": 2
+        "children_in_risk_hhs": 2,
+        "large_households": 6
       },
       "bc_by_gender": {
         "boys_with_bc": 2,
@@ -42653,7 +43084,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 33
-      }
+      },
+      "large_households": 6
     },
     "state": "SOKOTO",
     "lga": "SILAME",
@@ -42818,7 +43250,8 @@
       "youth_employed": 199,
       "youth_unemployed": 14,
       "shock_prone_hhs": 0,
-      "children_in_risk_hhs": 0
+      "children_in_risk_hhs": 0,
+      "large_households": 37
     },
     "bc_by_gender": {
       "boys_with_bc": 41,
@@ -42859,6 +43292,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 50
     },
+    "large_households": 37,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -43008,7 +43442,8 @@
         "youth_employed": 199,
         "youth_unemployed": 14,
         "shock_prone_hhs": 0,
-        "children_in_risk_hhs": 0
+        "children_in_risk_hhs": 0,
+        "large_households": 37
       },
       "bc_by_gender": {
         "boys_with_bc": 41,
@@ -43048,7 +43483,8 @@
         "female_headed_shock": 0,
         "disability_shock": 0,
         "multi_vulnerable": 50
-      }
+      },
+      "large_households": 37
     },
     "state": "SOKOTO",
     "lga": "SILAME",
@@ -43213,7 +43649,8 @@
       "youth_employed": 102,
       "youth_unemployed": 7,
       "shock_prone_hhs": 96,
-      "children_in_risk_hhs": 185
+      "children_in_risk_hhs": 185,
+      "large_households": 17
     },
     "bc_by_gender": {
       "boys_with_bc": 6,
@@ -43254,6 +43691,7 @@
       "disability_shock": 2,
       "multi_vulnerable": 16
     },
+    "large_households": 17,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -43403,7 +43841,8 @@
         "youth_employed": 102,
         "youth_unemployed": 7,
         "shock_prone_hhs": 96,
-        "children_in_risk_hhs": 185
+        "children_in_risk_hhs": 185,
+        "large_households": 17
       },
       "bc_by_gender": {
         "boys_with_bc": 6,
@@ -43443,7 +43882,8 @@
         "female_headed_shock": 16,
         "disability_shock": 2,
         "multi_vulnerable": 16
-      }
+      },
+      "large_households": 17
     },
     "state": "SOKOTO",
     "lga": "SILAME",
@@ -43608,7 +44048,8 @@
       "youth_employed": 0,
       "youth_unemployed": 72,
       "shock_prone_hhs": 223,
-      "children_in_risk_hhs": 364
+      "children_in_risk_hhs": 364,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 151,
@@ -43649,6 +44090,7 @@
       "disability_shock": 11,
       "multi_vulnerable": 79
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -43798,7 +44240,8 @@
         "youth_employed": 0,
         "youth_unemployed": 72,
         "shock_prone_hhs": 223,
-        "children_in_risk_hhs": 364
+        "children_in_risk_hhs": 364,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 151,
@@ -43838,7 +44281,8 @@
         "female_headed_shock": 95,
         "disability_shock": 11,
         "multi_vulnerable": 79
-      }
+      },
+      "large_households": 1
     },
     "state": "SOKOTO",
     "lga": "TURETA",
@@ -44003,7 +44447,8 @@
       "youth_employed": 114,
       "youth_unemployed": 153,
       "shock_prone_hhs": 237,
-      "children_in_risk_hhs": 563
+      "children_in_risk_hhs": 563,
+      "large_households": 35
     },
     "bc_by_gender": {
       "boys_with_bc": 23,
@@ -44044,6 +44489,7 @@
       "disability_shock": 5,
       "multi_vulnerable": 68
     },
+    "large_households": 35,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -44193,7 +44639,8 @@
         "youth_employed": 114,
         "youth_unemployed": 153,
         "shock_prone_hhs": 237,
-        "children_in_risk_hhs": 563
+        "children_in_risk_hhs": 563,
+        "large_households": 35
       },
       "bc_by_gender": {
         "boys_with_bc": 23,
@@ -44233,7 +44680,8 @@
         "female_headed_shock": 51,
         "disability_shock": 5,
         "multi_vulnerable": 68
-      }
+      },
+      "large_households": 35
     },
     "state": "SOKOTO",
     "lga": "TURETA",
@@ -44398,7 +44846,8 @@
       "youth_employed": 84,
       "youth_unemployed": 60,
       "shock_prone_hhs": 137,
-      "children_in_risk_hhs": 380
+      "children_in_risk_hhs": 380,
+      "large_households": 25
     },
     "bc_by_gender": {
       "boys_with_bc": 276,
@@ -44439,6 +44888,7 @@
       "disability_shock": 62,
       "multi_vulnerable": 137
     },
+    "large_households": 25,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -44588,7 +45038,8 @@
         "youth_employed": 84,
         "youth_unemployed": 60,
         "shock_prone_hhs": 137,
-        "children_in_risk_hhs": 380
+        "children_in_risk_hhs": 380,
+        "large_households": 25
       },
       "bc_by_gender": {
         "boys_with_bc": 276,
@@ -44628,7 +45079,8 @@
         "female_headed_shock": 53,
         "disability_shock": 62,
         "multi_vulnerable": 137
-      }
+      },
+      "large_households": 25
     },
     "state": "SOKOTO",
     "lga": "TURETA",
@@ -44793,7 +45245,8 @@
       "youth_employed": 121,
       "youth_unemployed": 18,
       "shock_prone_hhs": 9,
-      "children_in_risk_hhs": 9
+      "children_in_risk_hhs": 9,
+      "large_households": 1
     },
     "bc_by_gender": {
       "boys_with_bc": 0,
@@ -44834,6 +45287,7 @@
       "disability_shock": 1,
       "multi_vulnerable": 27
     },
+    "large_households": 1,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -44983,7 +45437,8 @@
         "youth_employed": 121,
         "youth_unemployed": 18,
         "shock_prone_hhs": 9,
-        "children_in_risk_hhs": 9
+        "children_in_risk_hhs": 9,
+        "large_households": 1
       },
       "bc_by_gender": {
         "boys_with_bc": 0,
@@ -45023,7 +45478,8 @@
         "female_headed_shock": 0,
         "disability_shock": 1,
         "multi_vulnerable": 27
-      }
+      },
+      "large_households": 1
     },
     "state": "SOKOTO",
     "lga": "YABO",
@@ -45188,7 +45644,8 @@
       "youth_employed": 112,
       "youth_unemployed": 20,
       "shock_prone_hhs": 99,
-      "children_in_risk_hhs": 93
+      "children_in_risk_hhs": 93,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 8,
@@ -45229,6 +45686,7 @@
       "disability_shock": 5,
       "multi_vulnerable": 54
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -45378,7 +45836,8 @@
         "youth_employed": 112,
         "youth_unemployed": 20,
         "shock_prone_hhs": 99,
-        "children_in_risk_hhs": 93
+        "children_in_risk_hhs": 93,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 8,
@@ -45418,7 +45877,8 @@
         "female_headed_shock": 5,
         "disability_shock": 5,
         "multi_vulnerable": 54
-      }
+      },
+      "large_households": 0
     },
     "state": "SOKOTO",
     "lga": "YABO",
@@ -45583,7 +46043,8 @@
       "youth_employed": 119,
       "youth_unemployed": 34,
       "shock_prone_hhs": 9,
-      "children_in_risk_hhs": 10
+      "children_in_risk_hhs": 10,
+      "large_households": 0
     },
     "bc_by_gender": {
       "boys_with_bc": 2,
@@ -45624,6 +46085,7 @@
       "disability_shock": 0,
       "multi_vulnerable": 135
     },
+    "large_households": 0,
     "extended": {
       "age_sex_pyramid": [
         {
@@ -45773,7 +46235,8 @@
         "youth_employed": 119,
         "youth_unemployed": 34,
         "shock_prone_hhs": 9,
-        "children_in_risk_hhs": 10
+        "children_in_risk_hhs": 10,
+        "large_households": 0
       },
       "bc_by_gender": {
         "boys_with_bc": 2,
@@ -45813,7 +46276,8 @@
         "female_headed_shock": 1,
         "disability_shock": 0,
         "multi_vulnerable": 135
-      }
+      },
+      "large_households": 0
     },
     "state": "SOKOTO",
     "lga": "YABO",

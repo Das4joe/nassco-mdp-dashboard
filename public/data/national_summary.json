@@ -157,7 +157,8 @@
     "youth_employed": 14562,
     "youth_unemployed": 4450,
     "shock_prone_hhs": 4409,
-    "children_in_risk_hhs": 6692
+    "children_in_risk_hhs": 6692,
+    "large_households": 1659
   },
   "bc_by_gender": {
     "boys_with_bc": 5408,
@@ -198,6 +199,7 @@
     "disability_shock": 426,
     "multi_vulnerable": 4440
   },
+  "large_households": 1659,
   "extended": {
     "age_sex_pyramid": [
       {
@@ -347,7 +349,8 @@
       "youth_employed": 14562,
       "youth_unemployed": 4450,
       "shock_prone_hhs": 4409,
-      "children_in_risk_hhs": 6692
+      "children_in_risk_hhs": 6692,
+      "large_households": 1659
     },
     "bc_by_gender": {
       "boys_with_bc": 5408,
@@ -387,6 +390,7 @@
       "female_headed_shock": 1849,
       "disability_shock": 426,
       "multi_vulnerable": 4440
-    }
+    },
+    "large_households": 1659
   }
 }
