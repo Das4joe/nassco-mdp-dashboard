@@ -46,7 +46,7 @@ const ALIAS: Record<string, string> = {
 };
 
 /* ──────────────────────────────────────────────
-   Null-safe normaliser (prevents trim crash)
+   Null-safe normaliser
    ────────────────────────────────────────────── */
 
 const norm = (s?: string | null): string => {
@@ -94,7 +94,7 @@ async function fetchGeo(url: string): Promise<any> {
 }
 
 /* ──────────────────────────────────────────────
-   Domain-specific hover rows (single source of truth)
+   Domain-specific hover rows
    ────────────────────────────────────────────── */
 
 function buildHoverRows(
@@ -214,7 +214,7 @@ function buildHoverRows(
 }
 
 /* ──────────────────────────────────────────────
-   Choropleth value (for colour intensity)
+   Choropleth value
    ────────────────────────────────────────────── */
 
 function getChoroplethValue(
@@ -328,8 +328,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   path,
   onNavigate,
   onPathChange,
-  selectedStateFilter,
-  stateFilter,
   domain: domainProp,
   metric,
   height = 420,
@@ -377,14 +375,15 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     return () => setHoverInfo(null);
   }, [path.state, path.lga, path.ward, domain]);
 
-  const activeState = path.state || selectedStateFilter || stateFilter;
+  // CRITICAL FIX: Only use `path` to calculate map depth so it successfully zooms back out to Nigeria
+  const activeState = path.state;
 
   const currentLevel = useMemo(() => {
     if (path.ward) return "ward" as const;
     if (path.lga) return "lga" as const;
-    if (activeState) return "state" as const;
+    if (path.state) return "state" as const;
     return "national" as const;
-  }, [path.ward, path.lga, activeState]);
+  }, [path.ward, path.lga, path.state]);
 
   const stateLookup = useMemo(() => {
     const m = new Map<string, GeoRecord>();
@@ -411,11 +410,16 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     return m;
   }, [data.wards]);
 
+  // Fetch logic with race-condition guard
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
     setHoverInfo(null);
+
+    // CRITICAL FIX: Destroy the old map polygons instantly before fetching
+    // so Leaflet doesn't apply stale hover text or refuse to unmount.
+    setGeoData(null);
 
     const load = async () => {
       try {
@@ -472,33 +476,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         }
 
         if (cancelled) return;
-
-        if (import.meta.env.DEV) {
-          let matched = 0;
-          const unmatched: string[] = [];
-          for (const f of features) {
-            const p = f.properties || {};
-            let rec: GeoRecord | undefined;
-            if (currentLevel === "national") {
-              rec = stateLookup.get(norm(p.NAME_1));
-              if (!rec && MDP_STATES.has(norm(p.NAME_1)))
-                unmatched.push(p.NAME_1);
-            } else if (currentLevel === "state") {
-              rec = lgaLookup.get(`${norm(p.NAME_1)}|${norm(p.NAME_2)}`);
-              if (!rec) unmatched.push(p.NAME_2 || "?");
-            } else {
-              rec = wardLookup.get(
-                `${norm(p.state || p.NAME_1)}|${norm(p.lga || p.NAME_2)}|${norm(p.ward || p.NAME_3)}`,
-              );
-              if (!rec) unmatched.push(p.ward || p.NAME_3 || "?");
-            }
-            if (rec) matched++;
-          }
-          console.log(
-            `[Map] level=${currentLevel} polygons=${features.length} matched=${matched} unmatched=${unmatched.length}`,
-            unmatched.slice(0, 12),
-          );
-        }
 
         setGeoData({ type: "FeatureCollection", features });
         setLoading(false);
@@ -584,6 +561,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     const isMdp =
       currentLevel !== "national" || MDP_STATES.has(norm(f.properties?.NAME_1));
 
+    // Handle states lacking survey data
     if (currentLevel === "national" && !isMdp) {
       layer.on({
         mouseover: () => {
@@ -598,6 +576,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       return;
     }
 
+    // Explicit check to prevent hovering/clicking if polygon lacks record
     if (!record) {
       layer.on({
         mouseover: () => {
@@ -615,14 +594,13 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
             } catch {
               e.target.setStyle(styleFeature(f));
             }
-          } else {
-            e.target.setStyle(styleFeature(f));
           }
         },
       });
       return;
     }
 
+    // Valid MDP Region styling and clicks
     layer.on({
       mouseover: (e: any) => {
         e.target.setStyle({
@@ -645,8 +623,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
           } catch {
             e.target.setStyle(styleFeature(f));
           }
-        } else {
-          e.target.setStyle(styleFeature(f));
         }
       },
       click: () => {
@@ -714,7 +690,8 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         style={{ width: "100%", height: "100%", backgroundColor: bgColor }}
       >
         <InvalidateOnMount />
-        {geoData && (
+        {/* CRITICAL FIX: geoData strict enforcement guarantees total clear-out on render cycle before new render completes */}
+        {!loading && geoData && (
           <>
             <GeoJSON
               key={geoKey}
