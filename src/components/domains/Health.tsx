@@ -101,7 +101,8 @@ export const Health: React.FC<Props> = ({
             path={path}
             onPathChange={onPathChange}
             selectedStateFilter={stateFilter}
-            metric="vulnerability"
+            domain="health"
+            height={420}
           />
         </div>
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">

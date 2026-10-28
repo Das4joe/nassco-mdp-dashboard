@@ -17,15 +17,12 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-
-export interface DrilldownPath {
-  state?: string;
-  lga?: string;
-  ward?: string;
-}
+import type { DrilldownPath } from "../../lib/types";
+import type { DashboardData } from "../../lib/loadData";
+import DrilldownMap from "../maps/DrilldownMap";
 
 export interface LivelihoodsResilienceProps {
-  data: any;
+  data: DashboardData;
   record?: any;
   path?: DrilldownPath;
   onPathChange?: (path: DrilldownPath) => void;
@@ -35,52 +32,75 @@ export interface LivelihoodsResilienceProps {
 
 export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   data,
+  record,
+  path = {},
+  onPathChange,
+  stateFilter,
+  selectedStateFilter,
 }) => {
-  const summary = data?.summary || {
-    total_households: 41512,
-    female_headed_hh: 8302,
-    female_headed_pct: 20.0,
-    disabled_headed_hh: 2490,
-    disabled_headed_pct: 6.0,
-    multi_vulnerable_hh: 1245,
-    multi_vulnerable_pct: 3.0,
-    shocks_experienced_hh: 14529,
-    shocks_experienced_pct: 35.0,
-    large_households_count: 1659,
-    large_households_pct: 4.0,
-  };
+  const rec = (record || {}) as any;
+  const ext = rec.extended || {};
+  const lv =
+    ext.livelihoods_resilience_v2 || rec.livelihoods_resilience_v2 || {};
+  const nsr = rec.nsr || {};
 
-  const largeHHCount =
-    summary.large_households_count ?? summary.large_households ?? 1659;
-  const largeHHPct =
-    summary.large_households_pct ??
-    (largeHHCount / (summary.total_households || 41512)) * 100;
+  const totalHH = Number(
+    nsr.total_households ??
+      rec.total_households ??
+      data?.national?.nsr?.total_households ??
+      41512,
+  );
+  const femaleHeaded = Number(
+    lv.female_headed_hhs ?? rec.female_headed_hhs ?? 0,
+  );
+  const disabledHeaded = Number(
+    lv.disabled_headed_hhs ?? rec.disabled_headed_hhs ?? 0,
+  );
+  const multiVulnerable = Number(
+    lv.multi_vulnerable_hhs ?? rec.multi_vulnerable_hhs ?? 0,
+  );
+  const shocksHH = Number(lv.shock_prone_hhs ?? rec.shock_prone_hhs ?? 0);
+  const largeHHCount = Number(
+    lv.large_households ??
+      rec.large_households ??
+      rec.large_households_count ??
+      1659,
+  );
 
-  // Risk-prone children chart data (% in risk prone)
-  const childrenRiskData = [
-    { name: "Flood Prone", pct: 24.5, count: 18240, color: "#0284c7" },
-    { name: "Drought Risk", pct: 18.2, count: 13550, color: "#d97706" },
-    { name: "Conflict Area", pct: 12.8, count: 9530, color: "#dc2626" },
-    { name: "Erosion Zone", pct: 9.4, count: 6990, color: "#059669" },
-    { name: "Landslide Risk", pct: 4.1, count: 3050, color: "#7c3aed" },
+  const femaleHeadedPct = totalHH > 0 ? (femaleHeaded / totalHH) * 100 : 0;
+  const disabledHeadedPct = totalHH > 0 ? (disabledHeaded / totalHH) * 100 : 0;
+  const multiVulnerablePct =
+    totalHH > 0 ? (multiVulnerable / totalHH) * 100 : 0;
+  const shocksPct = totalHH > 0 ? (shocksHH / totalHH) * 100 : 0;
+  const largeHHPct = totalHH > 0 ? (largeHHCount / totalHH) * 100 : 0;
+
+  // Prefer live extended children-in-risk if present; otherwise show empty honest state
+  const childrenRiskRaw =
+    ext.children_in_risk_zones || rec.children_in_risk_zones;
+  const childrenRiskData = childrenRiskRaw
+    ? Object.entries(childrenRiskRaw).map(([name, v]: [string, any]) => ({
+        name,
+        pct: Number(v?.pct ?? v ?? 0),
+        count: Number(v?.count ?? 0),
+        color: "#0284c7",
+      }))
+    : [];
+
+  const fhhShocks = ext.fhh_shock_exposure || [
+    { shock: "Agricultural Failure / Crop Pest", fhhPct: 0, mhhPct: 0 },
+    { shock: "Severe Economic / Price Inflation", fhhPct: 0, mhhPct: 0 },
+    { shock: "Flood / Heavy Rainfall Damage", fhhPct: 0, mhhPct: 0 },
+    { shock: "Medical Emergency / Severe Illness", fhhPct: 0, mhhPct: 0 },
   ];
 
-  const fhhShocks = [
-    { shock: "Agricultural Failure / Crop Pest", fhhPct: 38.4, mhhPct: 32.1 },
-    { shock: "Severe Economic / Price Inflation", fhhPct: 44.2, mhhPct: 41.0 },
-    { shock: "Flood / Heavy Rainfall Damage", fhhPct: 22.8, mhhPct: 19.5 },
-    { shock: "Medical Emergency / Severe Illness", fhhPct: 31.6, mhhPct: 24.3 },
-  ];
-
-  const disabilityShocks = [
-    { shock: "Economic Hardship", disabledPct: 48.5, nonDisabledPct: 39.2 },
-    { shock: "Health Shock", disabledPct: 42.1, nonDisabledPct: 22.4 },
-    { shock: "Natural Disaster", disabledPct: 19.3, nonDisabledPct: 18.0 },
+  const disabilityShocks = ext.disability_shock_exposure || [
+    { shock: "Economic Hardship", disabledPct: 0, nonDisabledPct: 0 },
+    { shock: "Health Shock", disabledPct: 0, nonDisabledPct: 0 },
+    { shock: "Natural Disaster", disabledPct: 0, nonDisabledPct: 0 },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
       <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white p-6 rounded-xl shadow-md border border-emerald-800/40">
         <div className="flex items-center space-x-3">
           <ShieldAlert className="w-8 h-8 text-emerald-400" />
@@ -89,14 +109,13 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
               Livelihoods & Climate Resilience
             </h2>
             <p className="text-emerald-200 text-sm mt-1">
-              Vulnerability profiling across 41,512 surveyed households,
-              household size stress, and environmental risk exposures.
+              Vulnerability profiling across surveyed households, household size
+              stress, and environmental risk exposures.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Top 6 KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium">
@@ -104,7 +123,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             <Home className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-            {(summary.total_households || 41512).toLocaleString()}
+            {totalHH.toLocaleString()}
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
             NASSCO Verified Baseline
@@ -117,10 +136,10 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             <Users className="w-4 h-4 text-pink-500" />
           </div>
           <div className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-            {(summary.female_headed_hh || 8302).toLocaleString()}
+            {femaleHeaded.toLocaleString()}
           </div>
           <p className="text-[11px] text-pink-600 dark:text-pink-400 font-semibold mt-1">
-            {(summary.female_headed_pct || 20.0).toFixed(1)}% of all HHs
+            {femaleHeadedPct.toFixed(1)}% of all HHs
           </p>
         </div>
 
@@ -130,10 +149,10 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             <HeartHandshake className="w-4 h-4 text-purple-500" />
           </div>
           <div className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-            {(summary.disabled_headed_hh || 2490).toLocaleString()}
+            {disabledHeaded.toLocaleString()}
           </div>
           <p className="text-[11px] text-purple-600 dark:text-purple-400 font-semibold mt-1">
-            {(summary.disabled_headed_pct || 6.0).toFixed(1)}% of all HHs
+            {disabledHeadedPct.toFixed(1)}% of all HHs
           </p>
         </div>
 
@@ -143,11 +162,10 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-            {(summary.multi_vulnerable_hh || 1245).toLocaleString()}
+            {multiVulnerable.toLocaleString()}
           </div>
           <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-1">
-            {(summary.multi_vulnerable_pct || 3.0).toFixed(1)}% Overlapping
-            Risks
+            {multiVulnerablePct.toFixed(1)}% Overlapping Risks
           </p>
         </div>
 
@@ -157,11 +175,10 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             <ShieldAlert className="w-4 h-4 text-red-500" />
           </div>
           <div className="text-xl font-bold text-slate-900 dark:text-white mt-2">
-            {(summary.shocks_experienced_hh || 14529).toLocaleString()}
+            {shocksHH.toLocaleString()}
           </div>
           <p className="text-[11px] text-red-600 dark:text-red-400 font-semibold mt-1">
-            {(summary.shocks_experienced_pct || 35.0).toFixed(1)}% Experienced
-            Shocks
+            {shocksPct.toFixed(1)}% Experienced Shocks
           </p>
         </div>
 
@@ -179,59 +196,80 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         </div>
       </div>
 
-      {/* Chart: Children in Risk-Prone Households (% in risk prone) */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Children in Risk-Prone Households (% in risk prone)
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Proportion of children under 18 living in environmental shock risk
-              zones
-            </p>
+      {/* Map */}
+      {onPathChange && (
+        <div
+          className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden"
+          style={{ height: 420 }}
+        >
+          <DrilldownMap
+            data={data}
+            path={path}
+            onPathChange={onPathChange}
+            selectedStateFilter={selectedStateFilter || stateFilter}
+            domain="livelihoods"
+            height={420}
+          />
+        </div>
+      )}
+
+      {childrenRiskData.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Children in Risk-Prone Households (% in risk prone)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Proportion of children under 18 living in environmental shock
+                risk zones
+              </p>
+            </div>
+            <span className="px-2.5 py-1 text-xs font-semibold bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full">
+              UNICEF Environmental Exposure
+            </span>
           </div>
-          <span className="px-2.5 py-1 text-xs font-semibold bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full">
-            UNICEF Environmental Exposure
-          </span>
-        </div>
 
-        <div className="h-72 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={childrenRiskData}
-              margin={{ top: 20, right: 30, left: 10, bottom: 25 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis
-                dataKey="name"
-                stroke="#94a3b8"
-                fontSize={12}
-                tickLine={false}
-              />
-              <YAxis stroke="#94a3b8" fontSize={12} unit="%" tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0f172a",
-                  borderColor: "#334155",
-                  borderRadius: "8px",
-                  color: "#fff",
-                }}
-                formatter={(val: any) => [`${val}%`, "Risk Exposure"]}
-              />
-              <Bar dataKey="pct" radius={[6, 6, 0, 0]}>
-                {childrenRiskData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={childrenRiskData}
+                margin={{ top: 20, right: 30, left: 10, bottom: 25 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis
+                  dataKey="name"
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  unit="%"
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#0f172a",
+                    borderColor: "#334155",
+                    borderRadius: "8px",
+                    color: "#fff",
+                  }}
+                  formatter={(val: any) => [`${val}%`, "Risk Exposure"]}
+                />
+                <Bar dataKey="pct" radius={[6, 6, 0, 0]}>
+                  {childrenRiskData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Cross-Tabulations & Shock Exposure Details */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Female-Headed HH vs Shock Exposure */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">
             Female-Headed Households x Shock Exposure
@@ -246,17 +284,17 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {fhhShocks.map((row, i) => (
+                {fhhShocks.map((row: any, i: number) => (
                   <tr
                     key={i}
                     className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
                   >
                     <td className="px-3 py-2.5 font-medium">{row.shock}</td>
                     <td className="px-3 py-2.5 text-right font-semibold text-pink-600 dark:text-pink-400">
-                      {row.fhhPct}%
+                      {Number(row.fhhPct || 0)}%
                     </td>
                     <td className="px-3 py-2.5 text-right font-semibold text-slate-500 dark:text-slate-400">
-                      {row.mhhPct}%
+                      {Number(row.mhhPct || 0)}%
                     </td>
                   </tr>
                 ))}
@@ -265,7 +303,6 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
           </div>
         </div>
 
-        {/* Disability Headed HH vs Shock Exposure */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">
             Disability Status x Shock Impact
@@ -280,17 +317,17 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                {disabilityShocks.map((row, i) => (
+                {disabilityShocks.map((row: any, i: number) => (
                   <tr
                     key={i}
                     className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
                   >
                     <td className="px-3 py-2.5 font-medium">{row.shock}</td>
                     <td className="px-3 py-2.5 text-right font-semibold text-purple-600 dark:text-purple-400">
-                      {row.disabledPct}%
+                      {Number(row.disabledPct || 0)}%
                     </td>
                     <td className="px-3 py-2.5 text-right font-semibold text-slate-500 dark:text-slate-400">
-                      {row.nonDisabledPct}%
+                      {Number(row.nonDisabledPct || 0)}%
                     </td>
                   </tr>
                 ))}
@@ -300,7 +337,6 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         </div>
       </div>
 
-      {/* Large Household Breakdown Detail Card */}
       <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-xl shadow-lg border border-slate-700">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
@@ -320,7 +356,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
             </p>
           </div>
           <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs rounded-lg">
-            {largeHHCount} Households
+            {largeHHCount.toLocaleString()} Households
           </span>
         </div>
       </div>

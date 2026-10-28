@@ -52,7 +52,6 @@ export const Nutrition: React.FC<Props> = ({
     { name: "Normal", value: normal, color: "#10B981" },
   ];
 
-  // --- NEW: Nutrition programme enrolment ---
   const progData = ext.nutrition_programme ?? rec.nutrition_programme ?? null;
 
   const progEnrolled = progData
@@ -136,7 +135,8 @@ export const Nutrition: React.FC<Props> = ({
             path={path}
             onPathChange={onPathChange}
             selectedStateFilter={stateFilter}
-            metric="vulnerability"
+            domain="nutrition"
+            height={420}
           />
         </div>
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,7 +166,6 @@ export const Nutrition: React.FC<Props> = ({
             </div>
           </ChartCard>
 
-          {/* Enrolled into nutrition programmes */}
           <ChartCard
             title="Malnourished children enrolled in nutrition programmes"
             height={300}
@@ -229,7 +228,6 @@ export const Nutrition: React.FC<Props> = ({
             )}
           </ChartCard>
 
-          {/* Not enrolled */}
           <ChartCard
             title="Malnourished children NOT enrolled in any programme"
             height={300}

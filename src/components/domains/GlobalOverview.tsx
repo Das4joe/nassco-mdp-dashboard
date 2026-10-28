@@ -127,7 +127,6 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
 
   const formatAbs = (v: any) => Math.abs(Number(v || 0)).toLocaleString();
 
-  // --- NEW: Disability types data ---
   const disabilityTypesRaw =
     ext.disability_types_children ?? rec.disability_types_children ?? null;
 
@@ -226,12 +225,12 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             path={path}
             onPathChange={onPathChange}
             selectedStateFilter={stateFilter}
-            metric="vulnerability"
+            domain="overview"
+            height={640}
           />
         </div>
 
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 1. POPULATION PYRAMID (Diverging horizontal bars) */}
           <ChartCard
             title="Population pyramid [0-24] (boys & girls)"
             height={320}
@@ -302,7 +301,6 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             </div>
           </ChartCard>
 
-          {/* 2. GENDER RATIO (Pie / Donut Chart) */}
           <ChartCard title="Gender ratio (boys and girls)" height={320}>
             <div style={{ width: "100%", height: 240 }}>
               <ResponsiveContainer width="100%" height={240}>
@@ -340,7 +338,6 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             </div>
           </ChartCard>
 
-          {/* 3. AGE RATIO (Vertical Bar Chart) */}
           <ChartCard title="Age ratio (0-24yrs)" height={320}>
             <div style={{ width: "100%", height: 240 }}>
               <ResponsiveContainer width="100%" height={240}>
@@ -394,7 +391,6 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             </div>
           </ChartCard>
 
-          {/* 4. DISABILITIES DISTRIBUTION AMONGST CHILDREN */}
           <ChartCard
             title="Disabilities distribution amongst children"
             height={320}

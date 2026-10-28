@@ -79,7 +79,6 @@ export const Education: React.FC<EducationProps> = ({
     { gender: "Girls not attending (0-17)", count: oos617Female },
   ];
 
-  // --- NEW: Disabled never enrolled by gender ---
   const disabledByGender =
     ext.disabled_never_enrolled_by_gender ??
     rec.disabled_never_enrolled_by_gender ??
@@ -159,7 +158,7 @@ export const Education: React.FC<EducationProps> = ({
           path={path}
           onPathChange={onPathChange}
           selectedStateFilter={stateFilter}
-          metric="out_of_school"
+          domain="education"
           height={400}
         />
       </div>

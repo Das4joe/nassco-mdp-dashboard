@@ -48,7 +48,6 @@ export const CivilRegistration: React.FC<Props> = ({
   const c017NinNoBc = Number(civil.c_0_17_nin_no_bc ?? 0);
   const c05NinNoBc = Number(civil.c_0_5_nin_no_bc ?? 0);
 
-  // --- NEW: Gender-disaggregated data ---
   const bcByGender = ext.bc_by_gender ?? rec.bc_by_gender ?? null;
   const ninByGender = ext.nin_by_gender ?? rec.nin_by_gender ?? null;
 
@@ -82,7 +81,6 @@ export const CivilRegistration: React.FC<Props> = ({
       ]
     : null;
 
-  // --- Coverage % derived from existing data ---
   const children017 = Number(rec.children_0_17 ?? rec.nsr?.children_0_17 ?? 0);
   const bcCoveragePct = children017 > 0 ? (c017WithBc / children017) * 100 : 0;
   const ninCoveragePct =
@@ -204,11 +202,11 @@ export const CivilRegistration: React.FC<Props> = ({
             path={path}
             onPathChange={onPathChange}
             selectedStateFilter={stateFilter}
-            metric="vulnerability"
+            domain="civil"
+            height={480}
           />
         </div>
         <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 1. BC by Gender */}
           <ChartCard
             title="Birth certificate distribution by gender"
             height={280}
@@ -263,7 +261,6 @@ export const CivilRegistration: React.FC<Props> = ({
             )}
           </ChartCard>
 
-          {/* 2. NIN by Gender */}
           <ChartCard title="NIN distribution by gender" height={280}>
             {ninGenderData ? (
               <div style={{ width: "100%", height: 220 }}>
@@ -315,7 +312,6 @@ export const CivilRegistration: React.FC<Props> = ({
             )}
           </ChartCard>
 
-          {/* 3. BC Coverage % */}
           <ChartCard
             title="Birth Certificate coverage (%) among children 0-17"
             height={280}
@@ -382,7 +378,6 @@ export const CivilRegistration: React.FC<Props> = ({
             </div>
           </ChartCard>
 
-          {/* 4. NIN Coverage % */}
           <ChartCard title="NIN coverage (%) among children 0-17" height={280}>
             <div style={{ width: "100%", height: 220 }}>
               <ResponsiveContainer width="100%" height={220}>
