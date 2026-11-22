@@ -1,47 +1,91 @@
 import React from "react";
-import type { GeoRecord } from "../lib/types";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import { computeDecileDistribution, type DecileBar } from "../lib/insights";
 
-interface DecileChartProps {
-  record: GeoRecord;
+export interface DecileChartProps {
+  items: { score?: number }[];
+  isDark?: boolean;
 }
 
-export const DecileChart: React.FC<DecileChartProps> = ({ record }) => {
-  const bars: DecileBar[] = computeDecileDistribution(record);
-  const maxCount = Math.max(...bars.map((b) => b.count), 1);
+const DECILE_COLORS = [
+  "#10B981",
+  "#34D399",
+  "#6EE7B7",
+  "#A7F3D0",
+  "#FDE68A",
+  "#FCD34D",
+  "#FBBF24",
+  "#F87171",
+  "#EF4444",
+  "#B91C1C",
+];
+
+export const DecileChart: React.FC<DecileChartProps> = ({
+  items,
+  isDark = false,
+}) => {
+  const data: DecileBar[] = computeDecileDistribution(items);
 
   return (
-    <div className="space-y-1.5">
-      <div className="text-xs font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted flex items-center justify-between">
-        <span>Poverty Distribution</span>
-      </div>
-      <div className="space-y-1">
-        {bars.map((b) => {
-          const pct = Math.round((b.count / maxCount) * 100);
-          return (
-            <div key={b.decile} className="flex items-center text-xs gap-2">
-              <span className="w-7 font-mono font-semibold text-ink-muted dark:text-ink-onDarkMuted text-right">
-                {b.decile}
-              </span>
-              <div className="flex-1 bg-surface-page dark:bg-surface-darker h-4 rounded overflow-hidden relative">
-                <div
-                  className={`h-full transition-all duration-300 ${
-                    b.isPoorest
-                      ? "bg-amber-500"
-                      : "bg-emerald-600/40 dark:bg-emerald-500/30"
-                  }`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              <span className="w-12 text-right font-mono text-ink-primary dark:text-ink-onDark text-[11px]">
-                {b.count.toLocaleString()}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <div className="text-[10px] text-center text-ink-faint italic mt-1">
-        Poorest 30% highlighted
+    <div className="w-full h-full flex flex-col justify-between">
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="decile"
+            tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
+            tickFormatter={(val) => `D${val}`}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
+          />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const d = payload[0].payload as DecileBar;
+                return (
+                  <div
+                    className={`p-2.5 rounded-lg border text-xs shadow-lg ${
+                      isDark
+                        ? "bg-slate-900 border-slate-700 text-slate-100"
+                        : "bg-white border-slate-200 text-slate-900"
+                    }`}
+                  >
+                    <p className="font-bold">Decile {d.decile}</p>
+                    <p>Communities: {d.count.toLocaleString()}</p>
+                    <p>
+                      Score Range: {d.minScore} – {d.maxScore}
+                    </p>
+                    <p>Avg Score: {d.avgScore}</p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+          <Bar dataKey="count" name="Communities" radius={[4, 4, 0, 0]}>
+            {data.map((_, index) => (
+              <Cell
+                key={`decile-${index}`}
+                fill={DECILE_COLORS[index % DECILE_COLORS.length]}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="flex justify-between text-[10px] text-slate-400 mt-2 px-2 font-mono">
+        <span>← Least Vulnerable (D1)</span>
+        <span>Most Vulnerable (D10) →</span>
       </div>
     </div>
   );

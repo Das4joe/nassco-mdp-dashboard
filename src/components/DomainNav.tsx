@@ -1,101 +1,108 @@
-import type { FC } from "react";
-import { clsx } from "clsx";
+import React from "react";
+import type { DomainId } from "../lib/types";
 
-export type DomainKey =
-  | "overview"
-  | "civil-registration"
-  | "education"
-  | "health"
-  | "nutrition"
-  | "livelihoods";
-
-interface DomainDef {
-  key: DomainKey;
-  label: string;
-  hint: string;
-}
-
-const DOMAINS: DomainDef[] = [
-  {
-    key: "overview",
-    label: "Global / Overview",
-    hint: "Households, individuals, age bands, PVHH, pyramid",
-  },
-  {
-    key: "civil-registration",
-    label: "Civil Registration",
-    hint: "Birth certificates, NIN, dual documentation",
-  },
-  {
-    key: "education",
-    label: "Education / Out of School",
-    hint: "OOS 6–9, 10–14, 15–17, disability attendance",
-  },
-  {
-    key: "health",
-    label: "Health",
-    hint: "Pregnant, lactating, disability, insurance placeholders",
-  },
-  {
-    key: "nutrition",
-    label: "Nutrition",
-    hint: "SAM, MAM, wasting, F&N programme placeholders",
-  },
-  {
-    key: "livelihoods",
-    label: "Livelihoods and Shock Exposure",
-    hint: "Livelihoods, youth employment, shocks, large HHs",
-  },
-];
-
-interface DomainNavProps {
-  active: DomainKey;
-  onChange: (key: DomainKey) => void;
+export interface DomainNavProps {
+  activeDomain?: DomainId;
+  currentDomain?: DomainId;
+  onSelectDomain?: (id: DomainId) => void;
+  onDomainChange?: (id: DomainId) => void;
   className?: string;
 }
 
-export const DomainNav: FC<DomainNavProps> = ({
-  active,
-  onChange,
-  className,
+interface DomainTab {
+  id: DomainId;
+  label: string;
+  icon: string;
+  color: string;
+}
+
+const DOMAIN_TABS: DomainTab[] = [
+  {
+    id: "overview",
+    label: "Demographics & Overview",
+    icon: "📊",
+    color: "#002F6C",
+  },
+  {
+    id: "civil-registration",
+    label: "Civil Registration",
+    icon: "🪪",
+    color: "#10B981",
+  },
+  {
+    id: "education",
+    label: "Education & OOSC",
+    icon: "🎓",
+    color: "#F59E0B",
+  },
+  {
+    id: "health-nutrition",
+    label: "Health & Nutrition",
+    icon: "🏥",
+    color: "#EF4444",
+  },
+  {
+    id: "disabilities",
+    label: "Disabilities (PLWD)",
+    icon: "♿",
+    color: "#8B5CF6",
+  },
+  {
+    id: "livelihoods",
+    label: "Livelihoods & Resilience",
+    icon: "🌾",
+    color: "#06B6D4",
+  },
+];
+
+export const DomainNav: React.FC<DomainNavProps> = ({
+  activeDomain,
+  currentDomain,
+  onSelectDomain,
+  onDomainChange,
+  className = "",
 }) => {
+  const selectedDomain = activeDomain || currentDomain || "overview";
+
+  const handleClick = (id: DomainId) => {
+    if (onSelectDomain) onSelectDomain(id);
+    if (onDomainChange) onDomainChange(id);
+  };
+
   return (
     <nav
-      aria-label="Dashboard domain"
-      className={clsx(
-        "w-full bg-surface-light dark:bg-surface-dark",
-        "border-b border-line-light dark:border-line-dark",
-        className,
-      )}
+      className={`w-full overflow-x-auto no-scrollbar border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors ${className}`}
+      aria-label="Domain Tabs"
     >
-      <div className="max-w-[1600px] mx-auto px-6 py-3">
-        <div className="flex flex-wrap gap-2">
-          {DOMAINS.map((d) => {
-            const isActive = d.key === active;
-            return (
-              <button
-                key={d.key}
-                type="button"
-                onClick={() => onChange(d.key)}
-                title={d.hint}
-                aria-pressed={isActive}
-                className={clsx(
-                  "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
-                  "focus-visible:ring-offset-surface-light dark:focus-visible:ring-offset-surface-dark",
-                  isActive
-                    ? "bg-brand-600 text-white shadow-card"
-                    : "bg-surface-page dark:bg-surface-darker text-ink-muted dark:text-ink-onDarkMuted hover:bg-brand-50 dark:hover:bg-brand-950 hover:text-ink-primary dark:hover:text-ink-onDark",
-                )}
-              >
-                {d.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2">
+        {DOMAIN_TABS.map((tab) => {
+          const isActive = selectedDomain === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleClick(tab.id)}
+              className={`group relative flex items-center gap-2 py-3.5 px-4 text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
+                isActive
+                  ? "border-blue-600 text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/20"
+                  : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40"
+              }`}
+            >
+              <span className="text-sm opacity-90 group-hover:scale-110 transition-transform">
+                {tab.icon}
+              </span>
+              <span>{tab.label}</span>
+              {isActive && (
+                <span
+                  className="absolute bottom-0 left-0 right-0 h-0.5"
+                  style={{ backgroundColor: tab.color }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
 };
 
-export const DOMAIN_LIST = DOMAINS;
+export default DomainNav;

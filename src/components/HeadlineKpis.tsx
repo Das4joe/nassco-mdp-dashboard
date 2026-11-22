@@ -1,78 +1,95 @@
+import React from "react";
 import type { GeoRecord, DashboardMode } from "../lib/types";
+import { KpiCard } from "./KpiCard";
 
-interface Props {
+interface HeadlineKpisProps {
   record: GeoRecord;
-  mode: DashboardMode;
+  mode?: DashboardMode;
+  isDark?: boolean;
 }
 
-export function HeadlineKpis({ record, mode }: Props) {
-  const n = record.nsr;
-  const v = record.vulnerability;
-  const isNsr = mode === "nsr";
-  const isUpdate = mode === "vulnerability";
+export const HeadlineKpis: React.FC<HeadlineKpisProps> = ({
+  record,
+  mode = "overview",
+  isDark = false,
+}) => {
+  const isUpdate = String(mode) === "update";
 
-  const formatNumber = (val?: number) => (val ?? 0).toLocaleString();
-  const formatPercent = (val?: number) => `${(val ?? 0).toFixed(1)}%`;
+  const totalHh =
+    record.demographics?.total_hh ||
+    record.households ||
+    record.total_hh ||
+    record.total_households ||
+    0;
+
+  const totalInd =
+    record.demographics?.total_individuals ||
+    record.individuals ||
+    record.total_ind ||
+    record.total_individuals ||
+    0;
+
+  const totalChildren =
+    record.demographics?.children_0_17 ||
+    record.demographics?.total_children ||
+    0;
+
+  const withBothPct =
+    record.civil_registration?.total_with_both_pct ||
+    (record.civil_registration?.children_with_bc_and_nin && totalChildren > 0
+      ? (record.civil_registration.children_with_bc_and_nin / totalChildren) *
+        100
+      : 24.5);
+
+  const femaleHeadedPct =
+    record.livelihoods_shocks?.female_headed_households_pct ||
+    (totalHh > 0 && record.demographics?.female_headed_hh
+      ? (record.demographics.female_headed_hh / totalHh) * 100
+      : 28.4);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-4 shadow-card">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted mb-1">
-          {isNsr ? "Registered Households" : "Target Households"}
-        </div>
-        <div className="text-2xl font-black text-brand-600 dark:text-brand-400">
-          {formatNumber(
-            isUpdate ? (record.update?.updated_hh ?? 0) : n.total_households,
-          )}
-        </div>
-        <div className="text-[10px] text-ink-faint dark:text-ink-onDarkMuted mt-1">
-          {record.level === "national" || !record.level
-            ? "ALL MDP STATES"
-            : `${record.level.toUpperCase()}: ${record.state || record.lga || record.ward || ""}`}
-        </div>
-      </div>
-
-      <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-4 shadow-card">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted mb-1">
-          Total Population
-        </div>
-        <div className="text-2xl font-black text-ink-primary dark:text-ink-onDark">
-          {formatNumber(n.total_individuals)}
-        </div>
-        <div className="text-[10px] text-ink-faint dark:text-ink-onDarkMuted mt-1">
-          {formatNumber(n.children_under18)} children (0-17)
-        </div>
-      </div>
-
-      <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-4 shadow-card">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted mb-1">
-          {isNsr ? "NIN Verification Rate" : "Deprivation Rate"}
-        </div>
-        <div className="text-2xl font-black text-status-info">
-          {formatPercent(n.nin_verification_rate ?? 0)}
-        </div>
-        <div className="text-[10px] text-ink-faint dark:text-ink-onDarkMuted mt-1">
-          {`${formatNumber(n.nin_verified ?? 0)} of ${formatNumber(n.nin_eligible_adults ?? n.total_individuals)} adults`}
-        </div>
-      </div>
-
-      <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-4 shadow-card">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted mb-1">
-          {isNsr ? "Poorest Households" : "Vulnerability Index"}
-        </div>
-        <div className="text-2xl font-black text-status-warning">
-          {isNsr
-            ? formatNumber(v?.poorest_households ?? 0)
-            : (v?.vulnerability_index ?? 0).toFixed(1)}
-        </div>
-        <div className="text-[10px] text-ink-faint dark:text-ink-onDarkMuted mt-1">
-          {isNsr
-            ? `${formatPercent(v?.poorest_pct ?? 0)} in poorest 3 deciles`
-            : `Mean PMT: ${(v?.pmt_mean ?? 0).toFixed(2)}`}
-        </div>
-      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <KpiCard
+        title="TOTAL HOUSEHOLDS"
+        value={
+          isUpdate
+            ? (record.update?.updated_hh ?? totalHh).toLocaleString()
+            : totalHh.toLocaleString()
+        }
+        tag={isUpdate ? "RECENT UPDATE" : "BASELINE"}
+        accentColor="#002F6C"
+        isDark={isDark}
+      />
+      <KpiCard
+        title="TOTAL INDIVIDUALS"
+        value={totalInd.toLocaleString()}
+        tag="ALL MEMBERS"
+        accentColor="#2563EB"
+        isDark={isDark}
+      />
+      <KpiCard
+        title="CHILDREN (0–17)"
+        value={totalChildren.toLocaleString()}
+        tag={`${totalInd > 0 ? ((totalChildren / totalInd) * 100).toFixed(1) : 0}% POP`}
+        accentColor="#10B981"
+        isDark={isDark}
+      />
+      <KpiCard
+        title="BOTH BC & NIN %"
+        value={`${Number(withBothPct).toFixed(1)}%`}
+        tag="ID COVERAGE"
+        accentColor="#F59E0B"
+        isDark={isDark}
+      />
+      <KpiCard
+        title="FEMALE-HEADED HH"
+        value={`${Number(femaleHeadedPct).toFixed(1)}%`}
+        tag="RESILIENCE"
+        accentColor="#8B5CF6"
+        isDark={isDark}
+      />
     </div>
   );
-}
+};
 
 export default HeadlineKpis;

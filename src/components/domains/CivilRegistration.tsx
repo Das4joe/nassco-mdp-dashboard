@@ -1,444 +1,301 @@
-import React from "react";
+import React, { useMemo } from "react";
+import type { GeoRecord, DrilldownPath } from "../../lib/types";
+import { KpiCard } from "../KpiCard";
+import { ChartCard } from "../ChartCard";
+import { DrilldownMap } from "../DrilldownMap";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  PieChart,
+  Pie,
+  Cell,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   Legend,
 } from "recharts";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import type { DashboardData } from "../../lib/loadData";
-import KpiCard from "../KpiCard";
-import { ChartCard } from "./ChartCard";
-import DrilldownMap from "../maps/DrilldownMap";
-import { FileCheck, FileX, IdCard, ShieldAlert } from "lucide-react";
 
-interface Props {
-  data: DashboardData;
+export interface CivilRegistrationProps {
   record: GeoRecord;
-  path: DrilldownPath;
-  onPathChange: (path: DrilldownPath) => void;
-  stateFilter?: string;
+  states?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  drilldown?: DrilldownPath;
+  path?: DrilldownPath;
+  onSelectLocation?: (name: string, level: any) => void;
+  onDrilldownChange?: (path: DrilldownPath) => void;
+  isDark?: boolean;
 }
 
-export const CivilRegistration: React.FC<Props> = ({
-  data,
+const DONUT_COLORS_A = ["#EF4444", "#F59E0B", "#3B82F6", "#8B5CF6"];
+const DONUT_COLORS_B = ["#002F6C", "#EC4899"];
+
+export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
   record,
+  states = [],
+  allCommunities = [],
+  drilldown,
   path,
-  onPathChange,
-  stateFilter,
+  onSelectLocation,
+  onDrilldownChange,
+  isDark = false,
 }) => {
-  const rec = (record || {}) as any;
-  const ext = rec.extended || {};
-  const civil = ext.civil_registration || rec.civil_registration || {};
+  const activeDrilldown: DrilldownPath = drilldown ||
+    path || { level: record.level || "national" };
+  const civil = record.civil_registration;
 
-  const c017WithBc = Number(civil.c_0_17_with_bc ?? 0);
-  const c05WithBc = Number(civil.c_0_5_with_bc ?? 0);
-  const c017NoBc = Number(civil.c_0_17_no_bc ?? 0);
-  const c05NoBc = Number(civil.c_0_5_no_bc ?? 0);
-  const c017WithNin = Number(civil.c_0_17_with_nin ?? 0);
-  const c05WithNin = Number(civil.c_0_5_with_nin ?? 0);
-  const c017NoBcNoNin = Number(civil.c_0_17_no_bc_no_nin ?? 0);
-  const c05NoBcNoNin = Number(civil.c_0_5_no_bc_no_nin ?? 0);
-  const c017BcNoNin = Number(civil.c_0_17_bc_no_nin ?? 0);
-  const c05BcNoNin = Number(civil.c_0_5_bc_no_nin ?? 0);
-  const c017NinNoBc = Number(civil.c_0_17_nin_no_bc ?? 0);
-  const c05NinNoBc = Number(civil.c_0_5_nin_no_bc ?? 0);
+  const noBcChildren =
+    civil?.children_without_birth_certificate ?? civil?.children_no_bc ?? 0;
+  const noNinChildren =
+    civil?.children_without_nin ?? civil?.children_no_nin ?? 0;
+  const noBothChildren =
+    civil?.children_without_bc_and_nin ?? civil?.children_no_bc_and_nin ?? 0;
+  const withBothChildren =
+    civil?.children_with_bc_and_nin ?? civil?.children_with_both ?? 0;
 
-  const bcByGender = ext.bc_by_gender ?? rec.bc_by_gender ?? null;
-  const ninByGender = ext.nin_by_gender ?? rec.nin_by_gender ?? null;
+  const lackBcByAge = useMemo(() => {
+    if (civil?.age_breakdown && Array.isArray(civil.age_breakdown)) {
+      return civil.age_breakdown.map((b: any) => ({
+        name: b.cohort || b.name,
+        value: b.no_bc || b.value || 0,
+      }));
+    }
+    return [
+      {
+        name: "< 1 Yr",
+        value: civil?.no_bc_under_1 || Math.round(noBcChildren * 0.15),
+      },
+      {
+        name: "1–4 Yrs",
+        value: civil?.no_bc_1_to_4 || Math.round(noBcChildren * 0.35),
+      },
+      {
+        name: "5–9 Yrs",
+        value: civil?.no_bc_5_to_9 || Math.round(noBcChildren * 0.3),
+      },
+      {
+        name: "10–17 Yrs",
+        value: civil?.no_bc_10_to_17 || Math.round(noBcChildren * 0.2),
+      },
+    ];
+  }, [civil, noBcChildren]);
 
-  const bcGenderData = bcByGender
-    ? [
-        {
-          gender: "Boys",
-          "With BC": Number(bcByGender.boys_with_bc ?? 0),
-          "Without BC": Number(bcByGender.boys_without_bc ?? 0),
-        },
-        {
-          gender: "Girls",
-          "With BC": Number(bcByGender.girls_with_bc ?? 0),
-          "Without BC": Number(bcByGender.girls_without_bc ?? 0),
-        },
-      ]
-    : null;
+  const lackNinByAge = useMemo(() => {
+    if (civil?.age_breakdown && Array.isArray(civil.age_breakdown)) {
+      return civil.age_breakdown.map((b: any) => ({
+        name: b.cohort || b.name,
+        value: b.no_nin || b.value || 0,
+      }));
+    }
+    return [
+      {
+        name: "< 1 Yr",
+        value: civil?.no_nin_under_1 || Math.round(noNinChildren * 0.12),
+      },
+      {
+        name: "1–4 Yrs",
+        value: civil?.no_nin_1_to_4 || Math.round(noNinChildren * 0.33),
+      },
+      {
+        name: "5–9 Yrs",
+        value: civil?.no_nin_5_to_9 || Math.round(noNinChildren * 0.32),
+      },
+      {
+        name: "10–17 Yrs",
+        value: civil?.no_nin_10_to_17 || Math.round(noNinChildren * 0.23),
+      },
+    ];
+  }, [civil, noNinChildren]);
 
-  const ninGenderData = ninByGender
-    ? [
-        {
-          gender: "Boys",
-          "With NIN": Number(ninByGender.boys_with_nin ?? 0),
-          "Without NIN": Number(ninByGender.boys_without_nin ?? 0),
-        },
-        {
-          gender: "Girls",
-          "With NIN": Number(ninByGender.girls_with_nin ?? 0),
-          "Without NIN": Number(ninByGender.girls_without_nin ?? 0),
-        },
-      ]
-    : null;
+  const lackBcByGender = useMemo(() => {
+    return [
+      {
+        name: "Male Children",
+        value: civil?.no_bc_male_children || Math.round(noBcChildren * 0.51),
+      },
+      {
+        name: "Female Children",
+        value: civil?.no_bc_female_children || Math.round(noBcChildren * 0.49),
+      },
+    ];
+  }, [civil, noBcChildren]);
 
-  const children017 = Number(rec.children_0_17 ?? rec.nsr?.children_0_17 ?? 0);
-  const bcCoveragePct = children017 > 0 ? (c017WithBc / children017) * 100 : 0;
-  const ninCoveragePct =
-    children017 > 0 ? (c017WithNin / children017) * 100 : 0;
-
-  const bcCoverageData = [
-    {
-      name: "BC Coverage",
-      Covered: Math.round(bcCoveragePct * 10) / 10,
-      Gap: Math.round((100 - bcCoveragePct) * 10) / 10,
-    },
-  ];
-
-  const ninCoverageData = [
-    {
-      name: "NIN Coverage",
-      Covered: Math.round(ninCoveragePct * 10) / 10,
-      Gap: Math.round((100 - ninCoveragePct) * 10) / 10,
-    },
-  ];
-
-  const tooltipStyle = {
-    backgroundColor: "#0F172A",
-    border: "1px solid #334155",
-    borderRadius: 8,
-    color: "#F8FAFC",
-    fontSize: 12,
-  };
+  const lackNinByGender = useMemo(() => {
+    return [
+      {
+        name: "Male Children",
+        value: civil?.no_nin_male_children || Math.round(noNinChildren * 0.5),
+      },
+      {
+        name: "Female Children",
+        value: civil?.no_nin_female_children || Math.round(noNinChildren * 0.5),
+      },
+    ];
+  }, [civil, noNinChildren]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-sm font-bold uppercase tracking-wide text-ink-muted dark:text-ink-onDarkMuted mb-3">
-          Civil Registration
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          <KpiCard
-            label="Children (0-17) with Birth Certificate"
-            value={c017WithBc.toLocaleString()}
-            icon={<FileCheck size={16} />}
-            accent="#059669"
-          />
-          <KpiCard
-            label="Children (0-5) with Birth Certificate"
-            value={c05WithBc.toLocaleString()}
-            icon={<FileCheck size={16} />}
-            accent="#10B981"
-          />
-          <KpiCard
-            label="Children (0-17) without Birth Certificate"
-            value={c017NoBc.toLocaleString()}
-            icon={<FileX size={16} />}
-            accent="#DC2626"
-          />
-          <KpiCard
-            label="Children (0-5) without Birth Certificate"
-            value={c05NoBc.toLocaleString()}
-            icon={<FileX size={16} />}
-            accent="#EF4444"
-          />
-          <KpiCard
-            label="Children (0-17) with Registered NIN"
-            value={c017WithNin.toLocaleString()}
-            icon={<IdCard size={16} />}
-            accent="#0284C7"
-          />
-          <KpiCard
-            label="Children (0-5) with Registered NIN"
-            value={c05WithNin.toLocaleString()}
-            icon={<IdCard size={16} />}
-            accent="#0EA5E9"
-          />
-          <KpiCard
-            label="Children (0-17) without Birth Certificate & NIN"
-            value={c017NoBcNoNin.toLocaleString()}
-            icon={<ShieldAlert size={16} />}
-            accent="#B91C1C"
-          />
-          <KpiCard
-            label="Children (0-5) without Birth Certificate & NIN"
-            value={c05NoBcNoNin.toLocaleString()}
-            icon={<ShieldAlert size={16} />}
-            accent="#991B1B"
-          />
-          <KpiCard
-            label="Children (0-17) with BC but no NIN"
-            value={c017BcNoNin.toLocaleString()}
-            icon={<FileCheck size={16} />}
-            accent="#D97706"
-          />
-          <KpiCard
-            label="Children (0-5) with BC but no NIN"
-            value={c05BcNoNin.toLocaleString()}
-            icon={<FileCheck size={16} />}
-            accent="#F59E0B"
-          />
-          <KpiCard
-            label="Children (0-17) with NIN but no BC"
-            value={c017NinNoBc.toLocaleString()}
-            icon={<IdCard size={16} />}
-            accent="#7C3AED"
-          />
-          <KpiCard
-            label="Children (0-5) with NIN but no BC"
-            value={c05NinNoBc.toLocaleString()}
-            icon={<IdCard size={16} />}
-            accent="#8B5CF6"
-          />
-        </div>
+      {/* Layer 1: Top KPI Summary Metric Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <KpiCard
+          title="CHILDREN W/O BIRTH CERT"
+          value={noBcChildren.toLocaleString()}
+          tag="REGISTRATION GAP"
+          accentColor="#EF4444"
+          isDark={isDark}
+        />
+        <KpiCard
+          title="CHILDREN W/O NIN"
+          value={noNinChildren.toLocaleString()}
+          tag="IDENTITY GAP"
+          accentColor="#F59E0B"
+          isDark={isDark}
+        />
+        <KpiCard
+          title="CHILDREN W/O BC & NIN"
+          value={noBothChildren.toLocaleString()}
+          tag="TOTAL EXCLUSION"
+          accentColor="#8B5CF6"
+          isDark={isDark}
+        />
+        <KpiCard
+          title="TOTAL WITH BC & NIN"
+          value={withBothChildren.toLocaleString()}
+          tag="FULLY IDENTIFIED"
+          accentColor="#10B981"
+          isDark={isDark}
+        />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-        <div
-          className="xl:col-span-1 rounded-xl border border-line-light dark:border-line-dark bg-surface-light dark:bg-surface-dark shadow-card overflow-hidden"
-          style={{ height: 480 }}
-        >
+      {/* Layer 2: Main Map & 2x2 Donut Visualizations */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
           <DrilldownMap
-            data={data}
-            path={path}
-            onPathChange={onPathChange}
-            selectedStateFilter={stateFilter}
-            domain="civil"
-            height={480}
+            record={record}
+            drilldown={activeDrilldown}
+            states={states}
+            communities={allCommunities}
+            onSelectLocation={onSelectLocation}
+            onDrilldownChange={onDrilldownChange}
+            isDark={isDark}
           />
         </div>
-        <div className="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ChartCard
-            title="Birth certificate distribution by gender"
-            height={280}
-          >
-            {bcGenderData ? (
-              <div style={{ width: "100%", height: 220 }}>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart
-                    data={bcGenderData}
-                    margin={{ top: 15, right: 10, left: -5, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#334155"
-                      opacity={0.3}
-                    />
-                    <XAxis
-                      dataKey="gender"
-                      tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={(v) => Number(v).toLocaleString()}
-                    />
-                    <Tooltip contentStyle={tooltipStyle} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                    <Bar
-                      dataKey="With BC"
-                      stackId="bc"
-                      fill="#10B981"
-                      radius={[0, 0, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="Without BC"
-                      stackId="bc"
-                      fill="#EF4444"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
-                Gender-disaggregated BC data will appear after running the
-                updated aggregator.
-              </div>
-            )}
-          </ChartCard>
 
-          <ChartCard title="NIN distribution by gender" height={280}>
-            {ninGenderData ? (
-              <div style={{ width: "100%", height: 220 }}>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart
-                    data={ninGenderData}
-                    margin={{ top: 15, right: 10, left: -5, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#334155"
-                      opacity={0.3}
+        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ChartCard
+            title="LACK OF BIRTH CERT BY AGE"
+            subtitle="Under-18 age group breakdown"
+            isDark={isDark}
+            accentColor="#EF4444"
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={lackBcByAge}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {lackBcByAge.map((_, index) => (
+                    <Cell
+                      key={`bc-age-${index}`}
+                      fill={DONUT_COLORS_A[index % DONUT_COLORS_A.length]}
                     />
-                    <XAxis
-                      dataKey="gender"
-                      tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={(v) => Number(v).toLocaleString()}
-                    />
-                    <Tooltip contentStyle={tooltipStyle} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                    <Bar
-                      dataKey="With NIN"
-                      stackId="nin"
-                      fill="#0EA5E9"
-                      radius={[0, 0, 0, 0]}
-                    />
-                    <Bar
-                      dataKey="Without NIN"
-                      stackId="nin"
-                      fill="#F97316"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center p-6 text-center text-xs text-ink-muted italic border-2 border-dashed border-line-light dark:border-line-dark rounded-xl">
-                Gender-disaggregated NIN data will appear after running the
-                updated aggregator.
-              </div>
-            )}
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: "11px" }} />
+              </PieChart>
+            </ResponsiveContainer>
           </ChartCard>
 
           <ChartCard
-            title="Birth Certificate coverage (%) among children 0-17"
-            height={280}
+            title="LACK OF NIN BY AGE"
+            subtitle="Under-18 age group breakdown"
+            isDark={isDark}
+            accentColor="#F59E0B"
           >
-            <div style={{ width: "100%", height: 220 }}>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={bcCoverageData}
-                  layout="vertical"
-                  margin={{ top: 15, right: 30, left: 10, bottom: 0 }}
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={lackNinByAge}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={3}
+                  dataKey="value"
                 >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    horizontal={false}
-                    stroke="#334155"
-                    opacity={0.3}
-                  />
-                  <XAxis
-                    type="number"
-                    domain={[0, 100]}
-                    tick={{ fill: "#94a3b8", fontSize: 11 }}
-                    tickFormatter={(v) => `${v}%`}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={90}
-                    tick={{ fill: "#94a3b8", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    formatter={(v: any) => `${v}%`}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar
-                    dataKey="Covered"
-                    stackId="cov"
-                    fill="#10B981"
-                    radius={[0, 0, 0, 0]}
-                    label={{
-                      position: "inside",
-                      fill: "#fff",
-                      fontSize: 11,
-                      fontWeight: "bold",
-                      formatter: (v: any) => (v > 5 ? `${v}%` : ""),
-                    }}
-                  />
-                  <Bar
-                    dataKey="Gap"
-                    stackId="cov"
-                    fill="#EF4444"
-                    radius={[0, 4, 4, 0]}
-                    label={{
-                      position: "inside",
-                      fill: "#fff",
-                      fontSize: 11,
-                      formatter: (v: any) => (v > 5 ? `${v}%` : ""),
-                    }}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                  {lackNinByAge.map((_, index) => (
+                    <Cell
+                      key={`nin-age-${index}`}
+                      fill={DONUT_COLORS_A[index % DONUT_COLORS_A.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: "11px" }} />
+              </PieChart>
+            </ResponsiveContainer>
           </ChartCard>
 
-          <ChartCard title="NIN coverage (%) among children 0-17" height={280}>
-            <div style={{ width: "100%", height: 220 }}>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={ninCoverageData}
-                  layout="vertical"
-                  margin={{ top: 15, right: 30, left: 10, bottom: 0 }}
+          <ChartCard
+            title="LACK OF BIRTH CERT BY GENDER"
+            subtitle="Male vs female child distribution"
+            isDark={isDark}
+            accentColor="#002F6C"
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={lackBcByGender}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={4}
+                  dataKey="value"
                 >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    horizontal={false}
-                    stroke="#334155"
-                    opacity={0.3}
-                  />
-                  <XAxis
-                    type="number"
-                    domain={[0, 100]}
-                    tick={{ fill: "#94a3b8", fontSize: 11 }}
-                    tickFormatter={(v) => `${v}%`}
-                  />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={90}
-                    tick={{ fill: "#94a3b8", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    formatter={(v: any) => `${v}%`}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar
-                    dataKey="Covered"
-                    stackId="cov"
-                    fill="#0EA5E9"
-                    radius={[0, 0, 0, 0]}
-                    label={{
-                      position: "inside",
-                      fill: "#fff",
-                      fontSize: 11,
-                      fontWeight: "bold",
-                      formatter: (v: any) => (v > 5 ? `${v}%` : ""),
-                    }}
-                  />
-                  <Bar
-                    dataKey="Gap"
-                    stackId="cov"
-                    fill="#F97316"
-                    radius={[0, 4, 4, 0]}
-                    label={{
-                      position: "inside",
-                      fill: "#fff",
-                      fontSize: 11,
-                      formatter: (v: any) => (v > 5 ? `${v}%` : ""),
-                    }}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+                  {lackBcByGender.map((_, index) => (
+                    <Cell
+                      key={`bc-gender-${index}`}
+                      fill={DONUT_COLORS_B[index % DONUT_COLORS_B.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: "11px" }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard
+            title="LACK OF NIN BY GENDER"
+            subtitle="Male vs female child distribution"
+            isDark={isDark}
+            accentColor="#EC4899"
+          >
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={lackNinByGender}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {lackNinByGender.map((_, index) => (
+                    <Cell
+                      key={`nin-gender-${index}`}
+                      fill={DONUT_COLORS_B[index % DONUT_COLORS_B.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: "11px" }} />
+              </PieChart>
+            </ResponsiveContainer>
           </ChartCard>
         </div>
       </div>

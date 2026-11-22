@@ -79,20 +79,67 @@
     "girls": 26524
   },
   "civil_registration": {
-    "c_0_17_with_bc": 9957,
-    "c_0_5_with_bc": 2750,
-    "c_0_17_no_bc": 47731,
-    "c_0_5_no_bc": 12433,
-    "c_0_17_with_nin": 1505,
-    "c_0_5_with_nin": 33,
-    "c_0_17_no_nin": 56183,
-    "c_0_5_no_nin": 15150,
-    "c_0_17_no_bc_no_nin": 46647,
-    "c_0_5_no_bc_no_nin": 12407,
-    "c_0_17_bc_no_nin": 9536,
-    "c_0_5_bc_no_nin": 2743,
-    "c_0_17_nin_no_bc": 1084,
-    "c_0_5_nin_no_bc": 26
+    "children_without_bc": 47731,
+    "children_with_bc": 9957,
+    "children_without_nin": 56183,
+    "children_with_nin": 1505,
+    "children_without_both": 46647,
+    "children_with_both": 421,
+    "total_with_both": 8789,
+    "no_bc_boys": 25756,
+    "no_bc_girls": 21975,
+    "no_nin_boys": 30463,
+    "no_nin_girls": 25720,
+    "no_bc_by_age": [
+      {
+        "name": "0\u20134 yrs",
+        "value": 9308,
+        "color": "#EF4444"
+      },
+      {
+        "name": "5\u20139 yrs",
+        "value": 15797,
+        "color": "#F59E0B"
+      },
+      {
+        "name": "10\u201314 yrs",
+        "value": 14103,
+        "color": "#3B82F6"
+      },
+      {
+        "name": "15\u201317 yrs",
+        "value": 8523,
+        "color": "#8B5CF6"
+      }
+    ],
+    "no_nin_by_age": [
+      {
+        "name": "0\u20134 yrs",
+        "value": 11289,
+        "color": "#EF4444"
+      },
+      {
+        "name": "5\u20139 yrs",
+        "value": 19168,
+        "color": "#F59E0B"
+      },
+      {
+        "name": "10\u201314 yrs",
+        "value": 16617,
+        "color": "#3B82F6"
+      },
+      {
+        "name": "15\u201317 yrs",
+        "value": 9109,
+        "color": "#8B5CF6"
+      }
+    ],
+    "adults_without_bc": 68139,
+    "adults_with_bc": 12849,
+    "adults_without_nin": 41292,
+    "adults_with_nin": 39696,
+    "adults_without_both": 36811,
+    "adults_with_both": 8368
   },
   "education": {
     "oos_6_17": {
@@ -131,75 +178,221 @@
         "oos": 1267
       }
     },
-    "disabled_children": {
-      "oos": 132
-    }
+    "total_oos_6_17": 12404,
+    "total_oos_boys": 7186,
+    "total_oos_girls": 5218,
+    "never_enrolled_boys": 4886,
+    "never_enrolled_girls": 3756,
+    "dropouts_boys": 2300,
+    "dropouts_girls": 1462
   },
   "health_nutrition": {
     "pregnant_total": 2483,
     "lactating_total": 718,
-    "plwd_total": 1376,
-    "children_plwd": 221,
-    "health_insurance_0_7_covered": 3623,
-    "health_insurance_0_7_not_covered": 19337,
-    "health_insurance_0_5_covered": 2350,
-    "health_insurance_0_5_not_covered": 12833
+    "sam_children": 7990,
+    "mam_children": 2166,
+    "normal_children": 982,
+    "insurance_covered_households": 6793,
+    "nutrition_service_access": 0,
+    "illness_by_age": [
+      {
+        "ageGroup": "0\u20134 yrs",
+        "feverMalaria": 12480,
+        "respiratory": 5547,
+        "diarrhea": 4853,
+        "chronic": 693
+      },
+      {
+        "ageGroup": "5\u201317 yrs",
+        "feverMalaria": 10400,
+        "respiratory": 3466,
+        "diarrhea": 2080,
+        "chronic": 1386
+      },
+      {
+        "ageGroup": "18\u201349 yrs",
+        "feverMalaria": 6933,
+        "respiratory": 2080,
+        "diarrhea": 1386,
+        "chronic": 4853
+      },
+      {
+        "ageGroup": "50+ yrs",
+        "feverMalaria": 4853,
+        "respiratory": 2773,
+        "diarrhea": 1109,
+        "chronic": 8320
+      }
+    ]
   },
   "nutrition": {
     "pregnant_total": 2483,
     "lactating_total": 718,
     "sam_children": 7990,
     "mam_children": 2166,
-    "normal_children": 982
+    "normal_children": 982,
+    "food_support_by_age": [
+      {
+        "ageGroup": "0\u20134 yrs",
+        "supported": 0,
+        "unsupported": 5585
+      },
+      {
+        "ageGroup": "5\u20139 yrs",
+        "supported": 0,
+        "unsupported": 2539
+      },
+      {
+        "ageGroup": "10\u201314 yrs",
+        "supported": 0,
+        "unsupported": 1218
+      },
+      {
+        "ageGroup": "15\u201317 yrs",
+        "supported": 0,
+        "unsupported": 812
+      }
+    ]
+  },
+  "disabilities": {
+    "plwd_total": 1376,
+    "children_plwd": 221,
+    "adults_plwd": 1155,
+    "children_plwd_boys": 131,
+    "children_plwd_girls": 90,
+    "disability_types_all": {
+      "physicaldisability": 817,
+      "blind": 208,
+      "deaf": 170,
+      "dumb": 46,
+      "mentalill": 71,
+      "epilepsy": 10,
+      "autism": 25,
+      "otherdisability": 94
+    },
+    "disability_types_children": {
+      "physicaldisability": 109,
+      "blind": 36,
+      "deaf": 46,
+      "dumb": 7,
+      "mentalill": 12,
+      "epilepsy": 5,
+      "autism": 6,
+      "otherdisability": 11
+    },
+    "disability_by_age_gender": [
+      {
+        "ageGroup": "0\u20134 yrs",
+        "boys": 21,
+        "girls": 18
+      },
+      {
+        "ageGroup": "5\u201317 yrs",
+        "boys": 94,
+        "girls": 86
+      },
+      {
+        "ageGroup": "18\u201349 yrs",
+        "boys": 353,
+        "girls": 339
+      },
+      {
+        "ageGroup": "50+ yrs",
+        "boys": 226,
+        "girls": 235
+      }
+    ]
   },
   "livelihoods": {
     "female_headed_hhs": 21055,
     "youth_employed": 14562,
     "youth_unemployed": 4450,
     "shock_prone_hhs": 4409,
-    "children_in_risk_hhs": 6692,
-    "large_households": 1659
+    "negative_coping_hhs": 2821,
+    "child_coping_hhs": 1234,
+    "livelihood_sources": [
+      {
+        "source": "Crop Farming / Agriculture",
+        "count": 17435
+      },
+      {
+        "source": "Informal Trade / Micro-business",
+        "count": 9962
+      },
+      {
+        "source": "Wage Labour / Daily Casual",
+        "count": 6641
+      },
+      {
+        "source": "Livestock / Poultry Rearing",
+        "count": 3320
+      },
+      {
+        "source": "Artisanship / Skills",
+        "count": 2490
+      },
+      {
+        "source": "Formal Salary / Remittances",
+        "count": 1660
+      }
+    ],
+    "shock_types": [
+      {
+        "type": "Flooding & Extreme Weather",
+        "count": 1675
+      },
+      {
+        "type": "Food Price / Inflation Spike",
+        "count": 1234
+      },
+      {
+        "type": "Insecurity / Communal Conflict",
+        "count": 793
+      },
+      {
+        "type": "Drought / Water Scarcity",
+        "count": 440
+      },
+      {
+        "type": "Illness / Loss of Breadwinner",
+        "count": 264
+      }
+    ],
+    "coping_strategies": [
+      {
+        "strategy": "Reduced Food Quantity / Meals",
+        "count": 3174
+      },
+      {
+        "strategy": "Spent Savings / Borrowed Money",
+        "count": 2380
+      },
+      {
+        "strategy": "Sold Productive / Domestic Assets",
+        "count": 1587
+      },
+      {
+        "strategy": "Withdrew Children from School",
+        "count": 969
+      },
+      {
+        "strategy": "Sent Children into Child Labour",
+        "count": 617
+      }
+    ],
+    "youth_economic_data": [
+      {
+        "cohort": "18\u201320 yrs",
+        "male": 2925,
+        "female": 3038
+      },
+      {
+        "cohort": "21\u201324 yrs",
+        "male": 4039,
+        "female": 4558
+      }
+    ]
   },
-  "bc_by_gender": {
-    "boys_with_bc": 5408,
-    "boys_without_bc": 25756,
-    "girls_with_bc": 4549,
-    "girls_without_bc": 21975
-  },
-  "nin_by_gender": {
-    "boys_with_nin": 701,
-    "boys_without_nin": 30463,
-    "girls_with_nin": 804,
-    "girls_without_nin": 25720
-  },
-  "disability_types_children": {
-    "blind": 36,
-    "deaf": 46,
-    "physicaldisability": 109,
-    "mentalill": 12,
-    "epilepsy": 5,
-    "dumb": 7,
-    "autism": 6,
-    "otherdisability": 11
-  },
-  "disabled_never_enrolled_by_gender": {
-    "boys": 50,
-    "girls": 41
-  },
-  "nutrition_programme": {
-    "total_sam_mam": 10156,
-    "enrolled": 0,
-    "not_enrolled": 10156,
-    "rutf": 0,
-    "food": 0,
-    "cash": 0
-  },
-  "hh_cross": {
-    "female_headed_shock": 1849,
-    "disability_shock": 426,
-    "multi_vulnerable": 4440
-  },
-  "large_households": 1659,
   "extended": {
     "age_sex_pyramid": [
       {
@@ -246,6 +439,87 @@
         "boys": 6383,
         "girls": 6969,
         "total": 13352
+      },
+      {
+        "band": "25-29",
+        "ageGroup": "25-29",
+        "male": 5733,
+        "female": 6639,
+        "boys": 5733,
+        "girls": 6639,
+        "total": 12372
+      },
+      {
+        "band": "30-34",
+        "ageGroup": "30-34",
+        "male": 4466,
+        "female": 5017,
+        "boys": 4466,
+        "girls": 5017,
+        "total": 9483
+      },
+      {
+        "band": "35-39",
+        "ageGroup": "35-39",
+        "male": 4305,
+        "female": 4542,
+        "boys": 4305,
+        "girls": 4542,
+        "total": 8847
+      },
+      {
+        "band": "40-44",
+        "ageGroup": "40-44",
+        "male": 3945,
+        "female": 4185,
+        "boys": 3945,
+        "girls": 4185,
+        "total": 8130
+      },
+      {
+        "band": "45-49",
+        "ageGroup": "45-49",
+        "male": 3136,
+        "female": 3488,
+        "boys": 3136,
+        "girls": 3488,
+        "total": 6624
+      },
+      {
+        "band": "50-54",
+        "ageGroup": "50-54",
+        "male": 2439,
+        "female": 2590,
+        "boys": 2439,
+        "girls": 2590,
+        "total": 5029
+      },
+      {
+        "band": "55-59",
+        "ageGroup": "55-59",
+        "male": 1975,
+        "female": 1948,
+        "boys": 1975,
+        "girls": 1948,
+        "total": 3923
+      },
+      {
+        "band": "60-64",
+        "ageGroup": "60-64",
+        "male": 1405,
+        "female": 1276,
+        "boys": 1405,
+        "girls": 1276,
+        "total": 2681
+      },
+      {
+        "band": "65+",
+        "ageGroup": "65+",
+        "male": 2478,
+        "female": 2409,
+        "boys": 2478,
+        "girls": 2409,
+        "total": 4887
       }
     ],
     "age_bands_v2": {
@@ -253,11 +527,6 @@
         "total": 57688,
         "male": 31164,
         "female": 26524
-      },
-      "0-3": {
-        "total": 8195,
-        "male": 4321,
-        "female": 3874
       },
       "0-5": {
         "total": 15183,
@@ -268,23 +537,75 @@
         "total": 19012,
         "male": 9266,
         "female": 9746
+      },
+      "25+": {
+        "total": 61976,
+        "male": 29882,
+        "female": 32094
       }
     },
-    "civil_registration": {
-      "c_0_17_with_bc": 9957,
-      "c_0_5_with_bc": 2750,
-      "c_0_17_no_bc": 47731,
-      "c_0_5_no_bc": 12433,
-      "c_0_17_with_nin": 1505,
-      "c_0_5_with_nin": 33,
-      "c_0_17_no_nin": 56183,
-      "c_0_5_no_nin": 15150,
-      "c_0_17_no_bc_no_nin": 46647,
-      "c_0_5_no_bc_no_nin": 12407,
-      "c_0_17_bc_no_nin": 9536,
-      "c_0_5_bc_no_nin": 2743,
-      "c_0_17_nin_no_bc": 1084,
-      "c_0_5_nin_no_bc": 26
+    "civil_registration_v2": {
+      "children_without_bc": 47731,
+      "children_with_bc": 9957,
+      "children_without_nin": 56183,
+      "children_with_nin": 1505,
+      "children_without_both": 46647,
+      "children_with_both": 421,
+      "total_with_both": 8789,
+      "no_bc_boys": 25756,
+      "no_bc_girls": 21975,
+      "no_nin_boys": 30463,
+      "no_nin_girls": 25720,
+      "no_bc_by_age": [
+        {
+          "name": "0\u20134 yrs",
+          "value": 9308,
+          "color": "#EF4444"
+        },
+        {
+          "name": "5\u20139 yrs",
+          "value": 15797,
+          "color": "#F59E0B"
+        },
+        {
+          "name": "10\u201314 yrs",
+          "value": 14103,
+          "color": "#3B82F6"
+        },
+        {
+          "name": "15\u201317 yrs",
+          "value": 8523,
+          "color": "#8B5CF6"
+        }
+      ],
+      "no_nin_by_age": [
+        {
+          "name": "0\u20134 yrs",
+          "value": 11289,
+          "color": "#EF4444"
+        },
+        {
+          "name": "5\u20139 yrs",
+          "value": 19168,
+          "color": "#F59E0B"
+        },
+        {
+          "name": "10\u201314 yrs",
+          "value": 16617,
+          "color": "#3B82F6"
+        },
+        {
+          "name": "15\u201317 yrs",
+          "value": 9109,
+          "color": "#8B5CF6"
+        }
+      ],
+      "adults_without_bc": 68139,
+      "adults_with_bc": 12849,
+      "adults_without_nin": 41292,
+      "adults_with_nin": 39696,
+      "adults_without_both": 36811,
+      "adults_with_both": 8368
     },
     "education_v2": {
       "oos_6_17": {
@@ -323,61 +644,263 @@
           "oos": 1267
         }
       },
-      "disabled_children": {
-        "oos": 132
-      }
+      "total_oos_6_17": 12404,
+      "total_oos_boys": 7186,
+      "total_oos_girls": 5218,
+      "never_enrolled_boys": 4886,
+      "never_enrolled_girls": 3756,
+      "dropouts_boys": 2300,
+      "dropouts_girls": 1462
     },
     "health_v2": {
       "pregnant_total": 2483,
       "lactating_total": 718,
-      "plwd_total": 1376,
-      "children_plwd": 221,
-      "health_insurance_0_7_covered": 3623,
-      "health_insurance_0_7_not_covered": 19337,
-      "health_insurance_0_5_covered": 2350,
-      "health_insurance_0_5_not_covered": 12833
+      "sam_children": 7990,
+      "mam_children": 2166,
+      "normal_children": 982,
+      "insurance_covered_households": 6793,
+      "nutrition_service_access": 0,
+      "illness_by_age": [
+        {
+          "ageGroup": "0\u20134 yrs",
+          "feverMalaria": 12480,
+          "respiratory": 5547,
+          "diarrhea": 4853,
+          "chronic": 693
+        },
+        {
+          "ageGroup": "5\u201317 yrs",
+          "feverMalaria": 10400,
+          "respiratory": 3466,
+          "diarrhea": 2080,
+          "chronic": 1386
+        },
+        {
+          "ageGroup": "18\u201349 yrs",
+          "feverMalaria": 6933,
+          "respiratory": 2080,
+          "diarrhea": 1386,
+          "chronic": 4853
+        },
+        {
+          "ageGroup": "50+ yrs",
+          "feverMalaria": 4853,
+          "respiratory": 2773,
+          "diarrhea": 1109,
+          "chronic": 8320
+        }
+      ]
     },
     "nutrition_v2": {
       "pregnant_total": 2483,
       "lactating_total": 718,
       "sam_children": 7990,
       "mam_children": 2166,
-      "normal_children": 982
+      "normal_children": 982,
+      "food_support_by_age": [
+        {
+          "ageGroup": "0\u20134 yrs",
+          "supported": 0,
+          "unsupported": 5585
+        },
+        {
+          "ageGroup": "5\u20139 yrs",
+          "supported": 0,
+          "unsupported": 2539
+        },
+        {
+          "ageGroup": "10\u201314 yrs",
+          "supported": 0,
+          "unsupported": 1218
+        },
+        {
+          "ageGroup": "15\u201317 yrs",
+          "supported": 0,
+          "unsupported": 812
+        }
+      ]
+    },
+    "disabilities_v2": {
+      "plwd_total": 1376,
+      "children_plwd": 221,
+      "adults_plwd": 1155,
+      "children_plwd_boys": 131,
+      "children_plwd_girls": 90,
+      "disability_types_all": {
+        "physicaldisability": 817,
+        "blind": 208,
+        "deaf": 170,
+        "dumb": 46,
+        "mentalill": 71,
+        "epilepsy": 10,
+        "autism": 25,
+        "otherdisability": 94
+      },
+      "disability_types_children": {
+        "physicaldisability": 109,
+        "blind": 36,
+        "deaf": 46,
+        "dumb": 7,
+        "mentalill": 12,
+        "epilepsy": 5,
+        "autism": 6,
+        "otherdisability": 11
+      },
+      "disability_by_age_gender": [
+        {
+          "ageGroup": "0\u20134 yrs",
+          "boys": 21,
+          "girls": 18
+        },
+        {
+          "ageGroup": "5\u201317 yrs",
+          "boys": 94,
+          "girls": 86
+        },
+        {
+          "ageGroup": "18\u201349 yrs",
+          "boys": 353,
+          "girls": 339
+        },
+        {
+          "ageGroup": "50+ yrs",
+          "boys": 226,
+          "girls": 235
+        }
+      ]
     },
     "livelihoods_resilience_v2": {
       "female_headed_hhs": 21055,
       "youth_employed": 14562,
       "youth_unemployed": 4450,
       "shock_prone_hhs": 4409,
-      "children_in_risk_hhs": 6692,
-      "large_households": 1659
+      "negative_coping_hhs": 2821,
+      "child_coping_hhs": 1234,
+      "livelihood_sources": [
+        {
+          "source": "Crop Farming / Agriculture",
+          "count": 17435
+        },
+        {
+          "source": "Informal Trade / Micro-business",
+          "count": 9962
+        },
+        {
+          "source": "Wage Labour / Daily Casual",
+          "count": 6641
+        },
+        {
+          "source": "Livestock / Poultry Rearing",
+          "count": 3320
+        },
+        {
+          "source": "Artisanship / Skills",
+          "count": 2490
+        },
+        {
+          "source": "Formal Salary / Remittances",
+          "count": 1660
+        }
+      ],
+      "shock_types": [
+        {
+          "type": "Flooding & Extreme Weather",
+          "count": 1675
+        },
+        {
+          "type": "Food Price / Inflation Spike",
+          "count": 1234
+        },
+        {
+          "type": "Insecurity / Communal Conflict",
+          "count": 793
+        },
+        {
+          "type": "Drought / Water Scarcity",
+          "count": 440
+        },
+        {
+          "type": "Illness / Loss of Breadwinner",
+          "count": 264
+        }
+      ],
+      "coping_strategies": [
+        {
+          "strategy": "Reduced Food Quantity / Meals",
+          "count": 3174
+        },
+        {
+          "strategy": "Spent Savings / Borrowed Money",
+          "count": 2380
+        },
+        {
+          "strategy": "Sold Productive / Domestic Assets",
+          "count": 1587
+        },
+        {
+          "strategy": "Withdrew Children from School",
+          "count": 969
+        },
+        {
+          "strategy": "Sent Children into Child Labour",
+          "count": 617
+        }
+      ],
+      "youth_economic_data": [
+        {
+          "cohort": "18\u201320 yrs",
+          "male": 2925,
+          "female": 3038
+        },
+        {
+          "cohort": "21\u201324 yrs",
+          "male": 4039,
+          "female": 4558
+        }
+      ]
     },
-    "bc_by_gender": {
-      "boys_with_bc": 5408,
-      "boys_without_bc": 25756,
-      "girls_with_bc": 4549,
-      "girls_without_bc": 21975
-    },
-    "nin_by_gender": {
-      "boys_with_nin": 701,
-      "boys_without_nin": 30463,
-      "girls_with_nin": 804,
-      "girls_without_nin": 25720
+    "disability_types_all": {
+      "physicaldisability": 817,
+      "blind": 208,
+      "deaf": 170,
+      "dumb": 46,
+      "mentalill": 71,
+      "epilepsy": 10,
+      "autism": 25,
+      "otherdisability": 94
     },
     "disability_types_children": {
+      "physicaldisability": 109,
       "blind": 36,
       "deaf": 46,
-      "physicaldisability": 109,
+      "dumb": 7,
       "mentalill": 12,
       "epilepsy": 5,
-      "dumb": 7,
       "autism": 6,
       "otherdisability": 11
     },
-    "disabled_never_enrolled_by_gender": {
-      "boys": 50,
-      "girls": 41
-    },
+    "disability_by_age_gender": [
+      {
+        "ageGroup": "0\u20134 yrs",
+        "boys": 21,
+        "girls": 18
+      },
+      {
+        "ageGroup": "5\u201317 yrs",
+        "boys": 94,
+        "girls": 86
+      },
+      {
+        "ageGroup": "18\u201349 yrs",
+        "boys": 353,
+        "girls": 339
+      },
+      {
+        "ageGroup": "50+ yrs",
+        "boys": 226,
+        "girls": 235
+      }
+    ],
     "nutrition_programme": {
       "total_sam_mam": 10156,
       "enrolled": 0,
@@ -385,12 +908,6 @@
       "rutf": 0,
       "food": 0,
       "cash": 0
-    },
-    "hh_cross": {
-      "female_headed_shock": 1849,
-      "disability_shock": 426,
-      "multi_vulnerable": 4440
-    },
-    "large_households": 1659
+    }
   }
 }

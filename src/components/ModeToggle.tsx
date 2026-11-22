@@ -1,47 +1,49 @@
-import { Users, Target } from "lucide-react";
-import clsx from "clsx";
+import React from "react";
 import type { DashboardMode } from "../lib/types";
 
 interface ModeToggleProps {
   mode: DashboardMode;
   onChange: (m: DashboardMode) => void;
+  isDark?: boolean;
 }
 
-export default function ModeToggle({ mode, onChange }: ModeToggleProps) {
+export const ModeToggle: React.FC<ModeToggleProps> = ({
+  mode,
+  onChange,
+  isDark = false,
+}) => {
   return (
-    <div className="flex justify-center py-2">
-      <div
-        className={clsx(
-          "inline-flex items-center rounded-full p-1 gap-1",
-          "bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark shadow-card",
-        )}
+    <div
+      className={`inline-flex rounded-lg border p-1 text-xs font-medium ${
+        isDark
+          ? "bg-slate-900 border-slate-800"
+          : "bg-slate-100 border-slate-200"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={() => onChange("overview")}
+        className={`px-3 py-1.5 rounded-md transition-all ${
+          String(mode) === "nsr" || String(mode) === "overview"
+            ? "bg-blue-600 text-white shadow-sm"
+            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+        }`}
       >
-        <button
-          onClick={() => onChange("nsr")}
-          className={clsx(
-            "flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all",
-            mode === "nsr"
-              ? "bg-nsr-500 text-white shadow-sm"
-              : "text-ink-muted hover:text-ink-primary dark:text-ink-onDarkMuted dark:hover:text-ink-onDark",
-          )}
-        >
-          <Users size={16} />
-          <span>Household Profile</span>
-        </button>
-
-        <button
-          onClick={() => onChange("update")}
-          className={clsx(
-            "flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all",
-            mode === "update"
-              ? "bg-upd-500 text-white shadow-sm"
-              : "text-ink-muted hover:text-ink-primary dark:text-ink-onDarkMuted dark:hover:text-ink-onDark",
-          )}
-        >
-          <Target size={16} />
-          <span>Deprivation Analysis</span>
-        </button>
-      </div>
+        NSR Mode
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange("vulnerability")}
+        className={`px-3 py-1.5 rounded-md transition-all ${
+          String(mode) === "vulnerability"
+            ? "bg-blue-600 text-white shadow-sm"
+            : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+        }`}
+      >
+        Vulnerability Index
+      </button>
     </div>
   );
-}
+};
+
+export default ModeToggle;

@@ -1,290 +1,193 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Download, Search, Building2 } from "lucide-react";
-import type { DashboardData } from "../lib/loadData";
+import React, { useState, useMemo } from "react";
+import type { GeoRecord } from "../lib/types";
 
-interface CommunityRankingPanelProps {
-  data: DashboardData;
-  selectedStateFilter?: string;
+export interface CommunityRankingPanelProps {
+  communities?: GeoRecord[];
+  records?: GeoRecord[];
+  isDark?: boolean;
+  onSelectCommunity?: (comm: GeoRecord) => void;
 }
 
 export const CommunityRankingPanel: React.FC<CommunityRankingPanelProps> = ({
-  data,
-  selectedStateFilter,
+  communities = [],
+  records,
+  isDark = false,
+  onSelectCommunity,
 }) => {
-  const [stateFilter, setStateFilter] = useState<string>(
-    selectedStateFilter || "ALL",
-  );
-  const [topCount, setTopCount] = useState<number>(20);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const commList = records || communities;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedState, setSelectedState] = useState<string>("ALL");
 
-  useEffect(() => {
-    if (selectedStateFilter) {
-      setStateFilter(selectedStateFilter.toUpperCase());
-    } else {
-      setStateFilter("ALL");
-    }
-  }, [selectedStateFilter]);
-
-  const allCommunities = useMemo(() => {
-    return data.communities || [];
-  }, [data]);
-
-  const filteredCommunities = useMemo(() => {
-    let list = allCommunities;
-
-    if (stateFilter && stateFilter !== "ALL") {
-      list = list.filter(
-        (c) =>
-          (c.state || "").trim().toUpperCase() ===
-          stateFilter.trim().toUpperCase(),
-      );
-    }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (c) =>
-          (c.community || "").toLowerCase().includes(q) ||
-          (c.lga || "").toLowerCase().includes(q) ||
-          (c.state || "").toLowerCase().includes(q),
-      );
-    }
-
-    return list;
-  }, [allCommunities, stateFilter, searchQuery]);
-
-  const displayedCommunities = useMemo(() => {
-    if (topCount === -1) return filteredCommunities;
-    return filteredCommunities.slice(0, topCount);
-  }, [filteredCommunities, topCount]);
+  const filtered = useMemo(() => {
+    return commList.filter((c) => {
+      const nameMatch =
+        (c.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.community || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (c.lga || "").toLowerCase().includes(searchTerm.toLowerCase());
+      const stateMatch =
+        selectedState === "ALL" ||
+        (c.state || "").toUpperCase() === selectedState.toUpperCase();
+      return nameMatch && stateMatch;
+    });
+  }, [commList, searchTerm, selectedState]);
 
   const handleExportCSV = () => {
+    if (filtered.length === 0) return;
     const headers = [
-      "#",
       "Community",
+      "Ward",
       "LGA",
       "State",
-      "Number of PVHHs",
-      "Number of Individuals",
-      "Males",
-      "Females",
-      "Ages 0-17",
-      "18 and Above",
+      "Households",
+      "Individuals",
+      "Children (0-17)",
+      "Youth (18-24)",
+      "OOS Children (6-17)",
+      "Children w/o BC",
     ];
 
-    const rows = filteredCommunities.map((c, idx) => {
-      const totalInd = c.nsr?.total_individuals ?? 0;
-      const u18 = c.nsr?.children_under18 ?? 0;
-      const a18 = Math.max(0, totalInd - u18);
-      const pvhh =
-        c.vulnerability?.poorest_households ??
-        Math.round(
-          (c.nsr?.total_households ?? 0) *
-            ((c.vulnerability?.poorest_pct ?? 0) / 100),
-        );
-
-      return [
-        idx + 1,
-        `"${c.community || ""}"`,
-        `"${c.lga || ""}"`,
-        `"${c.state || ""}"`,
-        pvhh,
-        totalInd,
-        c.nsr?.total_male ?? 0,
-        c.nsr?.total_female ?? 0,
-        u18,
-        a18,
-      ];
-    });
+    const rows = filtered.map((c) => [
+      `"${c.name || c.community || ""}"`,
+      `"${c.ward || ""}"`,
+      `"${c.lga || ""}"`,
+      `"${c.state || ""}"`,
+      c.demographics?.total_hh || 0,
+      c.demographics?.total_individuals || 0,
+      c.demographics?.children_0_17 || 0,
+      c.demographics?.youth_18_24 || 0,
+      c.education?.oos_children_6_17 || 0,
+      c.civil_registration?.children_without_birth_certificate || 0,
+    ]);
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `UNICEF_Community_Demographics_${stateFilter}_${new Date().toISOString().slice(0, 10)}.csv`,
-    );
+    link.setAttribute("download", `community_demographics_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const statesList = ["ABIA", "BENUE", "OYO", "SOKOTO"];
-
   return (
-    <div className="bg-surface-light dark:bg-surface-dark border border-line-light dark:border-line-dark rounded-xl p-5 space-y-4 shadow-card">
-      {/* Title & Controls Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-line-light dark:border-line-dark">
+    <div
+      className={`rounded-xl border p-4 shadow-sm transition-colors ${
+        isDark
+          ? "bg-slate-900/90 border-slate-800 text-slate-100"
+          : "bg-white border-slate-200 text-slate-900"
+      }`}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-          <h3 className="text-base font-bold text-ink-primary dark:text-ink-onDark flex items-center gap-2">
-            <Building2
-              size={18}
-              className="text-brand-600 dark:text-brand-400"
-            />
-            UNICEF COMMUNITY SELECTION & DEMOGRAPHICS
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Community Level Demographics
           </h3>
-          <p className="text-xs text-ink-muted dark:text-ink-onDarkMuted mt-1">
-            Community-level demographic disaggregation across pilot states.
-            Download data for field team deployment.
+          <p className="text-xs text-slate-400">
+            Showing {filtered.length.toLocaleString()} surveyed communities
           </p>
         </div>
 
-        <div className="flex items-center flex-wrap gap-3">
-          <div className="flex items-center gap-2 text-xs">
-            <span className="font-semibold text-ink-muted dark:text-ink-onDarkMuted">
-              STATE
-            </span>
-            <select
-              value={stateFilter}
-              onChange={(e) => setStateFilter(e.target.value)}
-              className="px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs font-medium text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
-            >
-              <option value="ALL">All 4 MDP States</option>
-              {statesList.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="font-semibold text-ink-muted dark:text-ink-onDarkMuted">
-              SHOW TOP
-            </span>
-            <select
-              value={topCount}
-              onChange={(e) => setTopCount(Number(e.target.value))}
-              className="px-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs font-medium text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
-            >
-              <option value={20}>20 communities</option>
-              <option value={50}>50 communities</option>
-              <option value={100}>100 communities</option>
-              <option value={-1}>All communities</option>
-            </select>
-          </div>
-
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search community, LGA..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`text-xs px-3 py-1.5 rounded-lg border outline-none ${
+              isDark
+                ? "bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500"
+                : "bg-slate-50 border-slate-300 text-slate-800 focus:border-blue-600"
+            }`}
+          />
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+            className={`text-xs px-2.5 py-1.5 rounded-lg border outline-none cursor-pointer ${
+              isDark
+                ? "bg-slate-800 border-slate-700 text-slate-200"
+                : "bg-slate-50 border-slate-300 text-slate-800"
+            }`}
           >
-            <Download size={14} />
-            Download UNICEF Excel
+            <option value="ALL">All States</option>
+            <option value="ABIA">Abia</option>
+            <option value="BENUE">Benue</option>
+            <option value="OYO">Oyo</option>
+            <option value="SOKOTO">Sokoto</option>
+          </select>
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1.5"
+          >
+            <span>↓</span> Export CSV
           </button>
         </div>
       </div>
 
-      {/* Filter / Search Bar & Subtext */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div className="text-ink-muted dark:text-ink-onDarkMuted font-medium">
-          Showing{" "}
-          <span className="font-bold text-ink-primary dark:text-ink-onDark">
-            {displayedCommunities.length}
-          </span>{" "}
-          of{" "}
-          <span className="font-bold text-ink-primary dark:text-ink-onDark">
-            {filteredCommunities.length}
-          </span>{" "}
-          communities
-        </div>
-
-        <div className="relative max-w-xs w-full">
-          <Search
-            size={14}
-            className="absolute left-3 top-2.5 text-ink-faint"
-          />
-          <input
-            type="text"
-            placeholder="Search community or LGA..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-line-light dark:border-line-dark bg-surface-page dark:bg-surface-darker text-xs text-ink-primary dark:text-ink-onDark focus:outline-none focus:ring-1 focus:ring-brand-500"
-          />
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-line-light dark:border-line-dark">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-surface-page dark:bg-surface-darker border-b border-line-light dark:border-line-dark text-[11px] font-bold uppercase tracking-wider text-ink-muted dark:text-ink-onDarkMuted">
-              <th className="py-3 px-3 w-10 text-center">#</th>
-              <th className="py-3 px-3">Community</th>
-              <th className="py-3 px-3">LGA</th>
-              <th className="py-3 px-3">State</th>
-              <th className="py-3 px-3 text-right">Number of PVHHs</th>
-              <th className="py-3 px-3 text-right">Number of Individuals</th>
-              <th className="py-3 px-3 text-right">Males</th>
-              <th className="py-3 px-3 text-right">Females</th>
-              <th className="py-3 px-3 text-right">Ages 0–17</th>
-              <th className="py-3 px-3 text-right">18 and Above</th>
+      <div className="overflow-x-auto max-h-[380px] border border-slate-200 dark:border-slate-800 rounded-lg">
+        <table className="w-full text-left text-xs">
+          <thead
+            className={`sticky top-0 z-10 uppercase text-[10px] tracking-wider font-bold border-b ${
+              isDark
+                ? "bg-slate-800/90 text-slate-300 border-slate-700"
+                : "bg-slate-100 text-slate-600 border-slate-200"
+            }`}
+          >
+            <tr>
+              <th className="py-2.5 px-3">Community</th>
+              <th className="py-2.5 px-3">LGA</th>
+              <th className="py-2.5 px-3">State</th>
+              <th className="py-2.5 px-3 text-right">Households</th>
+              <th className="py-2.5 px-3 text-right">Individuals</th>
+              <th className="py-2.5 px-3 text-right">Children (0–17)</th>
+              <th className="py-2.5 px-3 text-right">Youth (18–24)</th>
+              <th className="py-2.5 px-3 text-right">OOSC (6–17)</th>
+              <th className="py-2.5 px-3 text-right">No Birth Cert</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-line-light dark:divide-line-dark">
-            {displayedCommunities.length > 0 ? (
-              displayedCommunities.map((c, i) => {
-                const totalInd = c.nsr?.total_individuals ?? 0;
-                const u18 = c.nsr?.children_under18 ?? 0;
-                const a18 = Math.max(0, totalInd - u18);
-                const pvhh =
-                  c.vulnerability?.poorest_households ??
-                  Math.round(
-                    (c.nsr?.total_households ?? 0) *
-                      ((c.vulnerability?.poorest_pct ?? 0) / 100),
-                  );
-
-                return (
-                  <tr
-                    key={`${c.state}-${c.lga}-${c.community}-${i}`}
-                    className="hover:bg-surface-page/60 dark:hover:bg-surface-darker/60 transition-colors text-ink-primary dark:text-ink-onDark"
-                  >
-                    <td className="py-2.5 px-3 text-center text-ink-faint font-mono text-[11px]">
-                      {i + 1}
-                    </td>
-                    <td className="py-2.5 px-3 font-semibold text-brand-700 dark:text-brand-400">
-                      {c.community}
-                    </td>
-                    <td className="py-2.5 px-3 font-medium uppercase text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
-                      {c.lga}
-                    </td>
-                    <td className="py-2.5 px-3 font-medium uppercase text-[11px] text-ink-muted dark:text-ink-onDarkMuted">
-                      {c.state}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">
-                      {pvhh.toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-semibold">
-                      {totalInd.toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
-                      {(c.nsr?.total_male ?? 0).toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
-                      {(c.nsr?.total_female ?? 0).toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-amber-600 dark:text-amber-400 font-medium">
-                      {u18.toLocaleString()}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-ink-muted dark:text-ink-onDarkMuted">
-                      {a18.toLocaleString()}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td
-                  colSpan={10}
-                  className="py-8 text-center text-ink-muted italic text-xs"
-                >
-                  No community records match the selected filters.
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono">
+            {filtered.slice(0, 100).map((c, i) => (
+              <tr
+                key={c.id || i}
+                onClick={() => onSelectCommunity && onSelectCommunity(c)}
+                className={`hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-colors ${
+                  onSelectCommunity ? "cursor-pointer" : ""
+                }`}
+              >
+                <td className="py-2 px-3 font-sans font-medium text-slate-900 dark:text-slate-100 truncate max-w-[140px]">
+                  {c.name || c.community}
+                </td>
+                <td className="py-2 px-3 font-sans text-slate-600 dark:text-slate-400">
+                  {c.lga || "—"}
+                </td>
+                <td className="py-2 px-3 font-sans text-slate-600 dark:text-slate-400">
+                  {c.state || "—"}
+                </td>
+                <td className="py-2 px-3 text-right">
+                  {(c.demographics?.total_hh || 0).toLocaleString()}
+                </td>
+                <td className="py-2 px-3 text-right">
+                  {(c.demographics?.total_individuals || 0).toLocaleString()}
+                </td>
+                <td className="py-2 px-3 text-right">
+                  {(c.demographics?.children_0_17 || 0).toLocaleString()}
+                </td>
+                <td className="py-2 px-3 text-right">
+                  {(c.demographics?.youth_18_24 || 0).toLocaleString()}
+                </td>
+                <td className="py-2 px-3 text-right text-red-600 dark:text-red-400">
+                  {(c.education?.oos_children_6_17 || 0).toLocaleString()}
+                </td>
+                <td className="py-2 px-3 text-right text-amber-600 dark:text-amber-400">
+                  {(
+                    c.civil_registration?.children_without_birth_certificate ||
+                    0
+                  ).toLocaleString()}
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
