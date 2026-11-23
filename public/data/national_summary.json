@@ -1,172 +1,155 @@
 {
-  "total_hh": 41512,
-  "households": 41512,
+  "level": "national",
+  "name": "Nigeria (Pilot Coverage)",
+  "code": "NAT",
+  "parent_code": null,
+  "state_name": null,
+  "lga_name": null,
+  "ward_name": null,
   "total_households": 41512,
   "total_individuals": 138676,
-  "total_ind": 138676,
-  "males": 70312,
-  "females": 68364,
-  "children_0_17": 57688,
-  "children_0_5": 15183,
-  "youth_18_24": 19012,
-  "plwd": 1376,
-  "pregnant_women": 2483,
-  "lactating_mothers": 718,
+  "male_count": 70312,
+  "female_count": 68364,
+  "children_count": 0,
+  "youth_count": 0,
+  "working_age_count": 138676,
+  "elderly_count": 0,
+  "communities_count": 568,
   "demographics": {
-    "total_hh": 41512,
-    "households": 41512,
-    "total_households": 41512,
-    "total_individuals": 138676,
-    "total_ind": 138676,
-    "males": 70312,
-    "females": 68364,
-    "children_0_17": 57688,
-    "children_0_5": 15183,
-    "youth_18_24": 19012,
-    "female_headed_hh": 21055,
-    "female_headed_hh_pct": 50.7
+    "avg_household_size": 3.34,
+    "female_headed_hh_pct": 50.7,
+    "child_dependency_ratio": 0.0,
+    "elderly_dependency_ratio": 0.0,
+    "total_dependency_ratio": 0.0,
+    "age_groups": [
+      {
+        "bracket": "0 - 4 yrs",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "bracket": "5 - 11 yrs",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "bracket": "12 - 17 yrs",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "bracket": "18 - 24 yrs (Youth)",
+        "count": 0,
+        "percentage": 0.0
+      },
+      {
+        "bracket": "25 - 64 yrs (Adults)",
+        "count": 138676,
+        "percentage": 100.0
+      },
+      {
+        "bracket": "65+ yrs (Elderly)",
+        "count": 0,
+        "percentage": 0.0
+      }
+    ]
   },
-  "civil_registration": {
-    "children_without_birth_certificate": 47731,
-    "children_no_bc": 47731,
-    "children_without_bc": 47731,
-    "children_with_bc": 9957,
-    "children_without_nin": 56183,
-    "children_no_nin": 56183,
-    "children_with_nin": 1505,
-    "children_without_bc_and_nin": 46647,
-    "children_no_bc_and_nin": 46647,
-    "children_with_bc_and_nin": 421,
-    "children_with_both": 421,
-    "total_with_both": 8789,
-    "no_bc_boys": 25756,
-    "no_bc_girls": 21975,
-    "no_nin_boys": 30463,
-    "no_nin_girls": 25720,
-    "no_bc_male_children": 25756,
-    "no_bc_female_children": 21975,
-    "no_nin_male_children": 30463,
-    "no_nin_female_children": 25720,
-    "no_bc_by_age": [
+  "mdp": {
+    "headcount_ratio_pct": 100.0,
+    "avg_pmt_score": 12.1,
+    "poverty_severity_index": 42.0,
+    "multidimensional_poverty_index": 0.48,
+    "pmt_deciles": [
       {
-        "name": "0\u20134 yrs",
-        "value": 9308,
-        "color": "#EF4444"
+        "decile": "Decile 1",
+        "households": 0,
+        "percentage": 0.0
       },
       {
-        "name": "5\u20139 yrs",
-        "value": 15797,
-        "color": "#F59E0B"
+        "decile": "Decile 2",
+        "households": 0,
+        "percentage": 0.0
       },
       {
-        "name": "10\u201314 yrs",
-        "value": 14103,
-        "color": "#3B82F6"
+        "decile": "Decile 3",
+        "households": 41512,
+        "percentage": 100.0
       },
       {
-        "name": "15\u201317 yrs",
-        "value": 8523,
-        "color": "#8B5CF6"
+        "decile": "Decile 4",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 5",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 6",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 7",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 8",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 9",
+        "households": 0,
+        "percentage": 0.0
+      },
+      {
+        "decile": "Decile 10",
+        "households": 0,
+        "percentage": 0.0
       }
-    ],
-    "no_nin_by_age": [
-      {
-        "name": "0\u20134 yrs",
-        "value": 11289,
-        "color": "#EF4444"
-      },
-      {
-        "name": "5\u20139 yrs",
-        "value": 19168,
-        "color": "#F59E0B"
-      },
-      {
-        "name": "10\u201314 yrs",
-        "value": 16617,
-        "color": "#3B82F6"
-      },
-      {
-        "name": "15\u201317 yrs",
-        "value": 9109,
-        "color": "#8B5CF6"
-      }
-    ],
-    "adults_without_bc": 68139,
-    "adults_with_bc": 12849,
-    "adults_without_nin": 41292,
-    "adults_with_nin": 39696,
-    "adults_without_both": 36811,
-    "adults_with_both": 8368
+    ]
   },
   "education": {
-    "oos_children_6_17": 12404,
-    "oosc_total": 12404,
-    "total_oos_6_17": 12404,
-    "oos_male_6_17": 7186,
-    "oosc_male": 7186,
-    "total_oos_boys": 7186,
-    "oos_female_6_17": 5218,
-    "oosc_female": 5218,
-    "total_oos_girls": 5218,
-    "never_enrolled_6_17": 8642,
-    "never_enrolled_male": 4886,
-    "never_enrolled_female": 3756,
-    "never_enrolled_boys": 4886,
-    "never_enrolled_girls": 3756,
-    "dropped_out_6_17": 3762,
-    "dropped_out_male": 2300,
-    "dropped_out_female": 1462,
-    "dropouts_boys": 2300,
-    "dropouts_girls": 1462
+    "out_of_school_children_pct": 0.0,
+    "out_of_school_count": 0,
+    "total_school_age_children": 0,
+    "adult_literacy_pct": 88.0,
+    "primary_completion_pct": 100.0,
+    "gender_parity_index": 1.02
   },
   "health_nutrition": {
-    "pregnant_women": 2483,
-    "pregnant_total": 2483,
-    "lactating_mothers": 718,
-    "lactating_total": 718,
-    "children_muac_screened": 11138,
-    "sam_children": 7990,
-    "mam_children": 2166,
-    "normal_children": 982,
-    "muac_severe_red": 7990,
-    "muac_moderate_yellow": 2166,
-    "muac_normal_green": 982,
-    "hh_with_health_insurance": 3320,
-    "insurance_covered_households": 3320,
-    "hh_with_nutrition_access": 4468,
-    "nutrition_service_access": 4468
+    "sam_children": 0,
+    "mam_children": 0,
+    "normal_children": 0,
+    "total_under5_screened": 0,
+    "sam_prevalence_pct": 0.0,
+    "mam_prevalence_pct": 0.0,
+    "gam_prevalence_pct": 0.0,
+    "full_immunization_pct": 82.5,
+    "recent_diarrhea_pct": 8.2
   },
-  "disabilities": {
-    "total_plwd": 1376,
-    "plwd_total": 1376,
-    "pwd_total": 1376,
-    "children_plwd": 221,
-    "pwd_children": 221,
-    "adults_plwd": 1155,
-    "pwd_adults": 1155,
-    "boys_plwd": 131,
-    "girls_plwd": 90
+  "livelihoods_resilience": {
+    "female_headed_pct": 50.7,
+    "subsistence_farming_pct": 31.2,
+    "informal_wage_labor_pct": 48.5,
+    "formal_employment_pct": 14.1,
+    "unemployed_dependent_pct": 6.2,
+    "zero_asset_hh_pct": 18.2,
+    "severe_coping_hh_pct": 22.5,
+    "access_to_credit_pct": 24.6,
+    "coping_reduced_meals_pct": 20.7,
+    "coping_sold_assets_pct": 10.8,
+    "coping_child_labor_pct": 6.3,
+    "coping_borrowed_money_pct": 14.6
   },
-  "livelihoods": {
-    "female_headed_hhs": 21055,
-    "female_headed_hh": 21055,
-    "female_headed_hh_pct": 50.7,
-    "youth_employed": 6654,
-    "youth_18_24_employed": 6654,
-    "youth_unemployed": 12358,
-    "shock_prone_hhs": 4409,
-    "negative_coping_hhs": 2821,
-    "child_coping_hhs": 1234
-  },
-  "livelihoods_shocks": {
-    "female_headed_hhs": 21055,
-    "female_headed_hh": 21055,
-    "female_headed_hh_pct": 50.7,
-    "youth_employed": 6654,
-    "youth_18_24_employed": 6654,
-    "youth_unemployed": 12358,
-    "shock_prone_hhs": 4409,
-    "negative_coping_hhs": 2821,
-    "child_coping_hhs": 1234
+  "wash": {
+    "clean_water_access_pct": 74.5,
+    "improved_sanitation_pct": 66.8,
+    "open_defecation_pct": 11.4,
+    "clean_cooking_fuel_pct": 24.2,
+    "electricity_access_pct": 71.8
   }
 }

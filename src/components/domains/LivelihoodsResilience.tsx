@@ -1,344 +1,277 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
+import React from "react";
+import type { GeoRecord, GeoLevel } from "../../lib/types";
 import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
 import {
+  ShieldAlert,
+  Coins,
+  TrendingDown,
+  Building,
+  AlertTriangle,
+  Users,
+} from "lucide-react";
+import {
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
+  Cell,
   PieChart,
   Pie,
-  Cell,
   Legend,
 } from "recharts";
 
 export interface LivelihoodsResilienceProps {
   record: GeoRecord;
-  drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
-  onDrilldownChange?: (path: DrilldownPath) => void;
+  onSelectLocation?: (name: string, level: GeoLevel) => void;
   isDark?: boolean;
 }
 
-const SHOCK_COLORS = ["#EF4444", "#F59E0B", "#3B82F6", "#8B5CF6", "#10B981"];
-
 export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   record,
-  drilldown,
-  path,
-  onSelectLocation,
-  onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const liv = record.livelihoods_shocks || record.livelihoods || ({} as any);
+  const lr = record.livelihoods_resilience;
 
-  const totalHh =
-    record.demographics?.total_hh ||
-    record.households ||
-    record.total_hh ||
-    1000;
-  const femaleHeadedHh = record.demographics?.female_headed_hh || 0;
-  const femaleHeadedPct =
-    liv?.female_headed_households_pct ??
-    (totalHh > 0 ? ((femaleHeadedHh / totalHh) * 100).toFixed(1) : 28.4);
+  // Safe fallback values
+  const femaleHeadedPct = lr?.female_headed_pct ?? 0;
+  const subsistenceFarmingPct = lr?.subsistence_farming_pct ?? 0;
+  const zeroAssetHhPct = lr?.zero_asset_hh_pct ?? 0;
+  const severeCopingHhPct = lr?.severe_coping_hh_pct ?? 0;
+  const accessToCreditPct = lr?.access_to_credit_pct ?? 0;
 
-  const mainLivelihood = liv?.main_livelihood_source ?? "Crop Farming (64%)";
-  const youthEmployedPct = liv?.youth_employed_18_24_pct ?? 34.2;
-  const negativeCopingPct = liv?.negative_coping_households_pct ?? 48.6;
-  const childCopingPct = liv?.child_coping_households_pct ?? 21.8;
+  // Primary income source breakdown for charts
+  const incomeChartData = [
+    {
+      name: "Subsistence Farming",
+      value: subsistenceFarmingPct,
+      color: "#10B981",
+    },
+    {
+      name: "Informal Wage / Petty Trade",
+      value: lr?.informal_wage_labor_pct ?? 0,
+      color: "#F59E0B",
+    },
+    {
+      name: "Formal / Salaried",
+      value: lr?.formal_employment_pct ?? 0,
+      color: "#3B82F6",
+    },
+    {
+      name: "Unemployed / Dependent",
+      value: lr?.unemployed_dependent_pct ?? 0,
+      color: "#EF4444",
+    },
+  ];
 
-  const livelihoodSourcesData = useMemo(() => {
-    if (liv?.livelihood_sources && Array.isArray(liv.livelihood_sources)) {
-      return liv.livelihood_sources;
-    }
-    return [
-      {
-        source: "Crop Farming",
-        count: liv?.crop_farming || Math.round(totalHh * 0.64),
-      },
-      {
-        source: "Informal Commerce",
-        count: liv?.informal_commerce || Math.round(totalHh * 0.18),
-      },
-      {
-        source: "Livestock Rearing",
-        count: liv?.livestock_rearing || Math.round(totalHh * 0.08),
-      },
-      {
-        source: "Wage Labor",
-        count: liv?.wage_labor || Math.round(totalHh * 0.05),
-      },
-      {
-        source: "Artisanal / Crafts",
-        count: liv?.artisanal_crafts || Math.round(totalHh * 0.03),
-      },
-      {
-        source: "Formal Salary",
-        count: liv?.formal_employment || Math.round(totalHh * 0.02),
-      },
-    ];
-  }, [liv, totalHh]);
-
-  const youthEconomicData = useMemo(() => {
-    if (
-      liv?.youth_economic_activity &&
-      Array.isArray(liv.youth_economic_activity)
-    ) {
-      return liv.youth_economic_activity;
-    }
-    const yEmployed = liv?.youth_18_24_employed || 340;
-    const yUnemployed = liv?.youth_18_24_unemployed || 460;
-    const yEdu = liv?.youth_18_24_in_education || 200;
-
-    return [
-      { status: "Employed / Self-Emp", count: yEmployed, fill: "#10B981" },
-      { status: "Unemployed / Seeking", count: yUnemployed, fill: "#EF4444" },
-      { status: "In Higher Edu / Voc", count: yEdu, fill: "#3B82F6" },
-    ];
-  }, [liv]);
-
-  const shockExposureData = useMemo(() => {
-    if (liv?.shock_exposure && Array.isArray(liv.shock_exposure)) {
-      return liv.shock_exposure;
-    }
-    return [
-      { name: "Food Price Hike", value: liv?.shock_food_price_hike || 720 },
-      { name: "Flooding", value: liv?.shock_flood || 480 },
-      {
-        name: "Severe Illness / Death",
-        value: liv?.shock_illness_death || 310,
-      },
-      { name: "Drought / Crop Failure", value: liv?.shock_drought || 240 },
-      { name: "Insecurity / Conflict", value: liv?.shock_conflict || 190 },
-    ];
-  }, [liv]);
-
-  const copingStrategiesData = useMemo(() => {
-    if (liv?.coping_strategies && Array.isArray(liv.coping_strategies)) {
-      return liv.coping_strategies;
-    }
-    return [
-      {
-        strategy: "Reduced Meals",
-        count: liv?.coping_reduced_meals || Math.round(totalHh * 0.52),
-      },
-      {
-        strategy: "Borrowed Money",
-        count: liv?.coping_borrowed_money || Math.round(totalHh * 0.44),
-      },
-      {
-        strategy: "Sold Assets",
-        count: liv?.coping_sold_assets || Math.round(totalHh * 0.31),
-      },
-      {
-        strategy: "Withdrew Child School",
-        count:
-          liv?.coping_withdrew_children_school || Math.round(totalHh * 0.18),
-      },
-      {
-        strategy: "Child Labor",
-        count: liv?.coping_child_labor || Math.round(totalHh * 0.12),
-      },
-    ];
-  }, [liv, totalHh]);
+  // Coping strategies breakdown
+  const copingData = [
+    {
+      name: "Reduced Meal Frequency",
+      pct: lr?.coping_reduced_meals_pct ?? 0,
+      color: "#EF4444",
+    },
+    {
+      name: "Sold Productive Assets",
+      pct: lr?.coping_sold_assets_pct ?? 0,
+      color: "#F97316",
+    },
+    {
+      name: "Child Labor / School Withdrawal",
+      pct: lr?.coping_child_labor_pct ?? 0,
+      color: "#DC2626",
+    },
+    {
+      name: "Borrowed from Moneylenders",
+      pct: lr?.coping_borrowed_money_pct ?? 0,
+      color: "#A855F7",
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: KPI Summary Top Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* Top 5 Key Livelihood Indicators using your exact KpiCard props */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <KpiCard
           title="FEMALE-HEADED HH"
-          value={`${Number(femaleHeadedPct).toFixed(1)}%`}
+          value={`${femaleHeadedPct.toFixed(1)}%`}
           tag="VULNERABILITY"
           accentColor="#EC4899"
           isDark={isDark}
+          icon={<Users className="w-4 h-4 text-pink-400" />}
         />
         <KpiCard
-          title="MAIN LIVELIHOOD"
-          value={String(mainLivelihood)}
+          title="SUBSISTENCE FARMING"
+          value={`${subsistenceFarmingPct.toFixed(1)}%`}
           tag="PRIMARY SOURCE"
-          accentColor="#002F6C"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="YOUTH (18–24) EMPLOYED"
-          value={`${Number(youthEmployedPct).toFixed(1)}%`}
-          tag="ECONOMIC INCLUSION"
           accentColor="#10B981"
           isDark={isDark}
+          icon={<Building className="w-4 h-4 text-emerald-400" />}
         />
         <KpiCard
-          title="NEGATIVE COPING HH"
-          value={`${Number(negativeCopingPct).toFixed(1)}%`}
+          title="ZERO PRODUCTIVE ASSETS"
+          value={`${zeroAssetHhPct.toFixed(1)}%`}
           tag="ASSET DEPLETION"
           accentColor="#EF4444"
           isDark={isDark}
+          icon={<TrendingDown className="w-4 h-4 text-red-400" />}
         />
         <KpiCard
-          title="CHILD-COPING HH"
-          value={`${Number(childCopingPct).toFixed(1)}%`}
-          tag="CHILD RISK"
+          title="EMERGENCY COPING"
+          value={`${severeCopingHhPct.toFixed(1)}%`}
+          tag="DISTRESS COPING"
           accentColor="#F59E0B"
           isDark={isDark}
+          icon={<AlertTriangle className="w-4 h-4 text-amber-400" />}
+        />
+        <KpiCard
+          title="ACCESS TO FORMAL CREDIT"
+          value={`${accessToCreditPct.toFixed(1)}%`}
+          tag="ECONOMIC INCLUSION"
+          accentColor="#3B82F6"
+          isDark={isDark}
+          icon={<Coins className="w-4 h-4 text-blue-400" />}
         />
       </div>
 
-      {/* Layer 2: Main Map & 2x2 Recharts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
+      {/* Main Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Income Distribution */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/60 border-slate-800 backdrop-blur-xl shadow-lg"
+              : "bg-white border-slate-200 shadow-sm"
+          }`}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3
+                className={`font-bold text-base ${isDark ? "text-slate-100" : "text-slate-800"}`}
+              >
+                Livelihood & Income Composition
+              </h3>
+              <p
+                className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}
+              >
+                Primary revenue generator per household in {record.name}
+              </p>
+            </div>
+            <span className="px-2.5 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+              Economy
+            </span>
+          </div>
+
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={incomeChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {incomeChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(val: number) => [
+                    `${val.toFixed(1)}%`,
+                    "Households",
+                  ]}
+                  contentStyle={{
+                    backgroundColor: isDark ? "#0F172A" : "#FFFFFF",
+                    borderColor: isDark ? "#334155" : "#E2E8F0",
+                    borderRadius: "12px",
+                    color: isDark ? "#F8FAFC" : "#0F172A",
+                  }}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  formatter={(value) => (
+                    <span
+                      className={`text-xs ${isDark ? "text-slate-300" : "text-slate-600"}`}
+                    >
+                      {value}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="HOUSEHOLD LIVELIHOOD SOURCES"
-            subtitle="Dominant economic engagement across households"
-            isDark={isDark}
-            accentColor="#002F6C"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={livelihoodSourcesData}
-                layout="vertical"
-                margin={{ top: 5, right: 20, left: 30, bottom: 0 }}
+        {/* Negative Coping Strategies */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/60 border-slate-800 backdrop-blur-xl shadow-lg"
+              : "bg-white border-slate-200 shadow-sm"
+          }`}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3
+                className={`font-bold text-base ${isDark ? "text-slate-100" : "text-slate-800"}`}
               >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
+                Negative Coping & Shock Response
+              </h3>
+              <p
+                className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}
+              >
+                Share of households adopting distress strategies
+              </p>
+            </div>
+            <span className="px-2.5 py-1 text-xs rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium flex items-center gap-1">
+              <ShieldAlert className="w-3.5 h-3.5" /> High Risk
+            </span>
+          </div>
+
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={copingData}
+                layout="vertical"
+                margin={{ top: 10, right: 30, left: 40, bottom: 5 }}
+              >
                 <XAxis
                   type="number"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
+                  domain={[0, 100]}
+                  tick={{ fill: isDark ? "#94A3B8" : "#64748B", fontSize: 11 }}
+                  unit="%"
                 />
                 <YAxis
-                  dataKey="source"
                   type="category"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                  width={90}
+                  dataKey="name"
+                  tick={{ fill: isDark ? "#CBD5E1" : "#334155", fontSize: 11 }}
+                  width={140}
                 />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Households"
-                  fill="#002F6C"
-                  radius={[0, 4, 4, 0]}
+                <Tooltip
+                  formatter={(val: number) => [
+                    `${val.toFixed(1)}%`,
+                    "Adoption Rate",
+                  ]}
+                  contentStyle={{
+                    backgroundColor: isDark ? "#0F172A" : "#FFFFFF",
+                    borderColor: isDark ? "#334155" : "#E2E8F0",
+                    borderRadius: "12px",
+                    color: isDark ? "#F8FAFC" : "#0F172A",
+                  }}
                 />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="YOUTH (18–24) ACTIVITY STATUS"
-            subtitle="Economic & education distribution of youth"
-            isDark={isDark}
-            accentColor="#10B981"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={youthEconomicData}
-                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="status"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Bar dataKey="count" name="Youth (18–24)">
-                  {youthEconomicData.map((entry, idx) => (
-                    <Cell key={`youth-cell-${idx}`} fill={entry.fill} />
+                <Bar dataKey="pct" radius={[0, 8, 8, 0]} barSize={20}>
+                  {copingData.map((entry, index) => (
+                    <Cell key={`bar-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="SHOCK EXPOSURE IN PAST 12 MONTHS"
-            subtitle="Reported climate, economic and conflict shocks"
-            isDark={isDark}
-            accentColor="#EF4444"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={shockExposureData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {shockExposureData.map((_, index) => (
-                    <Cell
-                      key={`shock-cell-${index}`}
-                      fill={SHOCK_COLORS[index % SHOCK_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "10px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="HOUSEHOLD COPING STRATEGIES"
-            subtitle="Adoption of severe & child-depleting coping mechanisms"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={copingStrategiesData}
-                layout="vertical"
-                margin={{ top: 5, right: 20, left: 35, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  dataKey="strategy"
-                  type="category"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                  width={95}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Households"
-                  fill="#F59E0B"
-                  radius={[0, 4, 4, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          </div>
         </div>
       </div>
     </div>
