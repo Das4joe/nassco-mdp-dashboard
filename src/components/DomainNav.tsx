@@ -31,7 +31,7 @@ const DOMAIN_TABS: DomainTab[] = [
   },
   {
     id: "education",
-    label: "Education & OOSC",
+    label: "Education",
     icon: "🎓",
     color: "#F59E0B",
   },

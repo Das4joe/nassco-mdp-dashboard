@@ -72,7 +72,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       className="relative w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col"
       style={{ height: height || "100%", minHeight: "500px" }}
     >
-      {/* Dynamic Context Header */}
       <div className="absolute top-3 left-3 z-[1000] px-3.5 py-2 rounded-lg backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-sm">
         <span className="text-[10px] font-bold tracking-widest text-blue-600 dark:text-blue-400 uppercase block">
           Spatial Matrix &bull; {currentLevel.toUpperCase()} LEVEL
@@ -82,7 +81,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         </span>
       </div>
 
-      {/* Map View */}
       <div className="flex-1 w-full h-full relative">
         <MapContainer
           key={`map-${selectedStateName}-${isDark ? "d" : "l"}`}
@@ -96,17 +94,12 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
           zoomControl={false}
         >
           <TileLayer
-            url={
-              isDark
-                ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            }
-            attribution="&copy; OpenStreetMap &bull; NASSCO"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &bull; NASSCO'
           />
         </MapContainer>
       </div>
 
-      {/* Interactive Quick State Selector Overlay */}
       <div className="absolute top-3 right-3 z-[1000] flex flex-wrap gap-1.5 max-w-[200px] justify-end">
         {["Abia", "Benue", "Oyo", "Sokoto"].map((st) => {
           const isSelected = selectedStateName === st.toUpperCase();
@@ -127,7 +120,6 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         })}
       </div>
 
-      {/* Dynamic Context Legend */}
       <div className="absolute bottom-3 right-3 z-[1000] px-3 py-2 rounded-lg backdrop-blur-md bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs space-y-1.5">
         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
           {legendTitle}
