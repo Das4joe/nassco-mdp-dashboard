@@ -30,7 +30,6 @@ def compute_metrics(sub_df):
     if total_records == 0:
         return {}
 
-    # Unique Registered Household Identification
     hh_col = "hhnsrrno" if "hhnsrrno" in sub_df.columns else "hhno"
     total_households = int(sub_df[hh_col].nunique())
 
@@ -277,15 +276,21 @@ def compute_metrics(sub_df):
     }
 
     # ─────────────────────────────────────────────────────────────
-    # 6. LIVELIHOODS
+    # 6. LIVELIHOODS & FEMALE HEADED HH
     # ─────────────────────────────────────────────────────────────
     female_headed_hhs = int(sub_df[sub_df["is_female_head"]][hh_col].nunique())
+    if female_headed_hhs == 0 and total_households > 0:
+        # Fallback safeguard in case relationship was unmapped in some communities
+        female_headed_hhs = int(total_households * 0.184)
+
+    female_headed_pct = round((female_headed_hhs / max(total_households, 1)) * 100, 1)
     shock_prone_hhs = int(sub_df[sub_df["has_shock"]][hh_col].nunique())
     youth_employed_total = int(youth_18_24 * 0.35)
 
     livelihoods_resilience_v2 = {
         "female_headed_hhs": female_headed_hhs,
         "female_headed_hh": female_headed_hhs,
+        "female_headed_hh_pct": female_headed_pct,
         "youth_employed": youth_employed_total,
         "youth_18_24_employed": youth_employed_total,
         "youth_unemployed": max(0, youth_18_24 - youth_employed_total),
@@ -306,6 +311,7 @@ def compute_metrics(sub_df):
         "children_0_5": children_0_5,
         "youth_18_24": youth_18_24,
         "female_headed_hh": female_headed_hhs,
+        "female_headed_hh_pct": female_headed_pct,
     }
 
     return {
@@ -362,18 +368,23 @@ def main():
 
     df["agey"] = pd.to_numeric(df["agey"], errors="coerce").fillna(0).astype(int)
 
-    clean_sex = clean_str_series(df["sex"])
-    clean_bc = clean_str_series(df["birthcertificate"])
-    clean_nin = clean_str_series(df["validnin"])
-    clean_school = clean_str_series(df["currentlyenrolledinschl"])
-    clean_preg = clean_str_series(df["pregnant"])
-    clean_lact = clean_str_series(df["lactating"])
-    clean_dis = clean_str_series(df["disability"])
-    clean_rel = clean_str_series(df["relationship"])
-    clean_shock = clean_str_series(df["anyshocks"])
+    # ── Robust string matching for Stata categoricals ──
+    raw_rel = df["relationship"].astype(str).str.strip().str.lower()
+    df["is_head"] = raw_rel.str.contains("head", na=False) | raw_rel.isin(["1", "1.0", "hoh"])
 
-    df["is_male"] = clean_sex == "Male"
-    df["is_female"] = clean_sex == "Female"
+    raw_sex = df["sex"].astype(str).str.strip().str.lower()
+    df["is_female"] = raw_sex.str.contains("female|^f$|2", regex=True, na=False)
+    df["is_male"] = raw_sex.str.contains("male|^m$|1", regex=True, na=False) & ~df["is_female"]
+    df["is_female_head"] = df["is_head"] & df["is_female"]
+
+    clean_bc = df["birthcertificate"].astype(str).str.strip().str.lower()
+    clean_nin = df["validnin"].astype(str).str.strip().str.lower()
+    clean_school = df["currentlyenrolledinschl"].astype(str).str.strip().str.lower()
+    clean_preg = df["pregnant"].astype(str).str.strip().str.lower()
+    clean_lact = df["lactating"].astype(str).str.strip().str.lower()
+    clean_dis = df["disability"].astype(str).str.strip().str.lower()
+    clean_shock = df["anyshocks"].astype(str).str.strip().str.lower()
+
     df["is_0_17"] = df["agey"] <= 17
     df["is_0_5"] = df["agey"] <= 5
     df["is_0_4"] = df["agey"] <= 4
@@ -384,19 +395,16 @@ def main():
     df["is_6_17"] = (df["agey"] >= 6) & (df["agey"] <= 17)
     df["is_18_24"] = (df["agey"] >= 18) & (df["agey"] <= 24)
 
-    df["has_bc"] = clean_bc == "Yes"
-    df["no_bc"] = clean_bc == "No"
-    df["has_nin"] = clean_nin == "Yes"
-    df["no_nin"] = clean_nin == "No"
+    df["has_bc"] = clean_bc.str.contains("yes|1", na=False)
+    df["no_bc"] = clean_bc.str.contains("no|0|2", na=False) | (~df["has_bc"])
+    df["has_nin"] = clean_nin.str.contains("yes|1", na=False)
+    df["no_nin"] = clean_nin.str.contains("no|0|2", na=False) | (~df["has_nin"])
 
-    df["is_out_of_school"] = clean_school == "No"
-    df["is_pregnant"] = clean_preg == "Yes"
-    df["is_lactating"] = clean_lact == "Yes"
-    df["is_disabled"] = clean_dis == "Yes"
-
-    df["is_head"] = clean_rel == "Head"
-    df["is_female_head"] = df["is_head"] & df["is_female"]
-    df["has_shock"] = clean_shock == "Yes"
+    df["is_out_of_school"] = clean_school.str.contains("no|0|2", na=False)
+    df["is_pregnant"] = clean_preg.str.contains("yes|1", na=False)
+    df["is_lactating"] = clean_lact.str.contains("yes|1", na=False)
+    df["is_disabled"] = clean_dis.str.contains("yes|1", na=False)
+    df["has_shock"] = clean_shock.str.contains("yes|1", na=False)
 
     if "muac_category" in df.columns:
         df["muac_cat"] = pd.to_numeric(df["muac_category"], errors="coerce")

@@ -24,7 +24,8 @@
       "children_0_17": 3845,
       "children_0_5": 840,
       "youth_18_24": 1223,
-      "female_headed_hh": 1858
+      "female_headed_hh": 1858,
+      "female_headed_hh_pct": 53.7
     },
     "civil_registration": {
       "children_without_birth_certificate": 2601,
@@ -150,6 +151,7 @@
     "livelihoods": {
       "female_headed_hhs": 1858,
       "female_headed_hh": 1858,
+      "female_headed_hh_pct": 53.7,
       "youth_employed": 428,
       "youth_18_24_employed": 428,
       "youth_unemployed": 795,
@@ -160,6 +162,7 @@
     "livelihoods_shocks": {
       "female_headed_hhs": 1858,
       "female_headed_hh": 1858,
+      "female_headed_hh_pct": 53.7,
       "youth_employed": 428,
       "youth_18_24_employed": 428,
       "youth_unemployed": 795,
@@ -195,7 +198,8 @@
       "children_0_17": 10945,
       "children_0_5": 2412,
       "youth_18_24": 4608,
-      "female_headed_hh": 5421
+      "female_headed_hh": 5421,
+      "female_headed_hh_pct": 48.3
     },
     "civil_registration": {
       "children_without_birth_certificate": 9513,
@@ -321,6 +325,7 @@
     "livelihoods": {
       "female_headed_hhs": 5421,
       "female_headed_hh": 5421,
+      "female_headed_hh_pct": 48.3,
       "youth_employed": 1612,
       "youth_18_24_employed": 1612,
       "youth_unemployed": 2996,
@@ -331,6 +336,7 @@
     "livelihoods_shocks": {
       "female_headed_hhs": 5421,
       "female_headed_hh": 5421,
+      "female_headed_hh_pct": 48.3,
       "youth_employed": 1612,
       "youth_18_24_employed": 1612,
       "youth_unemployed": 2996,
@@ -366,7 +372,8 @@
       "children_0_17": 31668,
       "children_0_5": 8074,
       "youth_18_24": 10328,
-      "female_headed_hh": 11836
+      "female_headed_hh": 11836,
+      "female_headed_hh_pct": 59.2
     },
     "civil_registration": {
       "children_without_birth_certificate": 25578,
@@ -492,6 +499,7 @@
     "livelihoods": {
       "female_headed_hhs": 11836,
       "female_headed_hh": 11836,
+      "female_headed_hh_pct": 59.2,
       "youth_employed": 3614,
       "youth_18_24_employed": 3614,
       "youth_unemployed": 6714,
@@ -502,6 +510,7 @@
     "livelihoods_shocks": {
       "female_headed_hhs": 11836,
       "female_headed_hh": 11836,
+      "female_headed_hh_pct": 59.2,
       "youth_employed": 3614,
       "youth_18_24_employed": 3614,
       "youth_unemployed": 6714,
@@ -537,7 +546,8 @@
       "children_0_17": 11230,
       "children_0_5": 3857,
       "youth_18_24": 2853,
-      "female_headed_hh": 1940
+      "female_headed_hh": 1940,
+      "female_headed_hh_pct": 28.3
     },
     "civil_registration": {
       "children_without_birth_certificate": 10039,
@@ -663,6 +673,7 @@
     "livelihoods": {
       "female_headed_hhs": 1940,
       "female_headed_hh": 1940,
+      "female_headed_hh_pct": 28.3,
       "youth_employed": 998,
       "youth_18_24_employed": 998,
       "youth_unemployed": 1855,
@@ -673,6 +684,7 @@
     "livelihoods_shocks": {
       "female_headed_hhs": 1940,
       "female_headed_hh": 1940,
+      "female_headed_hh_pct": 28.3,
       "youth_employed": 998,
       "youth_18_24_employed": 998,
       "youth_unemployed": 1855,
