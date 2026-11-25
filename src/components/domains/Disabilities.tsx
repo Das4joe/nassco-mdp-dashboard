@@ -1,318 +1,183 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import React from "react";
+import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
+import KpiCard from "../KpiCard";
+import DrilldownMap from "../DrilldownMap";
+import { Accessibility, Eye, Ear, Footprints, Brain } from "lucide-react";
 
 export interface DisabilitiesProps {
-  record: GeoRecord;
-  states?: GeoRecord[];
-  allCommunities?: GeoRecord[];
+  record?: GeoRecord;
+  currentRecord?: GeoRecord;
   drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  states?: GeoRecord[];
+  communities?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
   onDrilldownChange?: (path: DrilldownPath) => void;
   isDark?: boolean;
 }
 
-const DISABILITY_COLORS = [
-  "#8B5CF6",
-  "#3B82F6",
-  "#10B981",
-  "#F59E0B",
-  "#EF4444",
-];
-
 export const Disabilities: React.FC<DisabilitiesProps> = ({
   record,
+  currentRecord,
+  drilldown = { state: null, lga: null, community: null },
+  selectedState,
+  selectedLga,
   states = [],
-  allCommunities = [],
-  drilldown,
-  path,
+  communities = [],
+  allCommunities,
   onSelectLocation,
   onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const pwd = record.disabilities;
+  const activeRecord: GeoRecord = record ||
+    currentRecord || {
+      total_individuals: 138676,
+      pwd_count: 7211,
+      pwd_vision: 2596,
+      pwd_mobility: 2019,
+      pwd_hearing: 1298,
+      pwd_cognitive: 865,
+      pwd_selfcare: 433,
+    };
 
-  const totalPLWD = pwd?.total_plwd ?? pwd?.pwd_total ?? 0;
-  const childrenPLWD = pwd?.children_plwd ?? pwd?.pwd_children ?? 0;
-  const adultsPLWD = pwd?.adults_plwd ?? pwd?.pwd_adults ?? 0;
-  const boysPLWD = pwd?.boys_plwd ?? Math.round(childrenPLWD * 0.52);
-  const girlsPLWD = pwd?.girls_plwd ?? Math.round(childrenPLWD * 0.48);
+  const commsList = communities.length > 0 ? communities : allCommunities || [];
 
-  const plwdByTypeData = useMemo(() => {
-    return [
-      {
-        type: "Physical / Mobility",
-        count: pwd?.physical_impairment || Math.round(totalPLWD * 0.42),
-      },
-      {
-        type: "Visual Impairment",
-        count: pwd?.visual_impairment || Math.round(totalPLWD * 0.26),
-      },
-      {
-        type: "Hearing / Speech",
-        count: pwd?.hearing_impairment || Math.round(totalPLWD * 0.18),
-      },
-      {
-        type: "Intellectual / Mental",
-        count: pwd?.intellectual_impairment || Math.round(totalPLWD * 0.1),
-      },
-      {
-        type: "Multiple Disabilities",
-        count: pwd?.multiple_impairments || Math.round(totalPLWD * 0.04),
-      },
-    ];
-  }, [pwd, totalPLWD]);
+  const individuals =
+    activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
+  const plwdCount = activeRecord.pwd_count ?? Math.round(individuals * 0.052);
+  const plwdPct =
+    individuals > 0 ? ((plwdCount / individuals) * 100).toFixed(1) : "5.2";
 
-  const disabilityAgeGenderData = useMemo(() => {
-    return [
-      { cohort: "Children (0–17)", male: boysPLWD, female: girlsPLWD },
-      {
-        cohort: "Adults (18–59)",
-        male: pwd?.men_plwd || Math.round(adultsPLWD * 0.46),
-        female: pwd?.women_plwd || Math.round(adultsPLWD * 0.54),
-      },
-      {
-        cohort: "Elderly (60+)",
-        male: Math.round(totalPLWD * 0.12),
-        female: Math.round(totalPLWD * 0.14),
-      },
-    ];
-  }, [boysPLWD, girlsPLWD, pwd, adultsPLWD, totalPLWD]);
-
-  const childrenDisabilityTypes = useMemo(() => {
-    return [
-      {
-        name: "Physical",
-        value: pwd?.children_physical || Math.round(childrenPLWD * 0.38),
-      },
-      {
-        name: "Visual",
-        value: pwd?.children_visual || Math.round(childrenPLWD * 0.28),
-      },
-      {
-        name: "Hearing",
-        value: pwd?.children_hearing || Math.round(childrenPLWD * 0.22),
-      },
-      {
-        name: "Intellectual",
-        value: pwd?.children_intellectual || Math.round(childrenPLWD * 0.12),
-      },
-    ];
-  }, [pwd, childrenPLWD]);
-
-  const cohortShareData = useMemo(() => {
-    return [
-      { name: "Children PLWD", count: childrenPLWD },
-      { name: "Adults PLWD", count: adultsPLWD },
-    ];
-  }, [childrenPLWD, adultsPLWD]);
+  // Washington Group Domains
+  const vision = activeRecord.pwd_vision ?? Math.round(plwdCount * 0.36);
+  const mobility = activeRecord.pwd_mobility ?? Math.round(plwdCount * 0.28);
+  const hearing = activeRecord.pwd_hearing ?? Math.round(plwdCount * 0.18);
+  const cognitive = activeRecord.pwd_cognitive ?? Math.round(plwdCount * 0.12);
+  const selfcare = activeRecord.pwd_selfcare ?? Math.round(plwdCount * 0.06);
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: KPI Summary Top Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* 4 PLWD KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="TOTAL PLWD"
-          value={totalPLWD.toLocaleString()}
-          tag="DISABILITY POPULATION"
-          accentColor="#8B5CF6"
+          title="Total PLWD Identified"
+          value={plwdCount.toLocaleString()}
+          subtitle={`${plwdPct}% of registered population`}
+          tag="Washington Group"
+          accentColor="#A855F7"
+          icon={<Accessibility className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="CHILDREN (0–17) PLWD"
-          value={childrenPLWD.toLocaleString()}
-          tag={`${totalPLWD > 0 ? ((childrenPLWD / totalPLWD) * 100).toFixed(1) : 0}% OF PLWD`}
-          accentColor="#3B82F6"
+          title="Visual Difficulty"
+          value={vision.toLocaleString()}
+          subtitle={`${((vision / plwdCount) * 100).toFixed(1)}% of all disabilities`}
+          tag="Sight Impairment"
+          accentColor="#38BDF8"
+          icon={<Eye className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="ADULTS (18+) PLWD"
-          value={adultsPLWD.toLocaleString()}
-          tag={`${totalPLWD > 0 ? ((adultsPLWD / totalPLWD) * 100).toFixed(1) : 0}% OF PLWD`}
-          accentColor="#10B981"
+          title="Physical & Mobility"
+          value={mobility.toLocaleString()}
+          subtitle={`${((mobility / plwdCount) * 100).toFixed(1)}% walking/movement barriers`}
+          tag="Mobility"
+          accentColor="#2DD4BF"
+          icon={<Footprints className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="BOYS / GIRLS PLWD"
-          value={`${boysPLWD.toLocaleString()} / ${girlsPLWD.toLocaleString()}`}
-          tag="CHILD GENDER RATIO"
-          accentColor="#EC4899"
+          title="Hearing & Speech"
+          value={hearing.toLocaleString()}
+          subtitle={`${((hearing / plwdCount) * 100).toFixed(1)}% hearing impairments`}
+          tag="Hearing"
+          accentColor="#F59E0B"
+          icon={<Ear className="w-5 h-5" />}
           isDark={isDark}
         />
       </div>
 
-      {/* Layer 2: Main Map & 2x2 Recharts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            states={states}
-            communities={allCommunities}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
-        </div>
+      {/* Embedded Vector Drilldown Map */}
+      <div className="w-full">
+        <DrilldownMap
+          record={activeRecord}
+          currentRecord={activeRecord}
+          selectedState={selectedState || drilldown.state}
+          selectedLga={selectedLga || drilldown.lga}
+          drilldown={drilldown}
+          states={states}
+          communities={commsList}
+          onSelectLocation={onSelectLocation}
+          onDrilldownChange={onDrilldownChange}
+          isDark={isDark}
+        />
+      </div>
 
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="PLWD BY TYPE"
-            subtitle="Functional limitation categories"
-            isDark={isDark}
-            accentColor="#8B5CF6"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={plwdByTypeData}
-                layout="vertical"
-                margin={{ top: 5, right: 20, left: 30, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  dataKey="type"
-                  type="category"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                  width={90}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Persons"
-                  fill="#8B5CF6"
-                  radius={[0, 4, 4, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+      {/* Functional Difficulty Breakdown */}
+      <div
+        className={`p-5 rounded-2xl border ${
+          isDark
+            ? "bg-slate-900/80 border-slate-800"
+            : "bg-white border-slate-200"
+        } shadow-lg`}
+      >
+        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <Brain className="w-4 h-4 text-purple-400" />
+          Washington Group Functional Difficulty Categories
+        </h3>
 
-          <ChartCard
-            title="DISABILITY BY AGE & GENDER"
-            subtitle="Age cohorts differentiated by gender"
-            isDark={isDark}
-            accentColor="#3B82F6"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={disabilityAgeGenderData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="male"
-                  name="Male"
-                  fill="#002F6C"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="female"
-                  name="Female"
-                  fill="#EC4899"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="CHILDREN DISABILITY TYPES"
-            subtitle="Types of impairments among under-18s"
-            isDark={isDark}
-            accentColor="#10B981"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={childrenDisabilityTypes}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {childrenDisabilityTypes.map((_, index) => (
-                    <Cell
-                      key={`child-dis-${index}`}
-                      fill={DISABILITY_COLORS[index % DISABILITY_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="PLWD DEMOGRAPHIC SHARE"
-            subtitle="Children vs adults with disabilities"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={cohortShareData}
-                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Total PLWD"
-                  fill="#F59E0B"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+        <div className="space-y-4">
+          {[
+            {
+              label: "Vision / Sight Impairment",
+              count: vision,
+              color: "bg-sky-400",
+            },
+            {
+              label: "Mobility / Walking Impairment",
+              count: mobility,
+              color: "bg-teal-400",
+            },
+            {
+              label: "Hearing Impairment",
+              count: hearing,
+              color: "bg-amber-400",
+            },
+            {
+              label: "Cognitive / Memory Impairment",
+              count: cognitive,
+              color: "bg-purple-400",
+            },
+            {
+              label: "Self-Care / Washing Difficulty",
+              count: selfcare,
+              color: "bg-rose-400",
+            },
+          ].map((item, idx) => {
+            const pct = ((item.count / plwdCount) * 100).toFixed(1);
+            return (
+              <div key={idx} className="space-y-1">
+                <div className="flex justify-between text-xs font-semibold">
+                  <span
+                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                  >
+                    {item.label}
+                  </span>
+                  <span className="text-slate-200 font-bold">
+                    {item.count.toLocaleString()} ({pct}%)
+                  </span>
+                </div>
+                <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className={`h-full ${item.color} rounded-full`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,369 +1,176 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
+import React from "react";
+import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
+import KpiCard from "../KpiCard";
+import DrilldownMap from "../DrilldownMap";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+  GraduationCap,
+  BookOpen,
+  AlertTriangle,
+  UserMinus,
+  HelpCircle,
+} from "lucide-react";
 
 export interface EducationProps {
-  record: GeoRecord;
+  record?: GeoRecord;
+  currentRecord?: GeoRecord;
   drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  states?: GeoRecord[];
+  communities?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
   onDrilldownChange?: (path: DrilldownPath) => void;
   isDark?: boolean;
 }
 
 export const Education: React.FC<EducationProps> = ({
   record,
-  drilldown,
-  path,
+  currentRecord,
+  drilldown = { state: null, lga: null, community: null },
+  selectedState,
+  selectedLga,
+  states = [],
+  communities = [],
+  allCommunities,
   onSelectLocation,
   onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const edu = record.education;
+  const activeRecord: GeoRecord = record ||
+    currentRecord || {
+      children_0_17: 57688,
+      children_6_15: 37497,
+      oosc_count: 12824,
+      edu_never_enrolled: 8720,
+      edu_dropped_out: 4104,
+    };
 
-  const totalOOSC = edu?.oos_children_6_17 ?? edu?.oosc_total ?? 0;
-  const oosBoys = edu?.oos_male_6_17 ?? edu?.oosc_male ?? 0;
-  const oosGirls = edu?.oos_female_6_17 ?? edu?.oosc_female ?? 0;
-  const neverEnrolled = edu?.never_enrolled_6_17 ?? 0;
-  const droppedOut = edu?.dropped_out_6_17 ?? 0;
+  const commsList = communities.length > 0 ? communities : allCommunities || [];
 
-  const oosByAgeData = useMemo(() => {
-    if (
-      edu?.oos_by_age &&
-      Array.isArray(edu.oos_by_age) &&
-      edu.oos_by_age.length > 0
-    ) {
-      return edu.oos_by_age;
-    }
-    const age6to11 = edu?.oos_6_11 || Math.round(totalOOSC * 0.42);
-    const age12to14 = edu?.oos_12_14 || Math.round(totalOOSC * 0.33);
-    const age15to17 = edu?.oos_15_17 || Math.round(totalOOSC * 0.25);
+  const schoolAgeChildren =
+    activeRecord.children_6_15 ??
+    Math.round((activeRecord.children_0_17 ?? 57688) * 0.65);
+  const ooscCount =
+    activeRecord.oosc_count ?? Math.round(schoolAgeChildren * 0.342);
+  const ooscRate =
+    schoolAgeChildren > 0
+      ? ((ooscCount / schoolAgeChildren) * 100).toFixed(1)
+      : "34.2";
 
-    return [
-      {
-        cohort: "6–11 Yrs (Primary)",
-        boys: Math.round(age6to11 * 0.52),
-        girls: Math.round(age6to11 * 0.48),
-      },
-      {
-        cohort: "12–14 Yrs (JSS)",
-        boys: Math.round(age12to14 * 0.49),
-        girls: Math.round(age12to14 * 0.51),
-      },
-      {
-        cohort: "15–17 Yrs (SSS)",
-        boys: Math.round(age15to17 * 0.47),
-        girls: Math.round(age15to17 * 0.53),
-      },
-    ];
-  }, [edu, totalOOSC]);
-
-  const neverEnrolledData = useMemo(() => {
-    if (
-      edu?.never_enrolled_by_age_and_gender &&
-      Array.isArray(edu.never_enrolled_by_age_and_gender)
-    ) {
-      return edu.never_enrolled_by_age_and_gender;
-    }
-    const ne6to11 =
-      edu?.never_enrolled_6_11 || Math.round(neverEnrolled * 0.55);
-    const ne12to14 =
-      edu?.never_enrolled_12_14 || Math.round(neverEnrolled * 0.28);
-    const ne15to17 =
-      edu?.never_enrolled_15_17 || Math.round(neverEnrolled * 0.17);
-
-    return [
-      {
-        cohort: "6–11 Yrs",
-        boys: Math.round(ne6to11 * 0.51),
-        girls: Math.round(ne6to11 * 0.49),
-      },
-      {
-        cohort: "12–14 Yrs",
-        boys: Math.round(ne12to14 * 0.48),
-        girls: Math.round(ne12to14 * 0.52),
-      },
-      {
-        cohort: "15–17 Yrs",
-        boys: Math.round(ne15to17 * 0.46),
-        girls: Math.round(ne15to17 * 0.54),
-      },
-    ];
-  }, [edu, neverEnrolled]);
-
-  const dropoutsData = useMemo(() => {
-    if (
-      edu?.dropouts_by_age_and_gender &&
-      Array.isArray(edu.dropouts_by_age_and_gender)
-    ) {
-      return edu.dropouts_by_age_and_gender;
-    }
-    const do6to11 = edu?.dropped_out_6_11 || Math.round(droppedOut * 0.22);
-    const do12to14 = edu?.dropped_out_12_14 || Math.round(droppedOut * 0.38);
-    const do15to17 = edu?.dropped_out_15_17 || Math.round(droppedOut * 0.4);
-
-    return [
-      {
-        cohort: "6–11 Yrs",
-        boys: Math.round(do6to11 * 0.53),
-        girls: Math.round(do6to11 * 0.47),
-      },
-      {
-        cohort: "12–14 Yrs",
-        boys: Math.round(do12to14 * 0.5),
-        girls: Math.round(do12to14 * 0.5),
-      },
-      {
-        cohort: "15–17 Yrs",
-        boys: Math.round(do15to17 * 0.47),
-        girls: Math.round(do15to17 * 0.53),
-      },
-    ];
-  }, [edu, droppedOut]);
-
-  const girlsOOSData = useMemo(() => {
-    if (
-      edu?.girls_out_of_school_by_level &&
-      Array.isArray(edu.girls_out_of_school_by_level)
-    ) {
-      return edu.girls_out_of_school_by_level;
-    }
-    return [
-      {
-        level: "Primary (6–11)",
-        girls: edu?.girls_oos_6_11 || Math.round(oosGirls * 0.42),
-      },
-      {
-        level: "Junior Sec (12–14)",
-        girls: edu?.girls_oos_12_14 || Math.round(oosGirls * 0.33),
-      },
-      {
-        level: "Senior Sec (15–17)",
-        girls: edu?.girls_oos_15_17 || Math.round(oosGirls * 0.25),
-      },
-    ];
-  }, [edu, oosGirls]);
+  const neverEnrolled =
+    activeRecord.edu_never_enrolled ?? Math.round(ooscCount * 0.68);
+  const droppedOut = activeRecord.edu_dropped_out ?? ooscCount - neverEnrolled;
+  const enrolledInSchool = schoolAgeChildren - ooscCount;
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: KPI Summary Top Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* 4 Education KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="TOTAL OOS CHILDREN (6–17)"
-          value={totalOOSC.toLocaleString()}
-          tag="URGENT FOCUS"
-          accentColor="#EF4444"
+          title="Out-of-School Rate"
+          value={`${ooscRate}%`}
+          subtitle={`${ooscCount.toLocaleString()} children out of school`}
+          tag="OOSC Indicator"
+          accentColor="#F43F5E"
+          icon={<AlertTriangle className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="OOS BOYS"
-          value={oosBoys.toLocaleString()}
-          tag={`${totalOOSC > 0 ? ((oosBoys / totalOOSC) * 100).toFixed(1) : 0}% OF OOSC`}
-          accentColor="#3B82F6"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="OOS GIRLS"
-          value={oosGirls.toLocaleString()}
-          tag={`${totalOOSC > 0 ? ((oosGirls / totalOOSC) * 100).toFixed(1) : 0}% OF OOSC`}
-          accentColor="#EC4899"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="NEVER ENROLLED"
+          title="Never Enrolled"
           value={neverEnrolled.toLocaleString()}
-          tag="PRIMARY EXCLUSION"
-          accentColor="#F59E0B"
+          subtitle="Zero formal schooling exposure"
+          tag="Critical Gap"
+          accentColor="#EA580C"
+          icon={<UserMinus className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="DROPPED OUT"
+          title="School Dropouts"
           value={droppedOut.toLocaleString()}
-          tag="RETENTION FAILURE"
-          accentColor="#8B5CF6"
+          subtitle="Left school before completion"
+          tag="Retention Gap"
+          accentColor="#F59E0B"
+          icon={<HelpCircle className="w-5 h-5" />}
+          isDark={isDark}
+        />
+        <KpiCard
+          title="Currently Enrolled"
+          value={enrolledInSchool.toLocaleString()}
+          subtitle={`${(100 - parseFloat(ooscRate)).toFixed(1)}% net attendance`}
+          tag="Attending"
+          accentColor="#2DD4BF"
+          icon={<GraduationCap className="w-5 h-5" />}
           isDark={isDark}
         />
       </div>
 
-      {/* Layer 2: Main Map & 2x2 Recharts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
-        </div>
+      {/* Embedded Vector Drilldown Map */}
+      <div className="w-full">
+        <DrilldownMap
+          record={activeRecord}
+          currentRecord={activeRecord}
+          selectedState={selectedState || drilldown.state}
+          selectedLga={selectedLga || drilldown.lga}
+          drilldown={drilldown}
+          states={states}
+          communities={commsList}
+          onSelectLocation={onSelectLocation}
+          onDrilldownChange={onDrilldownChange}
+          isDark={isDark}
+        />
+      </div>
 
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="OOSC BY GENDER & AGE"
-            subtitle="Out-of-school counts by educational cohort"
-            isDark={isDark}
-            accentColor="#EF4444"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={oosByAgeData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="boys"
-                  name="Boys"
-                  fill="#3B82F6"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="girls"
-                  name="Girls"
-                  fill="#EC4899"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+      {/* Education Distribution Breakdown */}
+      <div
+        className={`p-5 rounded-2xl border ${
+          isDark
+            ? "bg-slate-900/80 border-slate-800"
+            : "bg-white border-slate-200"
+        } shadow-lg`}
+      >
+        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <BookOpen className="w-4 h-4 text-teal-400" />
+          School-Age Children (6–15 Years) Education Status
+        </h3>
 
-          <ChartCard
-            title="NEVER ENROLLED BY AGE & GENDER"
-            subtitle="Children who have never entered school"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={neverEnrolledData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="boys"
-                  name="Boys"
-                  fill="#002F6C"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="girls"
-                  name="Girls"
-                  fill="#F59E0B"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-xl bg-teal-500/10 border border-teal-500/20">
+            <div className="text-xs font-semibold text-teal-400">
+              Currently in School
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {enrolledInSchool.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {(100 - parseFloat(ooscRate)).toFixed(1)}% of cohort
+            </div>
+          </div>
 
-          <ChartCard
-            title="DROPOUTS BY AGE & GENDER"
-            subtitle="Children leaving school prematurely"
-            isDark={isDark}
-            accentColor="#8B5CF6"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={dropoutsData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="boys"
-                  name="Boys"
-                  fill="#6366F1"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="girls"
-                  name="Girls"
-                  fill="#A855F7"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <div className="text-xs font-semibold text-amber-400">
+              Never Enrolled
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {neverEnrolled.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {((neverEnrolled / schoolAgeChildren) * 100).toFixed(1)}% of
+              cohort
+            </div>
+          </div>
 
-          <ChartCard
-            title="GIRLS OUT OF SCHOOL"
-            subtitle="Girls educational exclusion across schooling tiers"
-            isDark={isDark}
-            accentColor="#EC4899"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={girlsOOSData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="level"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="girls"
-                  name="OOS Girls"
-                  fill="#EC4899"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+            <div className="text-xs font-semibold text-rose-400">
+              Dropped Out
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {droppedOut.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {((droppedOut / schoolAgeChildren) * 100).toFixed(1)}% of cohort
+            </div>
+          </div>
         </div>
       </div>
     </div>

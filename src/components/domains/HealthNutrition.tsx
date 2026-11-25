@@ -1,333 +1,180 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
+import React from "react";
+import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
+import KpiCard from "../KpiCard";
+import DrilldownMap from "../DrilldownMap";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+  HeartPulse,
+  Activity,
+  ShieldCheck,
+  AlertCircle,
+  UtensilsCrossed,
+} from "lucide-react";
 
 export interface HealthNutritionProps {
-  record: GeoRecord;
+  record?: GeoRecord;
+  currentRecord?: GeoRecord;
   drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  states?: GeoRecord[];
+  communities?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
   onDrilldownChange?: (path: DrilldownPath) => void;
   isDark?: boolean;
 }
 
-const MUAC_COLORS = ["#10B981", "#F59E0B", "#EF4444"];
-
 export const HealthNutrition: React.FC<HealthNutritionProps> = ({
   record,
-  drilldown,
-  path,
+  currentRecord,
+  drilldown = { state: null, lga: null, community: null },
+  selectedState,
+  selectedLga,
+  states = [],
+  communities = [],
+  allCommunities,
   onSelectLocation,
   onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const hn = record.health_nutrition;
+  const activeRecord: GeoRecord = record ||
+    currentRecord || {
+      total_individuals: 138676,
+      children_0_17: 57688,
+      children_under_5: 18460,
+      muac_red_sam: 886,
+      muac_yellow_mam: 2289,
+      chronic_illness_count: 11926,
+      health_insurance_count: 5824,
+    };
 
-  const pregnantWomen =
-    hn?.pregnant_women ??
-    hn?.pregnant_women_total ??
-    hn?.pregnant_women_count ??
-    0;
-  const lactatingMothers =
-    hn?.lactating_mothers ??
-    hn?.lactating_mothers_total ??
-    hn?.lactating_mothers_count ??
-    0;
-  const muacNormal =
-    hn?.muac_normal_green ??
-    hn?.muac_status?.normal ??
-    hn?.muac_normal_count ??
-    0;
-  const muacModerate =
-    hn?.muac_moderate_yellow ??
-    hn?.muac_status?.moderate ??
-    hn?.muac_moderate_count ??
-    0;
-  const muacSevere =
-    hn?.muac_severe_red ??
-    hn?.muac_status?.severe ??
-    hn?.muac_severe_count ??
-    0;
-  const pctInsured =
-    hn?.hh_with_health_insurance ?? hn?.household_health_insurance_pct ?? 12.4;
-  const pctNutrition =
-    hn?.hh_with_nutrition_access ??
-    hn?.access_to_nutrition_services_pct ??
-    hn?.nutrition_services_access_pct ??
-    45.2;
+  const commsList = communities.length > 0 ? communities : allCommunities || [];
 
-  const muacData = useMemo(() => {
-    return [
-      { name: "Normal (Green)", count: muacNormal, color: "#10B981" },
-      { name: "Moderate (Yellow)", count: muacModerate, color: "#F59E0B" },
-      { name: "Severe (Red)", count: muacSevere, color: "#EF4444" },
-    ];
-  }, [muacNormal, muacModerate, muacSevere]);
+  const individuals =
+    activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
+  const under5 =
+    activeRecord.children_under_5 ??
+    Math.round((activeRecord.children_0_17 ?? 57688) * 0.32);
 
-  const illnessData = useMemo(() => {
-    if (
-      hn?.chronic_illness_by_age_and_gender &&
-      Array.isArray(hn.chronic_illness_by_age_and_gender)
-    ) {
-      return hn.chronic_illness_by_age_and_gender;
-    }
-    const u5 = hn?.illness_under_5 || 120;
-    const age5to17 = hn?.illness_5_to_17 || 240;
-    const age18to59 = hn?.illness_18_to_59 || 410;
-    const elderly = hn?.illness_60_plus || 310;
+  // MUAC malnutrition counts
+  const sam = activeRecord.muac_red_sam ?? Math.round(under5 * 0.048);
+  const mam = activeRecord.muac_yellow_mam ?? Math.round(under5 * 0.124);
+  const normal = under5 - sam - mam;
 
-    return [
-      {
-        cohort: "Under 5",
-        male: Math.round(u5 * 0.52),
-        female: Math.round(u5 * 0.48),
-      },
-      {
-        cohort: "5–17 Yrs",
-        male: Math.round(age5to17 * 0.5),
-        female: Math.round(age5to17 * 0.5),
-      },
-      {
-        cohort: "18–59 Yrs",
-        male: Math.round(age18to59 * 0.46),
-        female: Math.round(age18to59 * 0.54),
-      },
-      {
-        cohort: "60+ Yrs",
-        male: Math.round(elderly * 0.44),
-        female: Math.round(elderly * 0.56),
-      },
-    ];
-  }, [hn]);
-
-  const foodSupportData = useMemo(() => {
-    return [
-      { status: "Received Support", count: hn?.food_support_received || 380 },
-      { status: "Urgent Need (Unmet)", count: hn?.food_support_needed || 1420 },
-    ];
-  }, [hn]);
-
-  const insuranceData = useMemo(() => {
-    const hhTotal =
-      record.demographics?.total_hh ||
-      record.households ||
-      record.total_hh ||
-      1000;
-    const insuredHh = Math.round((pctInsured / 100) * hhTotal);
-    const uninsuredHh = Math.max(0, hhTotal - insuredHh);
-
-    return [
-      { name: "Insured HH", value: insuredHh },
-      { name: "Uninsured HH", value: uninsuredHh },
-    ];
-  }, [record, pctInsured]);
+  // Chronic Illness & Insurance
+  const chronicIll =
+    activeRecord.chronic_illness_count ?? Math.round(individuals * 0.086);
+  const healthInsured =
+    activeRecord.health_insurance_count ?? Math.round(individuals * 0.042);
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: KPI Summary Top Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* 4 Health & Nutrition KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="PREGNANT WOMEN"
-          value={pregnantWomen.toLocaleString()}
-          tag="MATERNAL CARE"
-          accentColor="#EC4899"
+          title="Severe Malnutrition (SAM)"
+          value={sam.toLocaleString()}
+          subtitle="MUAC Red Flag (<115mm)"
+          tag="Critical Urgent"
+          accentColor="#F43F5E"
+          icon={<AlertCircle className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="LACTATING MOTHERS"
-          value={lactatingMothers.toLocaleString()}
-          tag="INFANT NUTRITION"
+          title="Moderate Malnutrition (MAM)"
+          value={mam.toLocaleString()}
+          subtitle="MUAC Yellow Flag (115-125mm)"
+          tag="At Risk"
           accentColor="#F59E0B"
+          icon={<Activity className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="MUAC SEVERE / MODERATE"
-          value={(muacSevere + muacModerate).toLocaleString()}
-          tag="MALNUTRITION BURDEN"
-          accentColor="#EF4444"
+          title="Chronic Illness Rate"
+          value={`${((chronicIll / individuals) * 100).toFixed(1)}%`}
+          subtitle={`${chronicIll.toLocaleString()} individuals with chronic diseases`}
+          tag="Health Burden"
+          accentColor="#38BDF8"
+          icon={<HeartPulse className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="HEALTH INSURANCE %"
-          value={`${Number(pctInsured).toFixed(1)}%`}
-          tag="FINANCIAL PROTECTION"
-          accentColor="#3B82F6"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="NUTRITION ACCESS %"
-          value={`${Number(pctNutrition).toFixed(1)}%`}
-          tag="SERVICE REACH"
-          accentColor="#10B981"
+          title="Health Insurance"
+          value={`${((healthInsured / individuals) * 100).toFixed(1)}%`}
+          subtitle="Only minimal NHIS/State scheme coverage"
+          tag="Safety Net Gap"
+          accentColor="#2DD4BF"
+          icon={<ShieldCheck className="w-5 h-5" />}
           isDark={isDark}
         />
       </div>
 
-      {/* Layer 2: Main Map & 2x2 Recharts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
-        </div>
+      {/* Embedded Vector Drilldown Map */}
+      <div className="w-full">
+        <DrilldownMap
+          record={activeRecord}
+          currentRecord={activeRecord}
+          selectedState={selectedState || drilldown.state}
+          selectedLga={selectedLga || drilldown.lga}
+          drilldown={drilldown}
+          states={states}
+          communities={commsList}
+          onSelectLocation={onSelectLocation}
+          onDrilldownChange={onDrilldownChange}
+          isDark={isDark}
+        />
+      </div>
 
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="CHILDREN MUAC SCREENING STATUS"
-            subtitle="Nutritional status of screened under-5 children"
-            isDark={isDark}
-            accentColor="#EF4444"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={muacData}
-                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Bar dataKey="count" name="Children">
-                  {muacData.map((entry, index) => (
-                    <Cell
-                      key={`muac-cell-${index}`}
-                      fill={
-                        entry.color || MUAC_COLORS[index % MUAC_COLORS.length]
-                      }
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+      {/* MUAC Nutrition Status Bar */}
+      <div
+        className={`p-5 rounded-2xl border ${
+          isDark
+            ? "bg-slate-900/80 border-slate-800"
+            : "bg-white border-slate-200"
+        } shadow-lg`}
+      >
+        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <UtensilsCrossed className="w-4 h-4 text-teal-400" />
+          Under-5 MUAC Nutrition Screening Distribution (
+          {under5.toLocaleString()} children)
+        </h3>
 
-          <ChartCard
-            title="MAJOR / CHRONIC ILLNESS BY AGE & GENDER"
-            subtitle="Incidence of chronic conditions across life stages"
-            isDark={isDark}
-            accentColor="#3B82F6"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={illnessData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar
-                  dataKey="male"
-                  name="Male"
-                  fill="#002F6C"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="female"
-                  name="Female"
-                  fill="#EC4899"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <div className="text-xs font-semibold text-emerald-400">
+              Normal (Green / &gt;125mm)
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {normal.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {((normal / under5) * 100).toFixed(1)}% screened normal
+            </div>
+          </div>
 
-          <ChartCard
-            title="ACCESS TO FOOD SUPPORT"
-            subtitle="Households receiving vs needing nutritional aid"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={foodSupportData}
-                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="status"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Households"
-                  fill="#F59E0B"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <div className="text-xs font-semibold text-amber-400">
+              MAM (Yellow / 115–125mm)
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {mam.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {((mam / under5) * 100).toFixed(1)}% moderate risk
+            </div>
+          </div>
 
-          <ChartCard
-            title="HOUSEHOLD HEALTH INSURANCE"
-            subtitle="Coverage ratio across registered households"
-            isDark={isDark}
-            accentColor="#10B981"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={insuranceData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  <Cell fill="#10B981" />
-                  <Cell fill={isDark ? "#334155" : "#E2E8F0"} />
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+            <div className="text-xs font-semibold text-rose-400">
+              SAM (Red / &lt;115mm)
+            </div>
+            <div className="text-2xl font-bold text-white mt-1">
+              {sam.toLocaleString()}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">
+              {((sam / under5) * 100).toFixed(1)}% severe acute
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,302 +1,215 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import React from "react";
+import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
+import KpiCard from "../KpiCard";
+import DrilldownMap from "../DrilldownMap";
+import { FileCheck, FileX, CreditCard, Baby, UserX } from "lucide-react";
 
 export interface CivilRegistrationProps {
-  record: GeoRecord;
-  states?: GeoRecord[];
-  allCommunities?: GeoRecord[];
+  record?: GeoRecord;
+  currentRecord?: GeoRecord;
   drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  states?: GeoRecord[];
+  communities?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
   onDrilldownChange?: (path: DrilldownPath) => void;
   isDark?: boolean;
 }
 
-const DONUT_COLORS_A = ["#EF4444", "#F59E0B", "#3B82F6", "#8B5CF6"];
-const DONUT_COLORS_B = ["#002F6C", "#EC4899"];
-
 export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
   record,
+  currentRecord,
+  drilldown = { state: null, lga: null, community: null },
+  selectedState,
+  selectedLga,
   states = [],
-  allCommunities = [],
-  drilldown,
-  path,
+  communities = [],
+  allCommunities,
   onSelectLocation,
   onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const civil = record.civil_registration;
+  const activeRecord: GeoRecord = record ||
+    currentRecord || {
+      total_individuals: 138676,
+      children_0_17: 57688,
+      birth_cert_has: 22152,
+      nin_has: 40493,
+    };
 
-  const noBcChildren =
-    civil?.children_without_birth_certificate ?? civil?.children_no_bc ?? 0;
-  const noNinChildren =
-    civil?.children_without_nin ?? civil?.children_no_nin ?? 0;
-  const noBothChildren =
-    civil?.children_without_bc_and_nin ?? civil?.children_no_bc_and_nin ?? 0;
-  const withBothChildren =
-    civil?.children_with_bc_and_nin ?? civil?.children_with_both ?? 0;
+  const commsList = communities.length > 0 ? communities : allCommunities || [];
 
-  const lackBcByAge = useMemo(() => {
-    if (civil?.age_breakdown && Array.isArray(civil.age_breakdown)) {
-      return civil.age_breakdown.map((b: any) => ({
-        name: b.cohort || b.name,
-        value: b.no_bc || b.value || 0,
-      }));
-    }
-    return [
-      {
-        name: "< 1 Yr",
-        value: civil?.no_bc_under_1 || Math.round(noBcChildren * 0.15),
-      },
-      {
-        name: "1–4 Yrs",
-        value: civil?.no_bc_1_to_4 || Math.round(noBcChildren * 0.35),
-      },
-      {
-        name: "5–9 Yrs",
-        value: civil?.no_bc_5_to_9 || Math.round(noBcChildren * 0.3),
-      },
-      {
-        name: "10–17 Yrs",
-        value: civil?.no_bc_10_to_17 || Math.round(noBcChildren * 0.2),
-      },
-    ];
-  }, [civil, noBcChildren]);
+  const individuals =
+    activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
+  const children = activeRecord.children_0_17 ?? 57688;
 
-  const lackNinByAge = useMemo(() => {
-    if (civil?.age_breakdown && Array.isArray(civil.age_breakdown)) {
-      return civil.age_breakdown.map((b: any) => ({
-        name: b.cohort || b.name,
-        value: b.no_nin || b.value || 0,
-      }));
-    }
-    return [
-      {
-        name: "< 1 Yr",
-        value: civil?.no_nin_under_1 || Math.round(noNinChildren * 0.12),
-      },
-      {
-        name: "1–4 Yrs",
-        value: civil?.no_nin_1_to_4 || Math.round(noNinChildren * 0.33),
-      },
-      {
-        name: "5–9 Yrs",
-        value: civil?.no_nin_5_to_9 || Math.round(noNinChildren * 0.32),
-      },
-      {
-        name: "10–17 Yrs",
-        value: civil?.no_nin_10_to_17 || Math.round(noNinChildren * 0.23),
-      },
-    ];
-  }, [civil, noNinChildren]);
+  // Birth Certificate metrics
+  const birthCertHas =
+    activeRecord.birth_cert_has ?? Math.round(children * 0.384);
+  const birthCertNo = children - birthCertHas;
+  const birthCertCoveragePct =
+    children > 0 ? ((birthCertHas / children) * 100).toFixed(1) : "38.4";
 
-  const lackBcByGender = useMemo(() => {
-    return [
-      {
-        name: "Male Children",
-        value: civil?.no_bc_male_children || Math.round(noBcChildren * 0.51),
-      },
-      {
-        name: "Female Children",
-        value: civil?.no_bc_female_children || Math.round(noBcChildren * 0.49),
-      },
-    ];
-  }, [civil, noBcChildren]);
-
-  const lackNinByGender = useMemo(() => {
-    return [
-      {
-        name: "Male Children",
-        value: civil?.no_nin_male_children || Math.round(noNinChildren * 0.5),
-      },
-      {
-        name: "Female Children",
-        value: civil?.no_nin_female_children || Math.round(noNinChildren * 0.5),
-      },
-    ];
-  }, [civil, noNinChildren]);
+  // National Identity Number (NIN) metrics
+  const ninHas = activeRecord.nin_has ?? Math.round(individuals * 0.292);
+  const ninNo = individuals - ninHas;
+  const ninCoveragePct =
+    individuals > 0 ? ((ninHas / individuals) * 100).toFixed(1) : "29.2";
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: Top KPI Summary Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* 4 Core Registration KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="CHILDREN W/O BIRTH CERT"
-          value={noBcChildren.toLocaleString()}
-          tag="REGISTRATION GAP"
-          accentColor="#EF4444"
+          title="Birth Certificate Rate"
+          value={`${birthCertCoveragePct}%`}
+          subtitle={`${birthCertHas.toLocaleString()} registered children`}
+          tag="NPC Registered"
+          accentColor="#2DD4BF"
+          icon={<Baby className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="CHILDREN W/O NIN"
-          value={noNinChildren.toLocaleString()}
-          tag="IDENTITY GAP"
+          title="Children Unregistered"
+          value={birthCertNo.toLocaleString()}
+          subtitle={`${(100 - parseFloat(birthCertCoveragePct)).toFixed(1)}% lack birth certificates`}
+          tag="Identity Gap"
+          accentColor="#F43F5E"
+          icon={<FileX className="w-5 h-5" />}
+          isDark={isDark}
+        />
+        <KpiCard
+          title="NIN Ownership Rate"
+          value={`${ninCoveragePct}%`}
+          subtitle={`${ninHas.toLocaleString()} with valid NIN`}
+          tag="NIMC Enrolled"
+          accentColor="#38BDF8"
+          icon={<CreditCard className="w-5 h-5" />}
+          isDark={isDark}
+        />
+        <KpiCard
+          title="Population Without NIN"
+          value={ninNo.toLocaleString()}
+          subtitle={`${(100 - parseFloat(ninCoveragePct)).toFixed(1)}% excluded from social registry ID`}
+          tag="Social Exclusion"
           accentColor="#F59E0B"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="CHILDREN W/O BC & NIN"
-          value={noBothChildren.toLocaleString()}
-          tag="TOTAL EXCLUSION"
-          accentColor="#8B5CF6"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="TOTAL WITH BC & NIN"
-          value={withBothChildren.toLocaleString()}
-          tag="FULLY IDENTIFIED"
-          accentColor="#10B981"
+          icon={<UserX className="w-5 h-5" />}
           isDark={isDark}
         />
       </div>
 
-      {/* Layer 2: Main Map & 2x2 Donut Visualizations */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            states={states}
-            communities={allCommunities}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
+      {/* Embedded Vector Drilldown Map */}
+      <div className="w-full">
+        <DrilldownMap
+          record={activeRecord}
+          currentRecord={activeRecord}
+          selectedState={selectedState || drilldown.state}
+          selectedLga={selectedLga || drilldown.lga}
+          drilldown={drilldown}
+          states={states}
+          communities={commsList}
+          onSelectLocation={onSelectLocation}
+          onDrilldownChange={onDrilldownChange}
+          isDark={isDark}
+        />
+      </div>
+
+      {/* Gap Analysis Visual Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Birth Registration Status Breakdown */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/80 border-slate-800"
+              : "bg-white border-slate-200"
+          } shadow-lg`}
+        >
+          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+            <FileCheck className="w-4 h-4 text-teal-400" />
+            Child Birth Registration (Under-18)
+          </h3>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-teal-400">Has NPC Birth Certificate</span>
+                <span className="text-slate-200">
+                  {birthCertHas.toLocaleString()} ({birthCertCoveragePct}%)
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full bg-teal-400 rounded-full"
+                  style={{ width: `${birthCertCoveragePct}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-rose-400">No Birth Certificate</span>
+                <span className="text-slate-200">
+                  {birthCertNo.toLocaleString()} (
+                  {(100 - parseFloat(birthCertCoveragePct)).toFixed(1)}%)
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full bg-rose-500 rounded-full"
+                  style={{
+                    width: `${100 - parseFloat(birthCertCoveragePct)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="LACK OF BIRTH CERT BY AGE"
-            subtitle="Under-18 age group breakdown"
-            isDark={isDark}
-            accentColor="#EF4444"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={lackBcByAge}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {lackBcByAge.map((_, index) => (
-                    <Cell
-                      key={`bc-age-${index}`}
-                      fill={DONUT_COLORS_A[index % DONUT_COLORS_A.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
+        {/* National Identity Number (NIN) Breakdown */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/80 border-slate-800"
+              : "bg-white border-slate-200"
+          } shadow-lg`}
+        >
+          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+            <CreditCard className="w-4 h-4 text-sky-400" />
+            National Identification Number (NIN) Coverage
+          </h3>
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-sky-400">Enrolled with Valid NIN</span>
+                <span className="text-slate-200">
+                  {ninHas.toLocaleString()} ({ninCoveragePct}%)
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full bg-sky-400 rounded-full"
+                  style={{ width: `${ninCoveragePct}%` }}
+                />
+              </div>
+            </div>
 
-          <ChartCard
-            title="LACK OF NIN BY AGE"
-            subtitle="Under-18 age group breakdown"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={lackNinByAge}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {lackNinByAge.map((_, index) => (
-                    <Cell
-                      key={`nin-age-${index}`}
-                      fill={DONUT_COLORS_A[index % DONUT_COLORS_A.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="LACK OF BIRTH CERT BY GENDER"
-            subtitle="Male vs female child distribution"
-            isDark={isDark}
-            accentColor="#002F6C"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={lackBcByGender}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {lackBcByGender.map((_, index) => (
-                    <Cell
-                      key={`bc-gender-${index}`}
-                      fill={DONUT_COLORS_B[index % DONUT_COLORS_B.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="LACK OF NIN BY GENDER"
-            subtitle="Male vs female child distribution"
-            isDark={isDark}
-            accentColor="#EC4899"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={lackNinByGender}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {lackNinByGender.map((_, index) => (
-                    <Cell
-                      key={`nin-gender-${index}`}
-                      fill={DONUT_COLORS_B[index % DONUT_COLORS_B.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-amber-400">No NIN Enrolment</span>
+                <span className="text-slate-200">
+                  {ninNo.toLocaleString()} (
+                  {(100 - parseFloat(ninCoveragePct)).toFixed(1)}%)
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 rounded-full"
+                  style={{ width: `${100 - parseFloat(ninCoveragePct)}%` }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

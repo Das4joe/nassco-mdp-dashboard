@@ -1,382 +1,278 @@
-import React, { useMemo } from "react";
-import type { GeoRecord, DrilldownPath } from "../../lib/types";
-import { KpiCard } from "../KpiCard";
-import { ChartCard } from "../ChartCard";
-import { DrilldownMap } from "../DrilldownMap";
-import { CommunityRankingPanel } from "../CommunityRankingPanel";
+import React from "react";
+import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
+import KpiCard from "../KpiCard";
+import DrilldownMap from "../DrilldownMap";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+  Users,
+  Home,
+  UserCheck,
+  MapPin,
+  Award,
+  Layers,
+  ArrowUpRight,
+} from "lucide-react";
 
 export interface GlobalOverviewProps {
-  record: GeoRecord;
-  communities: GeoRecord[];
+  record?: GeoRecord;
+  currentRecord?: GeoRecord;
   drilldown?: DrilldownPath;
-  path?: DrilldownPath;
-  onSelectLocation?: (name: string, level: any) => void;
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  states?: GeoRecord[];
+  communities?: GeoRecord[];
+  allCommunities?: GeoRecord[];
+  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
   onDrilldownChange?: (path: DrilldownPath) => void;
   isDark?: boolean;
 }
 
-const GENDER_COLORS = ["#002F6C", "#EC4899"];
-const COHORT_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6"];
-
 export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
   record,
+  currentRecord,
+  drilldown = { state: null, lga: null, community: null },
+  selectedState,
+  selectedLga,
+  states = [],
   communities = [],
-  drilldown,
-  path,
+  allCommunities,
   onSelectLocation,
   onDrilldownChange,
-  isDark = false,
+  isDark = true,
 }) => {
-  const activeDrilldown: DrilldownPath = drilldown ||
-    path || { level: record.level || "national" };
-  const demographics = record.demographics;
+  const activeRecord: GeoRecord = record ||
+    currentRecord || {
+      total_households: 41512,
+      total_individuals: 138676,
+      male: 70312,
+      female: 68364,
+      children_0_17: 57688,
+      youth_18_24: 19012,
+      adults_25_59: 48750,
+      elderly_60_plus: 13226,
+    };
 
-  const totalHouseholds =
-    demographics?.total_hh ?? record.households ?? record.total_hh ?? 0;
-  const totalIndividuals =
-    demographics?.total_individuals ??
-    record.individuals ??
-    record.total_ind ??
-    0;
-  const totalChildren =
-    demographics?.children_0_17 ??
-    demographics?.children_0_17_total ??
-    demographics?.total_children ??
-    0;
-  const totalYouth =
-    demographics?.youth_18_24 ?? demographics?.youth_18_24_total ?? 0;
-  const communitiesCovered =
-    communities.length ||
-    record.communities_covered ||
-    record.coverage?.communities_count ||
-    1;
+  const commsList = communities.length > 0 ? communities : allCommunities || [];
 
-  const pyramidData = useMemo(() => {
-    if (demographics?.pyramid && demographics.pyramid.length > 0) {
-      return demographics.pyramid;
-    }
-    const under5 =
-      demographics?.children_0_5 || Math.round(totalIndividuals * 0.18);
-    const age6to11 =
-      demographics?.children_6_11 || Math.round(totalIndividuals * 0.19);
-    const age12to17 =
-      demographics?.children_12_17 || Math.round(totalIndividuals * 0.15);
-    const youth =
-      demographics?.youth_18_24 || Math.round(totalIndividuals * 0.14);
-    const adults =
-      demographics?.adults_18_59 || Math.round(totalIndividuals * 0.28);
-    const elderly =
-      demographics?.elderly_60_plus || Math.round(totalIndividuals * 0.06);
+  const households =
+    activeRecord.total_households ?? activeRecord.households ?? 41512;
+  const individuals =
+    activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
+  const male = activeRecord.male ?? 70312;
+  const female = activeRecord.female ?? 68364;
+  const femalePct =
+    individuals > 0 ? ((female / individuals) * 100).toFixed(1) : "49.3";
+  const avgHhSize =
+    households > 0 ? (individuals / households).toFixed(1) : "3.3";
 
-    return [
-      {
-        cohort: "0–5 Yrs",
-        male: Math.round(under5 * 0.51),
-        female: Math.round(under5 * 0.49),
-      },
-      {
-        cohort: "6–11 Yrs",
-        male: Math.round(age6to11 * 0.51),
-        female: Math.round(age6to11 * 0.49),
-      },
-      {
-        cohort: "12–17 Yrs",
-        male: Math.round(age12to17 * 0.5),
-        female: Math.round(age12to17 * 0.5),
-      },
-      {
-        cohort: "18–24 Yrs",
-        male: Math.round(youth * 0.48),
-        female: Math.round(youth * 0.52),
-      },
-      {
-        cohort: "25–59 Yrs",
-        male: Math.round(adults * 0.47),
-        female: Math.round(adults * 0.53),
-      },
-      {
-        cohort: "60+ Yrs",
-        male: Math.round(elderly * 0.45),
-        female: Math.round(elderly * 0.55),
-      },
-    ];
-  }, [demographics, totalIndividuals]);
+  // Age cohorts
+  const children = activeRecord.children_0_17 ?? 57688;
+  const youth = activeRecord.youth_18_24 ?? 19012;
+  const adults = activeRecord.adults_25_59 ?? 48750;
+  const elderly = activeRecord.elderly_60_plus ?? 13226;
 
-  const genderData = useMemo(() => {
-    const males = demographics?.males ?? Math.round(totalIndividuals * 0.49);
-    const females =
-      demographics?.females ?? Math.round(totalIndividuals * 0.51);
-    return [
-      { name: "Male", value: males },
-      { name: "Female", value: females },
-    ];
-  }, [demographics, totalIndividuals]);
-
-  const cohortShareData = useMemo(() => {
-    const children = totalChildren;
-    const youth = totalYouth;
-    const adults =
-      demographics?.adults_18_59 ?? Math.round(totalIndividuals * 0.28);
-    const elderly =
-      demographics?.elderly_60_plus ?? Math.round(totalIndividuals * 0.06);
-
-    return [
-      { name: "Children (0–17)", value: children },
-      { name: "Youth (18–24)", value: youth },
-      { name: "Adults (25–59)", value: adults },
-      { name: "Elderly (60+)", value: elderly },
-    ];
-  }, [demographics, totalChildren, totalYouth, totalIndividuals]);
-
-  const broadAgeData = useMemo(() => {
-    return [
-      {
-        group: "0–5 (Early Child)",
-        count:
-          demographics?.children_0_5 || Math.round(totalIndividuals * 0.18),
-      },
-      {
-        group: "6–11 (Primary)",
-        count:
-          demographics?.children_6_11 || Math.round(totalIndividuals * 0.19),
-      },
-      {
-        group: "12–17 (Secondary)",
-        count:
-          demographics?.children_12_17 || Math.round(totalIndividuals * 0.15),
-      },
-      { group: "18–24 (Youth)", count: totalYouth },
-      {
-        group: "25–59 (Adults)",
-        count:
-          demographics?.adults_18_59 || Math.round(totalIndividuals * 0.28),
-      },
-      {
-        group: "60+ (Elderly)",
-        count:
-          demographics?.elderly_60_plus || Math.round(totalIndividuals * 0.06),
-      },
-    ];
-  }, [demographics, totalIndividuals, totalYouth]);
+  const childPct =
+    individuals > 0 ? ((children / individuals) * 100).toFixed(1) : "41.6";
+  const youthPct =
+    individuals > 0 ? ((youth / individuals) * 100).toFixed(1) : "13.7";
 
   return (
     <div className="space-y-6">
-      {/* Layer 1: KPI Top Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      {/* 4 Core Demographic KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="TOTAL HOUSEHOLDS"
-          value={totalHouseholds.toLocaleString()}
-          tag="REGISTRY BASE"
-          accentColor="#002F6C"
+          title="Total Households"
+          value={households.toLocaleString()}
+          subtitle="Registered in Social Registry"
+          tag="NSR Core"
+          accentColor="#2DD4BF"
+          icon={<Home className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="TOTAL INDIVIDUALS"
-          value={totalIndividuals.toLocaleString()}
-          tag="POPULATION"
-          accentColor="#2563EB"
+          title="Total Population"
+          value={individuals.toLocaleString()}
+          subtitle={`Avg HH Size: ${avgHhSize} persons`}
+          tag="Surveyed"
+          accentColor="#38BDF8"
+          icon={<Users className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="TOTAL CHILDREN (0–17)"
-          value={totalChildren.toLocaleString()}
-          tag={`${totalIndividuals > 0 ? ((totalChildren / totalIndividuals) * 100).toFixed(1) : 0}% OF POP`}
-          accentColor="#10B981"
-          isDark={isDark}
-        />
-        <KpiCard
-          title="TOTAL YOUTH (18–24)"
-          value={totalYouth.toLocaleString()}
-          tag={`${totalIndividuals > 0 ? ((totalYouth / totalIndividuals) * 100).toFixed(1) : 0}% OF POP`}
+          title="Children (0-17)"
+          value={children.toLocaleString()}
+          subtitle={`${childPct}% of total population`}
+          tag="Child PMT"
           accentColor="#F59E0B"
+          icon={<UserCheck className="w-5 h-5" />}
           isDark={isDark}
         />
         <KpiCard
-          title="COMMUNITIES COVERED"
-          value={communitiesCovered.toLocaleString()}
-          tag="EXPANSION GEOS"
-          accentColor="#8B5CF6"
+          title="Youth (18-24)"
+          value={youth.toLocaleString()}
+          subtitle={`${youthPct}% adolescent & youth cohort`}
+          tag="Productive Age"
+          accentColor="#EC4899"
+          icon={<Award className="w-5 h-5" />}
           isDark={isDark}
         />
       </div>
 
-      {/* Layer 2: Main Map & Visualizations Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div className="lg:col-span-5 h-[560px] lg:h-auto min-h-[500px]">
-          <DrilldownMap
-            record={record}
-            drilldown={activeDrilldown}
-            onSelectLocation={onSelectLocation}
-            onDrilldownChange={onDrilldownChange}
-            isDark={isDark}
-          />
-        </div>
-
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ChartCard
-            title="POPULATION PYRAMID"
-            subtitle="Gender breakdown by key age cohort"
-            isDark={isDark}
-            accentColor="#002F6C"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={pyramidData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  dataKey="cohort"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <Tooltip />
-                <Legend
-                  wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }}
-                />
-                <Bar
-                  dataKey="male"
-                  name="Male"
-                  fill="#002F6C"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="female"
-                  name="Female"
-                  fill="#EC4899"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="GENDER RATIO"
-            subtitle="Overall male vs female distribution"
-            isDark={isDark}
-            accentColor="#EC4899"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={genderData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {genderData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={GENDER_COLORS[index % GENDER_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="DEMOGRAPHIC COHORT SHARE"
-            subtitle="Distribution of broad life stages"
-            isDark={isDark}
-            accentColor="#10B981"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={cohortShareData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {cohortShareData.map((_, index) => (
-                    <Cell
-                      key={`cohort-${index}`}
-                      fill={COHORT_COLORS[index % COHORT_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
-
-          <ChartCard
-            title="BROAD AGE DISTRIBUTION"
-            subtitle="Total population across functional groups"
-            isDark={isDark}
-            accentColor="#F59E0B"
-          >
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={broadAgeData}
-                layout="vertical"
-                margin={{ top: 5, right: 20, left: 20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={isDark ? 0.15 : 0.6}
-                />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#475569" }}
-                />
-                <YAxis
-                  dataKey="group"
-                  type="category"
-                  tick={{ fontSize: 9, fill: isDark ? "#94A3B8" : "#475569" }}
-                  width={80}
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="count"
-                  name="Individuals"
-                  fill="#F59E0B"
-                  radius={[0, 4, 4, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </div>
-      </div>
-
-      {/* Layer 3: Bottom Table */}
+      {/* Main Vector Drilldown Map Section */}
       <div className="w-full">
-        <CommunityRankingPanel
-          communities={communities}
+        <DrilldownMap
+          record={activeRecord}
+          currentRecord={activeRecord}
+          selectedState={selectedState || drilldown.state}
+          selectedLga={selectedLga || drilldown.lga}
+          drilldown={drilldown}
+          states={states}
+          communities={commsList}
+          onSelectLocation={onSelectLocation}
+          onDrilldownChange={onDrilldownChange}
           isDark={isDark}
-          onSelectCommunity={(comm) => {
-            if (onSelectLocation)
-              onSelectLocation(comm.name || comm.community || "", "community");
-          }}
         />
+      </div>
+
+      {/* Demographics & Age Pyramid Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Population Cohort Breakdown */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/80 border-slate-800"
+              : "bg-white border-slate-200"
+          } shadow-lg`}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-teal-400" />
+              Population Age Pyramid & Cohorts
+            </h3>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-semibold">
+              4 Pilot States
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                label: "Children (0–17 yrs)",
+                count: children,
+                pct: childPct,
+                color: "bg-amber-400",
+              },
+              {
+                label: "Youth (18–24 yrs)",
+                count: youth,
+                pct: youthPct,
+                color: "bg-pink-500",
+              },
+              {
+                label: "Adults (25–59 yrs)",
+                count: adults,
+                pct: ((adults / individuals) * 100).toFixed(1),
+                color: "bg-teal-400",
+              },
+              {
+                label: "Elderly (60+ yrs)",
+                count: elderly,
+                pct: ((elderly / individuals) * 100).toFixed(1),
+                color: "bg-indigo-400",
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="space-y-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span
+                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                  >
+                    {item.label}
+                  </span>
+                  <span className="font-bold text-slate-200">
+                    {item.count.toLocaleString()} ({item.pct}%)
+                  </span>
+                </div>
+                <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div
+                    className={`h-full ${item.color} rounded-full transition-all duration-500`}
+                    style={{ width: `${item.pct}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span>
+              Male:{" "}
+              <strong className="text-sky-400">{male.toLocaleString()}</strong>
+            </span>
+            <span>
+              Female:{" "}
+              <strong className="text-rose-400">
+                {female.toLocaleString()} ({femalePct}%)
+              </strong>
+            </span>
+          </div>
+        </div>
+
+        {/* State Summary Cards */}
+        <div
+          className={`p-5 rounded-2xl border ${
+            isDark
+              ? "bg-slate-900/80 border-slate-800"
+              : "bg-white border-slate-200"
+          } shadow-lg`}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-teal-400" />
+              Pilot State Coverage Summary
+            </h3>
+            <span className="text-xs text-slate-400">Target Geographies</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { name: "Abia", hhs: "9,842", ind: "31,820", lgas: "8 LGAs" },
+              { name: "Benue", hhs: "11,430", ind: "39,114", lgas: "7 LGAs" },
+              { name: "Oyo", hhs: "10,120", ind: "33,640", lgas: "7 LGAs" },
+              { name: "Sokoto", hhs: "10,120", ind: "34,102", lgas: "7 LGAs" },
+            ].map((st, i) => (
+              <button
+                key={i}
+                onClick={() =>
+                  onSelectLocation && onSelectLocation(st.name, "state")
+                }
+                className={`p-3.5 rounded-xl text-left border transition-all ${
+                  (selectedState || drilldown.state)?.toLowerCase() ===
+                  st.name.toLowerCase()
+                    ? "bg-teal-500/20 border-teal-500/60 shadow-lg shadow-teal-500/10"
+                    : isDark
+                      ? "bg-slate-800/60 border-slate-700/60 hover:bg-slate-800"
+                      : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-teal-300">
+                    {st.name}
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+                </div>
+                <div className="mt-2 text-xs text-slate-400">
+                  <div>
+                    HHs: <strong className="text-slate-200">{st.hhs}</strong>
+                  </div>
+                  <div>
+                    Pop: <strong className="text-slate-200">{st.ind}</strong>
+                  </div>
+                  <div className="text-[11px] text-teal-400/90 mt-0.5">
+                    {st.lgas}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
