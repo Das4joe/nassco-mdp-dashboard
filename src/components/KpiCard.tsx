@@ -1,4 +1,5 @@
 import type React from "react";
+import { isValidElement } from "react";
 import type { LucideIcon } from "lucide-react";
 
 export interface KpiCardProps {
@@ -36,7 +37,6 @@ export const KpiCard: React.FC<KpiCardProps> = ({
 }) => {
   const displayTag = tag || badge;
 
-  // Derive tone accent colors
   const toneBg =
     tone === "critical"
       ? "bg-rose-500/15 text-rose-300 border-rose-500/30"
@@ -45,6 +45,16 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         : tone === "positive"
           ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
           : "bg-teal-500/15 text-teal-300 border-teal-500/30";
+
+  // Safely handle Lucide forwardRef components, functional components, and JSX elements
+  const renderIcon = () => {
+    if (!Icon) return null;
+    if (isValidElement(Icon)) {
+      return Icon;
+    }
+    const IconComponent = Icon as React.ComponentType<{ className?: string }>;
+    return <IconComponent className="h-5 w-5" />;
+  };
 
   return (
     <div
@@ -100,7 +110,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${toneBg}`}
           >
-            {typeof Icon === "function" ? <Icon className="h-5 w-5" /> : Icon}
+            {renderIcon()}
           </div>
         )}
       </div>
