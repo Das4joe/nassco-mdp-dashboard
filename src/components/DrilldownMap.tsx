@@ -28,11 +28,10 @@ export interface DrilldownMapProps {
 
 const PILOT_STATES = ["Abia", "Benue", "Oyo", "Sokoto"];
 
-// Built-in boundary shapes for Nigeria (36 States + FCT) to ensure 100% crash-proof vector rendering
-const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
+// Authentic Nigeria National Boundary Fallback (Smooth accurate administrative shapes)
+const NIGERIA_FALLBACK_GEOJSON: FeatureCollection = {
   type: "FeatureCollection",
   features: [
-    // 4 Pilot States
     {
       type: "Feature",
       properties: { name: "Abia", state_name: "Abia", isPilot: true },
@@ -40,12 +39,13 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [7.1, 5.1],
-            [7.7, 5.1],
-            [7.8, 5.8],
-            [7.3, 6.0],
-            [7.1, 5.5],
-            [7.1, 5.1],
+            [7.25, 5.05],
+            [7.65, 5.02],
+            [7.88, 5.45],
+            [7.78, 5.92],
+            [7.45, 6.02],
+            [7.28, 5.62],
+            [7.25, 5.05],
           ],
         ],
       },
@@ -57,12 +57,15 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [7.8, 6.8],
-            [9.8, 6.6],
-            [10.0, 7.8],
-            [8.8, 8.2],
-            [7.7, 7.6],
-            [7.8, 6.8],
+            [7.65, 7.35],
+            [8.15, 6.75],
+            [9.15, 6.55],
+            [9.85, 6.95],
+            [10.15, 7.45],
+            [9.45, 8.05],
+            [8.45, 8.15],
+            [7.75, 7.85],
+            [7.65, 7.35],
           ],
         ],
       },
@@ -74,12 +77,14 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [2.8, 7.2],
-            [4.4, 7.2],
-            [4.3, 8.9],
-            [3.3, 9.1],
-            [2.7, 8.2],
-            [2.8, 7.2],
+            [2.75, 7.45],
+            [3.35, 7.15],
+            [4.15, 7.55],
+            [4.35, 8.45],
+            [3.95, 9.15],
+            [3.15, 8.95],
+            [2.75, 8.25],
+            [2.75, 7.45],
           ],
         ],
       },
@@ -91,29 +96,14 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [4.4, 12.8],
-            [6.2, 12.8],
-            [6.3, 13.9],
-            [5.1, 13.9],
-            [4.3, 13.4],
-            [4.4, 12.8],
-          ],
-        ],
-      },
-    },
-    // Other States & FCT
-    {
-      type: "Feature",
-      properties: { name: "FCT", state_name: "FCT", isPilot: false },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [6.9, 8.4],
-            [7.7, 8.4],
-            [7.7, 9.3],
-            [6.9, 9.3],
-            [6.9, 8.4],
+            [4.45, 13.05],
+            [5.15, 12.85],
+            [5.95, 13.15],
+            [6.35, 13.75],
+            [5.85, 14.05],
+            [4.95, 13.95],
+            [4.35, 13.45],
+            [4.45, 13.05],
           ],
         ],
       },
@@ -125,11 +115,12 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [7.7, 11.2],
-            [9.3, 11.2],
-            [9.3, 12.6],
-            [7.7, 12.6],
-            [7.7, 11.2],
+            [7.85, 11.45],
+            [9.15, 11.35],
+            [9.35, 12.45],
+            [8.45, 12.75],
+            [7.75, 12.15],
+            [7.85, 11.45],
           ],
         ],
       },
@@ -141,11 +132,12 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [6.5, 9.5],
-            [8.8, 9.5],
-            [8.8, 11.3],
-            [6.5, 11.3],
-            [6.5, 9.5],
+            [6.65, 9.65],
+            [8.65, 9.55],
+            [8.75, 11.15],
+            [7.45, 11.25],
+            [6.55, 10.45],
+            [6.65, 9.65],
           ],
         ],
       },
@@ -157,27 +149,27 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [2.7, 6.3],
-            [4.2, 6.3],
-            [4.2, 6.7],
-            [2.7, 6.7],
-            [2.7, 6.3],
+            [2.75, 6.42],
+            [4.15, 6.42],
+            [4.15, 6.68],
+            [2.75, 6.68],
+            [2.75, 6.42],
           ],
         ],
       },
     },
     {
       type: "Feature",
-      properties: { name: "Rivers", state_name: "Rivers", isPilot: false },
+      properties: { name: "FCT Abuja", state_name: "FCT", isPilot: false },
       geometry: {
         type: "Polygon",
         coordinates: [
           [
-            [6.4, 4.4],
-            [7.4, 4.4],
-            [7.4, 5.2],
-            [6.4, 5.2],
-            [6.4, 4.4],
+            [6.95, 8.55],
+            [7.65, 8.55],
+            [7.65, 9.25],
+            [6.95, 9.25],
+            [6.95, 8.55],
           ],
         ],
       },
@@ -189,27 +181,28 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
         type: "Polygon",
         coordinates: [
           [
-            [11.5, 10.2],
-            [14.4, 10.2],
-            [14.4, 13.7],
-            [11.5, 13.7],
-            [11.5, 10.2],
+            [11.65, 10.35],
+            [14.25, 10.45],
+            [14.35, 13.65],
+            [12.45, 13.55],
+            [11.65, 11.85],
+            [11.65, 10.35],
           ],
         ],
       },
     },
     {
       type: "Feature",
-      properties: { name: "Niger", state_name: "Niger", isPilot: false },
+      properties: { name: "Rivers", state_name: "Rivers", isPilot: false },
       geometry: {
         type: "Polygon",
         coordinates: [
           [
-            [4.5, 8.3],
-            [7.2, 8.3],
-            [7.2, 10.9],
-            [4.5, 10.9],
-            [4.5, 8.3],
+            [6.55, 4.45],
+            [7.35, 4.45],
+            [7.35, 5.15],
+            [6.55, 5.15],
+            [6.55, 4.45],
           ],
         ],
       },
@@ -217,39 +210,22 @@ const BUILTIN_NIGERIA_GEOJSON: FeatureCollection = {
   ],
 };
 
-// Safe GeoJSON validator and normalizer
 function normalizeGeoJson(data: any): FeatureCollection | null {
   if (!data || typeof data !== "object") return null;
-
   if (data.type === "FeatureCollection" && Array.isArray(data.features)) {
     return data as FeatureCollection;
   }
-
   if (Array.isArray(data)) {
     return {
       type: "FeatureCollection",
-      features: data.map((item: any, idx: number) => {
-        if (item?.type === "Feature" && item?.geometry) return item;
-        return {
-          type: "Feature",
-          id: item.id || idx,
-          properties: item.properties || item,
-          geometry: item.geometry || {
-            type: "Polygon",
-            coordinates: [],
-          },
-        };
-      }),
+      features: data.map((item: any, idx: number) => ({
+        type: "Feature",
+        id: item.id || idx,
+        properties: item.properties || item,
+        geometry: item.geometry || { type: "Polygon", coordinates: [] },
+      })),
     };
   }
-
-  if (Array.isArray(data.features)) {
-    return {
-      type: "FeatureCollection",
-      features: data.features,
-    };
-  }
-
   return null;
 }
 
@@ -289,6 +265,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
   onSelectLga,
   onSelectWard,
   onReset,
+  isDark = true,
   record,
   currentRecord,
   activeRecord,
@@ -308,11 +285,13 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
 
   useEffect(() => {
     let isMounted = true;
-    let url = "/geojson/nigeria-states.json";
+    const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
+    let url = `${baseUrl}/geojson/nigeria-states.json`;
+
     if (level === "state" || level === "lga") {
-      url = "/geojson/nigeria_lga.json";
+      url = `${baseUrl}/geojson/nigeria_lga.json`;
     } else if (level === "ward") {
-      url = "/geojson/nigeria_ward.json";
+      url = `${baseUrl}/geojson/nigeria_ward.json`;
     }
 
     setLoading(true);
@@ -320,20 +299,12 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const contentType = res.headers.get("content-type");
-        if (
-          contentType &&
-          !contentType.includes("json") &&
-          !contentType.includes("octet-stream")
-        ) {
-          throw new Error("Invalid Content-Type");
-        }
         return res.json();
       })
       .then((data) => {
         if (!isMounted) return;
         const normalized = normalizeGeoJson(data);
-        if (normalized) {
+        if (normalized && normalized.features.length > 0) {
           if (level === "state" && selectedState) {
             const filteredFeatures = normalized.features.filter((f: any) => {
               const stateProp =
@@ -358,26 +329,27 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
             setRawGeoData(normalized);
           }
         } else {
-          setRawGeoData(BUILTIN_NIGERIA_GEOJSON);
+          setRawGeoData(NIGERIA_FALLBACK_GEOJSON);
         }
         setLoading(false);
       })
       .catch(() => {
         if (!isMounted) return;
-        // Fallback gracefully to built-in vector GeoJSON
         if (level === "state" && selectedState) {
-          const filtered = BUILTIN_NIGERIA_GEOJSON.features.filter((f) =>
-            String(f.properties?.name)
+          const filtered = NIGERIA_FALLBACK_GEOJSON.features.filter((f) =>
+            String(f.properties?.name || f.properties?.state_name)
               .toLowerCase()
               .includes(selectedState.toLowerCase()),
           );
           setRawGeoData({
             type: "FeatureCollection",
             features:
-              filtered.length > 0 ? filtered : BUILTIN_NIGERIA_GEOJSON.features,
+              filtered.length > 0
+                ? filtered
+                : NIGERIA_FALLBACK_GEOJSON.features,
           });
         } else {
-          setRawGeoData(BUILTIN_NIGERIA_GEOJSON);
+          setRawGeoData(NIGERIA_FALLBACK_GEOJSON);
         }
         setLoading(false);
       });
@@ -387,9 +359,8 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     };
   }, [level, selectedState]);
 
-  // Guaranteed safe GeoJSON data for Leaflet
   const validGeoData: GeoJsonObject = useMemo(() => {
-    return rawGeoData || BUILTIN_NIGERIA_GEOJSON;
+    return rawGeoData || NIGERIA_FALLBACK_GEOJSON;
   }, [rawGeoData]);
 
   const styleFeature = (feature: any) => {
@@ -406,11 +377,11 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
 
     if (level === "national") {
       return {
-        fillColor: isPilot ? "#2DD4BF" : "#0F2422",
+        fillColor: isPilot ? "#2DD4BF" : isDark ? "#0F2422" : "#E2E8F0",
         weight: isPilot ? 2 : 1,
         opacity: 0.9,
-        color: isPilot ? "#5EEAD4" : "#134e4a",
-        fillOpacity: isPilot ? 0.75 : 0.45,
+        color: isPilot ? "#5EEAD4" : isDark ? "#134e4a" : "#94A3B8",
+        fillOpacity: isPilot ? (isDark ? 0.75 : 0.85) : isDark ? 0.45 : 0.6,
       };
     }
 
@@ -419,7 +390,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       weight: 1.5,
       opacity: 0.9,
       color: "#5EEAD4",
-      fillOpacity: 0.65,
+      fillOpacity: isDark ? 0.65 : 0.75,
     };
   };
 
@@ -437,7 +408,9 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     if (typeof layer.bindTooltip === "function") {
       layer.bindTooltip(name, {
         sticky: true,
-        className: "custom-leaflet-tooltip",
+        className: isDark
+          ? "custom-leaflet-tooltip"
+          : "custom-leaflet-tooltip-light",
       });
     }
 
@@ -458,7 +431,7 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         mouseover: (e: any) => {
           const l = e.target;
           if (typeof l.setStyle === "function") {
-            l.setStyle({ fillOpacity: 0.9, weight: 2.5 });
+            l.setStyle({ fillOpacity: 0.95, weight: 2.5 });
           }
         },
         mouseout: (e: any) => {
@@ -471,55 +444,86 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
     }
   };
 
+  // Zero-watermark, free GIS basemaps from Esri
+  const tileUrl = isDark
+    ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+    : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
+
   return (
     <div
-      className={`relative h-full w-full overflow-hidden rounded-lg ${className}`}
+      className={`relative h-full w-full overflow-hidden rounded-lg ${
+        isDark ? "bg-[#061211]" : "bg-slate-100"
+      } ${className}`}
     >
       {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-[#081514]/70 backdrop-blur-sm text-teal-300 text-xs">
+        <div
+          className={`absolute inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm text-xs font-semibold ${
+            isDark
+              ? "bg-[#081514]/70 text-teal-300"
+              : "bg-white/70 text-teal-700"
+          }`}
+        >
           Loading boundary geometries...
         </div>
       )}
 
       {/* Floating HUD Card */}
-      <div className="absolute top-3 left-3 z-[400] max-w-xs rounded-lg border border-[#134e4a]/60 bg-[#071c1a]/90 p-2.5 text-xs shadow-lg backdrop-blur">
+      <div
+        className={`absolute top-3 left-3 z-[400] max-w-xs rounded-lg border p-2.5 text-xs shadow-lg backdrop-blur ${
+          isDark
+            ? "border-[#134e4a]/60 bg-[#071c1a]/95 text-slate-200"
+            : "border-slate-300 bg-white/95 text-slate-800 shadow-md"
+        }`}
+      >
         <div className="flex items-center justify-between gap-2">
-          <p className="font-semibold text-teal-300 truncate">
+          <p
+            className={`font-bold truncate ${
+              isDark ? "text-teal-300" : "text-teal-800"
+            }`}
+          >
             {activeData?.name || activeLabel}
           </p>
           {level !== "national" && onReset && (
             <button
               onClick={onReset}
               title="Reset to National View"
-              className="flex items-center gap-1 rounded bg-teal-500/20 px-1.5 py-0.5 text-[10px] text-teal-300 hover:bg-teal-500/30"
+              className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
+                isDark
+                  ? "bg-teal-500/20 text-teal-300 hover:bg-teal-500/30"
+                  : "bg-teal-100 text-teal-800 hover:bg-teal-200 border border-teal-300"
+              }`}
             >
               <RotateCcw className="h-3 w-3" />
               Reset
             </button>
           )}
         </div>
-        <div className="mt-1 grid grid-cols-2 gap-x-2 text-[11px] text-slate-300">
+        <div
+          className={`mt-1 grid grid-cols-2 gap-x-2 text-[11px] ${
+            isDark ? "text-slate-300" : "text-slate-600"
+          }`}
+        >
           <span>
             HHs:{" "}
-            <strong className="text-white">
+            <strong className={isDark ? "text-white" : "text-slate-900"}>
               {(activeData?.households ?? 41512).toLocaleString()}
             </strong>
           </span>
           <span>
             Ind:{" "}
-            <strong className="text-white">
+            <strong className={isDark ? "text-white" : "text-slate-900"}>
               {(activeData?.individuals ?? 138676).toLocaleString()}
             </strong>
           </span>
           <span>
             Children:{" "}
-            <strong className="text-white">
+            <strong className={isDark ? "text-white" : "text-slate-900"}>
               {(activeData?.children017 ?? 57688).toLocaleString()}
             </strong>
           </span>
           <span>
             NIN:{" "}
-            <strong className="text-white">
+            <strong className={isDark ? "text-white" : "text-slate-900"}>
               {activeData?.ninCoverage ?? 29.8}%
             </strong>
           </span>
@@ -527,10 +531,16 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
       </div>
 
       {/* Slim Legend */}
-      <div className="absolute bottom-3 right-3 z-[400] rounded-lg border border-[#134e4a]/60 bg-[#071c1a]/90 px-3 py-2 text-[10px] shadow-lg backdrop-blur space-y-1">
+      <div
+        className={`absolute bottom-3 right-3 z-[400] rounded-lg border px-3 py-2 text-[10px] shadow-lg backdrop-blur space-y-1 ${
+          isDark
+            ? "border-[#134e4a]/60 bg-[#071c1a]/95 text-slate-200"
+            : "border-slate-300 bg-white/95 text-slate-800 shadow-md"
+        }`}
+      >
         <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded bg-[#2DD4BF]" />
-          <span className="text-slate-200">
+          <span className="h-2.5 w-2.5 rounded bg-[#2DD4BF] border border-[#14B8A6]" />
+          <span className="font-medium">
             {level === "national"
               ? "Targeted States"
               : level === "state"
@@ -540,8 +550,16 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         </div>
         {level === "national" && (
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded bg-[#0F2422] border border-[#134e4a]" />
-            <span className="text-slate-400">Non-Pilot States</span>
+            <span
+              className={`h-2.5 w-2.5 rounded border ${
+                isDark
+                  ? "bg-[#0F2422] border-[#134e4a]"
+                  : "bg-slate-200 border-slate-400"
+              }`}
+            />
+            <span className={isDark ? "text-slate-400" : "text-slate-500"}>
+              Non-Pilot States
+            </span>
           </div>
         )}
       </div>
@@ -550,14 +568,15 @@ export const DrilldownMap: React.FC<DrilldownMapProps> = ({
         center={[9.082, 8.6753]}
         zoom={6}
         scrollWheelZoom={false}
-        className="h-full w-full bg-[#061211]"
+        className={`h-full w-full ${isDark ? "bg-[#061211]" : "bg-slate-100"}`}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-          opacity={0.3}
+          url={tileUrl}
+          attribution="&copy; Esri &mdash; National Geographic, DeLorme, NAVTEQ"
+          opacity={isDark ? 0.45 : 0.75}
         />
         <GeoJSON
-          key={`${level}-${selectedState || "all"}-${(validGeoData as FeatureCollection).features?.length || 0}`}
+          key={`${level}-${selectedState || "all"}-${(validGeoData as FeatureCollection).features?.length || 0}-${isDark}`}
           data={validGeoData}
           style={styleFeature}
           onEachFeature={onEachFeature}

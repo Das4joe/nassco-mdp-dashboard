@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Header } from "./components/Header";
 import { Overview } from "./components/domains/GlobalOverview";
 import { CivilRegistration } from "./components/domains/CivilRegistration";
@@ -36,6 +36,19 @@ export const App = () => {
   const [selectedLga, setSelectedLga] = useState<string | null>(null);
   const [selectedWard, setSelectedWard] = useState<string | null>(null);
   const [isDark, setIsDark] = useState<boolean>(true);
+
+  // Synchronize document theme background to prevent light-theme body bleed
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      document.body.style.backgroundColor = "#081514";
+      document.body.style.color = "#f8fafc";
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.style.backgroundColor = "#f1f5f9";
+      document.body.style.color = "#0f172a";
+    }
+  }, [isDark]);
 
   const currentRecord: GeoRecord = useMemo(() => {
     let name = "Nigeria (4 Pilot States)";
@@ -152,7 +165,7 @@ export const App = () => {
   return (
     <div
       className={`min-h-screen font-sans transition-colors duration-200 ${
-        isDark ? "bg-[#081514] text-slate-100" : "bg-slate-50 text-slate-900"
+        isDark ? "bg-[#081514] text-slate-100" : "bg-slate-100 text-slate-900"
       }`}
     >
       <Header
