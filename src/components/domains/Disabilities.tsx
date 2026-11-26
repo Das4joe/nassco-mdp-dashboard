@@ -1,182 +1,290 @@
-import React from "react";
-import type { GeoRecord, DrilldownPath, GeoLevel } from "../../types";
-import KpiCard from "../KpiCard";
-import DrilldownMap from "../DrilldownMap";
-import { Accessibility, Eye, Ear, Footprints, Brain } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import {
+  Accessibility,
+  Baby,
+  Users,
+  ShieldAlert,
+  Layers,
+  Table as TableIcon,
+} from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+import { KpiCard } from "../KpiCard";
+import { DrilldownMap } from "../DrilldownMap";
+import type { GeoRecord, GeoLevel, DrilldownState } from "../../types";
 
 export interface DisabilitiesProps {
   record?: GeoRecord;
-  currentRecord?: GeoRecord;
-  drilldown?: DrilldownPath;
-  selectedState?: string | null;
-  selectedLga?: string | null;
-  states?: GeoRecord[];
-  communities?: GeoRecord[];
-  allCommunities?: GeoRecord[];
-  onSelectLocation?: (name: string, level: GeoLevel | any) => void;
-  onDrilldownChange?: (path: DrilldownPath) => void;
+  activeRecord?: GeoRecord;
+  drilldown?: DrilldownState;
   isDark?: boolean;
 }
 
+const DISABILITY_TYPE_DATA = [
+  { type: "Physical / Mobility", count: 512, pct: 37.2 },
+  { type: "Visual Impairment", count: 384, pct: 27.9 },
+  { type: "Hearing / Speech", count: 192, pct: 14.0 },
+  { type: "Intellectual / Mental", count: 128, pct: 9.3 },
+  { type: "Epilepsy", count: 78, pct: 5.7 },
+  { type: "Multiple / Other", count: 82, pct: 5.9 },
+];
+
+const DISABILITY_TABLE = [
+  {
+    state: "Abia",
+    totalPlwd: 318,
+    childrenPlwd: 52,
+    boys: 28,
+    girls: 24,
+    adultPlwd: 266,
+    topType: "Physical Mobility",
+  },
+  {
+    state: "Benue",
+    totalPlwd: 395,
+    childrenPlwd: 64,
+    boys: 34,
+    girls: 30,
+    adultPlwd: 331,
+    topType: "Physical Mobility",
+  },
+  {
+    state: "Oyo",
+    totalPlwd: 326,
+    childrenPlwd: 51,
+    boys: 27,
+    girls: 24,
+    adultPlwd: 275,
+    topType: "Visual Impairment",
+  },
+  {
+    state: "Sokoto",
+    totalPlwd: 337,
+    childrenPlwd: 54,
+    boys: 29,
+    girls: 25,
+    adultPlwd: 283,
+    topType: "Visual Impairment",
+  },
+];
+
 export const Disabilities: React.FC<DisabilitiesProps> = ({
   record,
-  currentRecord,
-  drilldown = { state: null, lga: null, community: null },
-  selectedState,
-  selectedLga,
-  states = [],
-  communities = [],
-  allCommunities,
-  onSelectLocation,
-  onDrilldownChange,
+  activeRecord,
   isDark = true,
 }) => {
-  const activeRecord: GeoRecord = record ||
-    currentRecord || {
-      total_individuals: 138676,
-      pwd_count: 7211,
-      pwd_vision: 2596,
-      pwd_mobility: 2019,
-      pwd_hearing: 1298,
-      pwd_cognitive: 865,
-      pwd_selfcare: 433,
-    };
+  const [geoLevel, setGeoLevel] = useState<GeoLevel>("national");
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedLga, setSelectedLga] = useState<string | null>(null);
+  const [selectedWard, setSelectedWard] = useState<string | null>(null);
 
-  const commsList = communities.length > 0 ? communities : allCommunities || [];
-
-  const individuals =
-    activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
-  const plwdCount = activeRecord.pwd_count ?? Math.round(individuals * 0.052);
-  const plwdPct =
-    individuals > 0 ? ((plwdCount / individuals) * 100).toFixed(1) : "5.2";
-
-  const vision = activeRecord.pwd_vision ?? Math.round(plwdCount * 0.36);
-  const mobility = activeRecord.pwd_mobility ?? Math.round(plwdCount * 0.28);
-  const hearing = activeRecord.pwd_hearing ?? Math.round(plwdCount * 0.18);
-  const cognitive = activeRecord.pwd_cognitive ?? Math.round(plwdCount * 0.12);
-  const selfcare = activeRecord.pwd_selfcare ?? Math.round(plwdCount * 0.06);
+  const active = record || activeRecord;
 
   return (
-    <div className="space-y-6">
-      {/* 4 PLWD KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-4">
+      {/* LAYER 1: 4 KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <KpiCard
-          title="Total PLWD Identified"
-          value={plwdCount.toLocaleString()}
-          subtitle={`${plwdPct}% of registered population`}
-          tag="Washington Group"
-          accentColor="#A855F7"
-          icon={<Accessibility className="w-5 h-5" />}
+          title="Total PLWD"
+          value="1,376"
+          subtitle="Persons living with disabilities"
+          tag="WASHINGTON GROUP"
+          tone="warning"
           isDark={isDark}
+          icon={Accessibility}
         />
         <KpiCard
-          title="Visual Difficulty"
-          value={vision.toLocaleString()}
-          subtitle={`${((vision / plwdCount) * 100).toFixed(1)}% of all disabilities`}
-          tag="Sight Impairment"
-          accentColor="#38BDF8"
-          icon={<Eye className="w-5 h-5" />}
+          title="Children PLWD (0 - 17)"
+          value="221"
+          subtitle="16.1% of all PLWD"
+          tag="CHILD PLWD"
+          tone="critical"
           isDark={isDark}
+          icon={Baby}
         />
         <KpiCard
-          title="Physical & Mobility"
-          value={mobility.toLocaleString()}
-          subtitle={`${((mobility / plwdCount) * 100).toFixed(1)}% walking/movement barriers`}
-          tag="Mobility"
-          accentColor="#2DD4BF"
-          icon={<Footprints className="w-5 h-5" />}
+          title="Adults PLWD (18+)"
+          value="1,155"
+          subtitle="83.9% of all PLWD"
+          tag="ADULT PLWD"
+          tone="neutral"
           isDark={isDark}
+          icon={Users}
         />
         <KpiCard
-          title="Hearing & Speech"
-          value={hearing.toLocaleString()}
-          subtitle={`${((hearing / plwdCount) * 100).toFixed(1)}% hearing impairments`}
-          tag="Hearing"
-          accentColor="#F59E0B"
-          icon={<Ear className="w-5 h-5" />}
+          title="Children PLWD by Gender"
+          value="118 Boys / 103 Girls"
+          subtitle="Boys: 53.4% | Girls: 46.6%"
+          tag="GENDER SPLIT"
+          tone="warning"
           isDark={isDark}
+          icon={ShieldAlert}
         />
       </div>
 
-      {/* Embedded Authentic Boundary Drilldown Map */}
-      <div className="w-full">
-        <DrilldownMap
-          record={activeRecord}
-          currentRecord={activeRecord}
-          selectedState={selectedState || drilldown.state}
-          selectedLga={selectedLga || drilldown.lga}
-          drilldown={drilldown}
-          states={states}
-          communities={commsList}
-          onSelectLocation={onSelectLocation}
-          onDrilldownChange={onDrilldownChange}
-          isDark={isDark}
-        />
-      </div>
+      {/* 2-COLUMN LAYER */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* LAYER 2 (Left, 55%): Leaflet Vector GIS Map */}
+        <div className="lg:col-span-7 flex flex-col rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="h-4 w-4 text-teal-400" />
+              <h3 className="text-sm font-semibold text-white">
+                Disability Concentration Spatial Matrix
+              </h3>
+            </div>
+            <span className="rounded bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-300 border border-teal-500/30 uppercase">
+              {geoLevel} Level
+            </span>
+          </div>
 
-      {/* Functional Difficulty Breakdown */}
-      <div
-        className={`p-5 rounded-2xl border ${
-          isDark
-            ? "bg-slate-900/90 border-slate-700/80"
-            : "bg-white border-slate-200"
-        } shadow-lg`}
-      >
-        <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
-          <Brain className="w-4 h-4 text-purple-400" />
-          Washington Group Functional Difficulty Categories
-        </h3>
+          <div className="h-[490px] w-full rounded-lg overflow-hidden border border-[#134e4a]/30">
+            <DrilldownMap
+              level={geoLevel}
+              selectedState={selectedState}
+              selectedLga={selectedLga}
+              selectedWard={selectedWard}
+              onSelectState={(st: string) => {
+                setSelectedState(st);
+                setGeoLevel("state");
+              }}
+              onSelectLga={(lg: string) => {
+                setSelectedLga(lg);
+                setGeoLevel("lga");
+              }}
+              onSelectWard={(wd: string) => {
+                setSelectedWard(wd);
+                setGeoLevel("ward");
+              }}
+              onReset={() => {
+                setSelectedState(null);
+                setSelectedLga(null);
+                setSelectedWard(null);
+                setGeoLevel("national");
+              }}
+              isDark={isDark}
+              activeDomain="disabilities"
+              record={active}
+            />
+          </div>
+        </div>
 
-        <div className="space-y-4">
-          {[
-            {
-              label: "Vision / Sight Impairment",
-              count: vision,
-              color: "bg-sky-400",
-            },
-            {
-              label: "Mobility / Walking Impairment",
-              count: mobility,
-              color: "bg-teal-400",
-            },
-            {
-              label: "Hearing Impairment",
-              count: hearing,
-              color: "bg-amber-400",
-            },
-            {
-              label: "Cognitive / Memory Impairment",
-              count: cognitive,
-              color: "bg-purple-400",
-            },
-            {
-              label: "Self-Care / Washing Difficulty",
-              count: selfcare,
-              color: "bg-rose-400",
-            },
-          ].map((item, idx) => {
-            const pct = ((item.count / plwdCount) * 100).toFixed(1);
-            return (
-              <div key={idx} className="space-y-1.5">
-                <div className="flex justify-between text-xs font-semibold">
-                  <span
-                    className={isDark ? "text-slate-200" : "text-slate-700"}
-                  >
-                    {item.label}
-                  </span>
-                  <span className="text-white font-bold">
-                    {item.count.toLocaleString()} ({pct}%)
-                  </span>
-                </div>
-                <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
-                  <div
-                    className={`h-full ${item.color} rounded-full`}
-                    style={{ width: `${pct}%` }}
+        {/* LAYER 3 (Right, 45%): Analytics Chart */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
+          <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur flex-1">
+            <h4 className="text-xs font-semibold text-teal-300 mb-1">
+              Impairment Breakdown (Washington Group)
+            </h4>
+            <div className="h-96 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={DISABILITY_TYPE_DATA}
+                  layout="vertical"
+                  margin={{ top: 10, right: 20, left: 60, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#134e4a"
+                    opacity={0.3}
                   />
-                </div>
-              </div>
-            );
-          })}
+                  <XAxis
+                    type="number"
+                    stroke="#94a3b8"
+                    tick={{ fontSize: 10 }}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="type"
+                    stroke="#94a3b8"
+                    tick={{ fontSize: 10 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#071c1a",
+                      borderColor: "#134e4a",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                      color: "#fff",
+                    }}
+                  />
+                  <Bar dataKey="count" fill="#2DD4BF" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* LAYER 4: Bottom Table */}
+      <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-4 shadow-md backdrop-blur">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TableIcon className="h-4 w-4 text-teal-400" />
+            <h3 className="text-sm font-semibold text-white">
+              State-by-State Disability Profile & Assistive Device Targeting
+            </h3>
+          </div>
+          <span className="text-xs text-slate-400">
+            NASSCO Disability Microdata Profile
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-[#134e4a]/60 bg-[#071c1a]/80 text-teal-300">
+                <th className="py-2.5 px-3 font-semibold">Pilot State</th>
+                <th className="py-2.5 px-3 font-semibold text-right">
+                  Total PLWD
+                </th>
+                <th className="py-2.5 px-3 font-semibold text-right">
+                  Children PLWD
+                </th>
+                <th className="py-2.5 px-3 font-semibold text-right">
+                  Boys / Girls
+                </th>
+                <th className="py-2.5 px-3 font-semibold text-right">
+                  Adults PLWD
+                </th>
+                <th className="py-2.5 px-3 font-semibold">
+                  Primary Impairment
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#134e4a]/30 text-slate-200">
+              {DISABILITY_TABLE.map((row, idx) => (
+                <tr
+                  key={idx}
+                  className="hover:bg-[#134e4a]/20 transition-colors"
+                >
+                  <td className="py-2.5 px-3 font-medium text-white">
+                    {row.state}
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono font-bold text-teal-300">
+                    {row.totalPlwd.toLocaleString()}
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono text-amber-300">
+                    {row.childrenPlwd.toLocaleString()}
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono">
+                    {row.boys} / {row.girls}
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono">
+                    {row.adultPlwd.toLocaleString()}
+                  </td>
+                  <td className="py-2.5 px-3">{row.topType}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

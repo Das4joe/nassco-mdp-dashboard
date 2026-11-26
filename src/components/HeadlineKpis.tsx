@@ -1,92 +1,65 @@
-import React from "react";
-import type { GeoRecord, DashboardMode } from "../lib/types";
+import type React from "react";
+import { Users, Home, Baby, ShieldCheck, HeartHandshake } from "lucide-react";
 import { KpiCard } from "./KpiCard";
+import type { GeoRecord } from "../types";
 
 interface HeadlineKpisProps {
-  record: GeoRecord;
-  mode?: DashboardMode;
+  data?: GeoRecord;
   isDark?: boolean;
 }
 
 export const HeadlineKpis: React.FC<HeadlineKpisProps> = ({
-  record,
-  mode = "overview",
-  isDark = false,
+  data,
+  isDark = true,
 }) => {
-  const isUpdate = String(mode) === "update";
-
-  const totalHh =
-    record.demographics?.total_hh ||
-    record.households ||
-    record.total_hh ||
-    record.total_households ||
-    0;
-
-  const totalInd =
-    record.demographics?.total_individuals ||
-    record.individuals ||
-    record.total_ind ||
-    record.total_individuals ||
-    0;
-
-  const totalChildren =
-    record.demographics?.children_0_17 ||
-    record.demographics?.total_children ||
-    0;
-
-  const withBothPct =
-    record.civil_registration?.total_with_both_pct ||
-    (record.civil_registration?.children_with_bc_and_nin && totalChildren > 0
-      ? (record.civil_registration.children_with_bc_and_nin / totalChildren) *
-        100
-      : 24.5);
-
-  const femaleHeadedPct =
-    record.livelihoods_shocks?.female_headed_households_pct ||
-    (totalHh > 0 && record.demographics?.female_headed_hh
-      ? (record.demographics.female_headed_hh / totalHh) * 100
-      : 28.4);
+  const totalHh = data?.households ?? 41512;
+  const totalInd = data?.individuals ?? 138676;
+  const totalChildren = data?.children017 ?? 57688;
+  const ninCoverage = data?.ninCoverage ?? 29.8;
+  const femaleHhPct = data?.femaleHeadedHhPct ?? 18.4;
+  const isUpdate = Boolean(data?.isUpdated);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
       <KpiCard
-        title="TOTAL HOUSEHOLDS"
-        value={
-          isUpdate
-            ? (record.update?.updated_hh ?? totalHh).toLocaleString()
-            : totalHh.toLocaleString()
-        }
+        title="Total Households"
+        value={totalHh}
         tag={isUpdate ? "RECENT UPDATE" : "BASELINE"}
-        accentColor="#002F6C"
+        accentColor="teal"
         isDark={isDark}
+        icon={Home}
       />
       <KpiCard
-        title="TOTAL INDIVIDUALS"
+        title="Total Individuals"
         value={totalInd.toLocaleString()}
         tag="ALL MEMBERS"
-        accentColor="#2563EB"
+        accentColor="teal"
         isDark={isDark}
+        icon={Users}
       />
       <KpiCard
-        title="CHILDREN (0–17)"
+        title="Children (0-17)"
         value={totalChildren.toLocaleString()}
         tag={`${totalInd > 0 ? ((totalChildren / totalInd) * 100).toFixed(1) : 0}% POP`}
-        accentColor="#10B981"
+        accentColor="teal"
         isDark={isDark}
+        icon={Baby}
       />
       <KpiCard
-        title="BOTH BC & NIN %"
-        value={`${Number(withBothPct).toFixed(1)}%`}
+        title="NIN Coverage"
+        value={`${ninCoverage}%`}
         tag="ID COVERAGE"
-        accentColor="#F59E0B"
+        accentColor="teal"
         isDark={isDark}
+        icon={ShieldCheck}
       />
       <KpiCard
-        title="FEMALE-HEADED HH"
-        value={`${Number(femaleHeadedPct).toFixed(1)}%`}
+        title="Female Headed HH"
+        value={`${femaleHhPct}%`}
         tag="RESILIENCE"
-        accentColor="#8B5CF6"
+        accentColor="teal"
         isDark={isDark}
+        icon={HeartHandshake}
       />
     </div>
   );

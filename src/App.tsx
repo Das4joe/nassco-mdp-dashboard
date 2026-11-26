@@ -1,316 +1,175 @@
-import React, { useState, useEffect, useMemo } from "react";
-import type { DomainId, GeoLevel, DrilldownPath, GeoRecord } from "./types";
-import { loadAllData } from "./lib/loadData";
-import Header from "./components/Header";
-import GlobalOverview from "./components/domains/GlobalOverview";
-import CivilRegistration from "./components/domains/CivilRegistration";
-import Education from "./components/domains/Education";
-import HealthNutrition from "./components/domains/HealthNutrition";
-import Disabilities from "./components/domains/Disabilities";
-import LivelihoodsResilience from "./components/domains/LivelihoodsResilience";
-import { Sun, Moon, Database } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Header } from "./components/Header";
+import { Overview } from "./components/domains/GlobalOverview";
+import { CivilRegistration } from "./components/domains/CivilRegistration";
+import { Education } from "./components/domains/Education";
+import { HealthNutrition } from "./components/domains/HealthNutrition";
+import { Disabilities } from "./components/domains/Disabilities";
+import { LivelihoodsResilience } from "./components/domains/LivelihoodsResilience";
+import type { DomainId, GeoLevel, GeoRecord } from "./types";
 
-export const App: React.FC = () => {
+const BASELINE_DATA: GeoRecord = {
+  id: "NG-NATIONAL",
+  name: "Nigeria (4 Pilot States)",
+  level: "national",
+  households: 41512,
+  individuals: 138676,
+  males: 70312,
+  females: 68364,
+  children017: 57688,
+  youth1824: 19012,
+  communities: 864,
+  ninCoverage: 29.8,
+  femaleHeadedHhPct: 18.4,
+  birthCertCoverage: 42.6,
+  ooscTotal: 17240,
+  plwdTotal: 1376,
+  pregnantWomen: 2483,
+  lactatingMothers: 7180,
+  isUpdated: false,
+};
+
+export const App = () => {
   const [activeDomain, setActiveDomain] = useState<DomainId>("overview");
-  const [drilldown, setDrilldown] = useState<DrilldownPath>({
-    state: null,
-    lga: null,
-    community: null,
-  });
+  const [geoLevel, setGeoLevel] = useState<GeoLevel>("national");
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedLga, setSelectedLga] = useState<string | null>(null);
+  const [selectedWard, setSelectedWard] = useState<string | null>(null);
   const [isDark, setIsDark] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(true);
 
-  // Geo Data Store
-  const [nationalRecord, setNationalRecord] = useState<GeoRecord | null>(null);
-  const [states, setStates] = useState<GeoRecord[]>([]);
-  const [lgas, setLgas] = useState<GeoRecord[]>([]);
-  const [communities, setCommunities] = useState<GeoRecord[]>([]);
+  const currentRecord: GeoRecord = useMemo(() => {
+    let name = "Nigeria (4 Pilot States)";
+    let id = "NG-NATIONAL";
+    let households = 41512;
+    let individuals = 138676;
+    let children017 = 57688;
+    let youth1824 = 19012;
+    let communities = 864;
 
-  useEffect(() => {
-    async function initData() {
-      try {
-        setLoading(true);
-        const data = await loadAllData();
-        setNationalRecord(data.national);
-        setStates(data.states);
-        setLgas(data.lgas);
-        setCommunities(data.communities);
-      } catch (err) {
-        console.error("Failed to load dataset:", err);
-      } finally {
-        setLoading(false);
+    if (selectedWard && selectedLga && selectedState) {
+      name = `${selectedWard} Ward, ${selectedLga}`;
+      id = `WARD-${selectedWard}`;
+      households = 420;
+      individuals = 1380;
+      children017 = 580;
+      youth1824 = 190;
+      communities = 8;
+    } else if (selectedLga && selectedState) {
+      name = `${selectedLga} LGA, ${selectedState}`;
+      id = `LGA-${selectedLga}`;
+      households = 1420;
+      individuals = 4750;
+      children017 = 1980;
+      youth1824 = 650;
+      communities = 28;
+    } else if (selectedState) {
+      name = `${selectedState} State`;
+      id = `STATE-${selectedState}`;
+      if (selectedState.toLowerCase().includes("abia")) {
+        households = 9842;
+        individuals = 31820;
+        children017 = 13240;
+        youth1824 = 4360;
+        communities = 204;
+      } else if (selectedState.toLowerCase().includes("benue")) {
+        households = 11430;
+        individuals = 39114;
+        children017 = 16270;
+        youth1824 = 5360;
+        communities = 238;
+      } else if (selectedState.toLowerCase().includes("oyo")) {
+        households = 10120;
+        individuals = 33640;
+        children017 = 13990;
+        youth1824 = 4610;
+        communities = 210;
+      } else if (selectedState.toLowerCase().includes("sokoto")) {
+        households = 10120;
+        individuals = 34102;
+        children017 = 14188;
+        youth1824 = 4682;
+        communities = 212;
       }
     }
-    initData();
-  }, []);
 
-  const handleSelectLocation = (name: string, level: GeoLevel) => {
-    if (level === "national" || name === "National") {
-      setDrilldown({ state: null, lga: null, community: null });
-    } else if (level === "state") {
-      setDrilldown({ state: name, lga: null, community: null });
-    } else if (level === "lga") {
-      setDrilldown((prev) => ({ ...prev, lga: name, community: null }));
-    } else if (level === "community") {
-      setDrilldown((prev) => ({ ...prev, community: name }));
-    }
+    return {
+      ...BASELINE_DATA,
+      id,
+      name,
+      level: geoLevel,
+      households,
+      individuals,
+      children017,
+      youth1824,
+      communities,
+    };
+  }, [selectedState, selectedLga, selectedWard, geoLevel]);
+
+  const handleResetGeo = () => {
+    setSelectedState(null);
+    setSelectedLga(null);
+    setSelectedWard(null);
+    setGeoLevel("national");
   };
 
-  const handleDrilldownChange = (path: DrilldownPath) => {
-    setDrilldown(path);
+  const renderActiveDomain = () => {
+    const domainProps = {
+      record: currentRecord,
+      activeRecord: currentRecord,
+      isDark,
+      drilldown: {
+        level: geoLevel,
+        state: selectedState,
+        lga: selectedLga,
+        ward: selectedWard,
+      },
+    };
+
+    switch (activeDomain) {
+      case "overview":
+      case "demographics":
+        return <Overview {...domainProps} />;
+      case "civil-registration":
+      case "civilRegistration":
+        return <CivilRegistration {...domainProps} />;
+      case "education":
+        return <Education {...domainProps} />;
+      case "health-nutrition":
+      case "healthNutrition":
+      case "health":
+        return <HealthNutrition {...domainProps} />;
+      case "disabilities":
+      case "disability":
+        return <Disabilities {...domainProps} />;
+      case "livelihoods-resilience":
+      case "livelihoods":
+        return <LivelihoodsResilience {...domainProps} />;
+      default:
+        return <Overview {...domainProps} />;
+    }
   };
-
-  // Resolve current active GeoRecord
-  const activeRecord: GeoRecord = useMemo(() => {
-    if (drilldown.community && communities.length > 0) {
-      const match = communities.find(
-        (c) =>
-          (c.community_name || c.name || "").toLowerCase() ===
-          drilldown.community?.toLowerCase(),
-      );
-      if (match) return match;
-    }
-    if (drilldown.lga && lgas.length > 0) {
-      const match = lgas.find(
-        (l) =>
-          (l.lga_name || l.name || "").toLowerCase() ===
-          drilldown.lga?.toLowerCase(),
-      );
-      if (match) return match;
-    }
-    if (drilldown.state && states.length > 0) {
-      const match = states.find(
-        (s) =>
-          (s.state_name || s.name || "").toLowerCase() ===
-          drilldown.state?.toLowerCase(),
-      );
-      if (match) return match;
-    }
-    return (
-      nationalRecord || {
-        id: "NGA",
-        name: "Nigeria (4 Pilot States)",
-        level: "national",
-        total_households: 41512,
-        total_individuals: 138676,
-        male: 70312,
-        female: 68364,
-        children_0_17: 57688,
-        youth_18_24: 19012,
-        adults_25_59: 48750,
-        elderly_60_plus: 13226,
-      }
-    );
-  }, [drilldown, communities, lgas, states, nationalRecord]);
-
-  const filteredCommunities = useMemo(() => {
-    if (!drilldown.state) return communities;
-    return communities.filter(
-      (c) =>
-        (c.state_name || "").toLowerCase() === drilldown.state?.toLowerCase(),
-    );
-  }, [communities, drilldown.state]);
-
-  const domainNavItems: { id: DomainId; label: string }[] = [
-    { id: "overview", label: "Overview" },
-    { id: "civil_registration", label: "Civil Registration" },
-    { id: "education", label: "Education" },
-    { id: "health_nutrition", label: "Health & Nutrition" },
-    { id: "disabilities", label: "Disabilities (PLWD)" },
-    { id: "livelihoods", label: "Livelihoods & Resilience" },
-  ];
-
-  if (loading) {
-    return (
-      <div
-        className={`min-h-screen flex flex-col items-center justify-center ${isDark ? "bg-slate-950 text-slate-100" : "bg-slate-100 text-slate-900"}`}
-      >
-        <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <div className="text-base font-semibold tracking-wide">
-          Loading NASSCO UNICEF MDP Dataset...
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
-      className={`min-h-screen flex flex-col transition-colors duration-200 ${
-        isDark ? "bg-slate-950 text-slate-100" : "bg-slate-100 text-slate-800"
+      className={`min-h-screen font-sans transition-colors duration-200 ${
+        isDark ? "bg-[#081514] text-slate-100" : "bg-slate-50 text-slate-900"
       }`}
     >
-      {/* Top Header */}
       <Header
         activeDomain={activeDomain}
-        onSelectDomain={setActiveDomain}
+        onDomainChange={setActiveDomain}
+        geoLevel={geoLevel}
+        selectedState={selectedState}
+        selectedLga={selectedLga}
+        selectedWard={selectedWard}
+        onResetGeo={handleResetGeo}
         isDark={isDark}
+        onToggleTheme={() => setIsDark(!isDark)}
       />
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Navigation Bar & Mode Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-800">
-          {/* Domain Tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900/60 border border-slate-800/80 shadow-inner">
-            {domainNavItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveDomain(item.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeDomain === item.id ||
-                  (item.id === "civil_registration" &&
-                    activeDomain === "civil_reg") ||
-                  (item.id === "livelihoods" &&
-                    activeDomain === "livelihoods_resilience")
-                    ? "bg-teal-500 text-slate-950 shadow-md font-bold"
-                    : isDark
-                      ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Controls: Theme & Microdata Status */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-medium">
-              <Database className="w-3.5 h-3.5" />
-              <span>138,676 NSR Records</span>
-            </div>
-
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className={`p-2 rounded-lg border transition-colors ${
-                isDark
-                  ? "bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-800"
-                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-              }`}
-              title="Toggle Theme"
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Active Domain View Content */}
-        <div className="transition-opacity duration-300">
-          {(activeDomain === "overview" || activeDomain === "demographics") && (
-            <GlobalOverview
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-
-          {(activeDomain === "civil_registration" ||
-            activeDomain === "civil_reg") && (
-            <CivilRegistration
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-
-          {activeDomain === "education" && (
-            <Education
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-
-          {activeDomain === "health_nutrition" && (
-            <HealthNutrition
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-
-          {activeDomain === "disabilities" && (
-            <Disabilities
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-
-          {(activeDomain === "livelihoods" ||
-            activeDomain === "livelihoods_resilience") && (
-            <LivelihoodsResilience
-              record={activeRecord}
-              currentRecord={activeRecord}
-              drilldown={drilldown}
-              selectedState={drilldown.state}
-              selectedLga={drilldown.lga}
-              states={states}
-              communities={filteredCommunities}
-              allCommunities={filteredCommunities}
-              onSelectLocation={handleSelectLocation}
-              onDrilldownChange={handleDrilldownChange}
-              isDark={isDark}
-            />
-          )}
-        </div>
+      <main className="mx-auto max-w-[1720px] px-3 sm:px-4 lg:px-6 py-4 space-y-4">
+        {renderActiveDomain()}
       </main>
-
-      {/* Footer */}
-      <footer
-        className={`py-4 border-t text-center text-xs ${
-          isDark
-            ? "border-slate-800 text-slate-500 bg-slate-950"
-            : "border-slate-200 text-slate-500 bg-white"
-        }`}
-      >
-        Federal Republic of Nigeria — National Social Safety-Nets Coordinating
-        Office (NASSCO) & UNICEF Section 3
-      </footer>
     </div>
   );
 };
