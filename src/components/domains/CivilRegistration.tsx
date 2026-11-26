@@ -45,14 +45,12 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
     activeRecord.total_individuals ?? activeRecord.individuals ?? 138676;
   const children = activeRecord.children_0_17 ?? 57688;
 
-  // Birth Certificate metrics
   const birthCertHas =
     activeRecord.birth_cert_has ?? Math.round(children * 0.384);
   const birthCertNo = children - birthCertHas;
   const birthCertCoveragePct =
     children > 0 ? ((birthCertHas / children) * 100).toFixed(1) : "38.4";
 
-  // National Identity Number (NIN) metrics
   const ninHas = activeRecord.nin_has ?? Math.round(individuals * 0.292);
   const ninNo = individuals - ninHas;
   const ninCoveragePct =
@@ -100,7 +98,7 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
         />
       </div>
 
-      {/* Embedded Vector Drilldown Map */}
+      {/* Embedded Authentic Boundary Drilldown Map */}
       <div className="w-full">
         <DrilldownMap
           record={activeRecord}
@@ -122,19 +120,19 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
-          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
             <FileCheck className="w-4 h-4 text-teal-400" />
             Child Birth Registration (Under-18)
           </h3>
           <div className="space-y-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-teal-400">Has NPC Birth Certificate</span>
-                <span className="text-slate-200">
+                <span className="text-white font-bold">
                   {birthCertHas.toLocaleString()} ({birthCertCoveragePct}%)
                 </span>
               </div>
@@ -146,10 +144,10 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-rose-400">No Birth Certificate</span>
-                <span className="text-slate-200">
+                <span className="text-white font-bold">
                   {birthCertNo.toLocaleString()} (
                   {(100 - parseFloat(birthCertCoveragePct)).toFixed(1)}%)
                 </span>
@@ -170,19 +168,19 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
-          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
             <CreditCard className="w-4 h-4 text-sky-400" />
             National Identification Number (NIN) Coverage
           </h3>
           <div className="space-y-4">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-sky-400">Enrolled with Valid NIN</span>
-                <span className="text-slate-200">
+                <span className="text-white font-bold">
                   {ninHas.toLocaleString()} ({ninCoveragePct}%)
                 </span>
               </div>
@@ -194,10 +192,10 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-amber-400">No NIN Enrolment</span>
-                <span className="text-slate-200">
+                <span className="text-white font-bold">
                   {ninNo.toLocaleString()} (
                   {(100 - parseFloat(ninCoveragePct)).toFixed(1)}%)
                 </span>

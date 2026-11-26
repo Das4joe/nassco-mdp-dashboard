@@ -53,7 +53,6 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
   const households =
     activeRecord.total_households ?? activeRecord.households ?? 41512;
 
-  // Non-zero calculation for Female-Headed HHs
   const femaleHeadedCount =
     activeRecord.female_headed_hh ?? Math.round(households * 0.184);
   const femaleHeadedPct =
@@ -118,7 +117,7 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         />
       </div>
 
-      {/* Embedded Vector Drilldown Map */}
+      {/* Embedded Authentic Boundary Drilldown Map */}
       <div className="w-full">
         <DrilldownMap
           record={activeRecord}
@@ -140,11 +139,11 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
-          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
             <Briefcase className="w-4 h-4 text-teal-400" />
             Primary Income Source Breakdown
           </h3>
@@ -177,14 +176,14 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 color: "bg-pink-400",
               },
             ].map((item, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold">
                   <span
-                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                    className={isDark ? "text-slate-200" : "text-slate-700"}
                   >
                     {item.label}
                   </span>
-                  <span className="text-slate-200 font-bold">{item.pct}</span>
+                  <span className="text-white font-bold">{item.pct}</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
                   <div
@@ -201,11 +200,11 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
-          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+          <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
             <AlertTriangle className="w-4 h-4 text-rose-400" />
             Household Distress Coping Strategies
           </h3>
@@ -233,14 +232,14 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
                 color: "bg-yellow-400",
               },
             ].map((item, idx) => (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold">
                   <span
-                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                    className={isDark ? "text-slate-200" : "text-slate-700"}
                   >
                     {item.label}
                   </span>
-                  <span className="text-slate-200 font-bold">{item.pct}</span>
+                  <span className="text-white font-bold">{item.pct}</span>
                 </div>
                 <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
                   <div

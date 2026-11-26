@@ -50,7 +50,6 @@ export const Disabilities: React.FC<DisabilitiesProps> = ({
   const plwdPct =
     individuals > 0 ? ((plwdCount / individuals) * 100).toFixed(1) : "5.2";
 
-  // Washington Group Domains
   const vision = activeRecord.pwd_vision ?? Math.round(plwdCount * 0.36);
   const mobility = activeRecord.pwd_mobility ?? Math.round(plwdCount * 0.28);
   const hearing = activeRecord.pwd_hearing ?? Math.round(plwdCount * 0.18);
@@ -99,7 +98,7 @@ export const Disabilities: React.FC<DisabilitiesProps> = ({
         />
       </div>
 
-      {/* Embedded Vector Drilldown Map */}
+      {/* Embedded Authentic Boundary Drilldown Map */}
       <div className="w-full">
         <DrilldownMap
           record={activeRecord}
@@ -119,11 +118,11 @@ export const Disabilities: React.FC<DisabilitiesProps> = ({
       <div
         className={`p-5 rounded-2xl border ${
           isDark
-            ? "bg-slate-900/80 border-slate-800"
+            ? "bg-slate-900/90 border-slate-700/80"
             : "bg-white border-slate-200"
         } shadow-lg`}
       >
-        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+        <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
           <Brain className="w-4 h-4 text-purple-400" />
           Washington Group Functional Difficulty Categories
         </h3>
@@ -158,14 +157,14 @@ export const Disabilities: React.FC<DisabilitiesProps> = ({
           ].map((item, idx) => {
             const pct = ((item.count / plwdCount) * 100).toFixed(1);
             return (
-              <div key={idx} className="space-y-1">
+              <div key={idx} className="space-y-1.5">
                 <div className="flex justify-between text-xs font-semibold">
                   <span
-                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                    className={isDark ? "text-slate-200" : "text-slate-700"}
                   >
                     {item.label}
                   </span>
-                  <span className="text-slate-200 font-bold">
+                  <span className="text-white font-bold">
                     {item.count.toLocaleString()} ({pct}%)
                   </span>
                 </div>

@@ -64,7 +64,7 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
   const avgHhSize =
     households > 0 ? (individuals / households).toFixed(1) : "3.3";
 
-  // Age cohorts
+  // Cohorts
   const children = activeRecord.children_0_17 ?? 57688;
   const youth = activeRecord.youth_18_24 ?? 19012;
   const adults = activeRecord.adults_25_59 ?? 48750;
@@ -117,7 +117,7 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
         />
       </div>
 
-      {/* Main Vector Drilldown Map Section */}
+      {/* Main Authentic Boundary Drilldown Map Section */}
       <div className="w-full">
         <DrilldownMap
           record={activeRecord}
@@ -133,22 +133,22 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
         />
       </div>
 
-      {/* Demographics & Age Pyramid Section */}
+      {/* Demographics & Age Cohort Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Population Cohort Breakdown */}
+        {/* Population Age Cohorts */}
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
               <Layers className="w-4 h-4 text-teal-400" />
               Population Age Pyramid & Cohorts
             </h3>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-semibold">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-bold border border-teal-500/40">
               4 Pilot States
             </span>
           </div>
@@ -180,14 +180,14 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                 color: "bg-indigo-400",
               },
             ].map((item, idx) => (
-              <div key={idx} className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
+              <div key={idx} className="space-y-1.5">
+                <div className="flex justify-between text-xs font-semibold">
                   <span
-                    className={isDark ? "text-slate-300" : "text-slate-700"}
+                    className={isDark ? "text-slate-200" : "text-slate-700"}
                   >
                     {item.label}
                   </span>
-                  <span className="font-bold text-slate-200">
+                  <span className="font-bold text-white">
                     {item.count.toLocaleString()} ({item.pct}%)
                   </span>
                 </div>
@@ -201,34 +201,38 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
             ))}
           </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-            <span>
+          <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-medium">
+            <span className="text-slate-300">
               Male:{" "}
-              <strong className="text-sky-400">{male.toLocaleString()}</strong>
+              <strong className="text-sky-400 font-bold">
+                {male.toLocaleString()}
+              </strong>
             </span>
-            <span>
+            <span className="text-slate-300">
               Female:{" "}
-              <strong className="text-rose-400">
+              <strong className="text-rose-400 font-bold">
                 {female.toLocaleString()} ({femalePct}%)
               </strong>
             </span>
           </div>
         </div>
 
-        {/* State Summary Cards */}
+        {/* Pilot State Summary Navigation Cards */}
         <div
           className={`p-5 rounded-2xl border ${
             isDark
-              ? "bg-slate-900/80 border-slate-800"
+              ? "bg-slate-900/90 border-slate-700/80"
               : "bg-white border-slate-200"
           } shadow-lg`}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
               <MapPin className="w-4 h-4 text-teal-400" />
               Pilot State Coverage Summary
             </h3>
-            <span className="text-xs text-slate-400">Target Geographies</span>
+            <span className="text-xs text-slate-300 font-semibold">
+              Target Geographies
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -248,7 +252,7 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   st.name.toLowerCase()
                     ? "bg-teal-500/20 border-teal-500/60 shadow-lg shadow-teal-500/10"
                     : isDark
-                      ? "bg-slate-800/60 border-slate-700/60 hover:bg-slate-800"
+                      ? "bg-slate-800/80 border-slate-700 hover:bg-slate-800"
                       : "bg-slate-50 border-slate-200 hover:bg-slate-100"
                 }`}
               >
@@ -256,16 +260,18 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
                   <span className="text-sm font-bold text-teal-300">
                     {st.name}
                   </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-300" />
                 </div>
-                <div className="mt-2 text-xs text-slate-400">
-                  <div>
-                    HHs: <strong className="text-slate-200">{st.hhs}</strong>
+                <div className="mt-2 text-xs space-y-0.5">
+                  <div className="text-slate-300">
+                    HHs:{" "}
+                    <strong className="text-white font-bold">{st.hhs}</strong>
                   </div>
-                  <div>
-                    Pop: <strong className="text-slate-200">{st.ind}</strong>
+                  <div className="text-slate-300">
+                    Pop:{" "}
+                    <strong className="text-white font-bold">{st.ind}</strong>
                   </div>
-                  <div className="text-[11px] text-teal-400/90 mt-0.5">
+                  <div className="text-[11px] font-semibold text-teal-400 mt-0.5">
                     {st.lgas}
                   </div>
                 </div>

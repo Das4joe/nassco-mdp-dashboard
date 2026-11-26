@@ -28,77 +28,80 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   tag,
   badge,
   subtitle,
-  accentColor,
-  color,
-  isDark = false,
-  darkMode = false,
+  accentColor = "#2DD4BF",
+  isDark = true,
   icon,
-  trend,
   onClick,
   className = "",
 }) => {
-  const activeDark = isDark || darkMode;
-  const cardTitle = title || label || "";
-  const cardTag = tag || badge || subtitle;
-  const cardColor = accentColor || color || "#002F6C";
+  const displayTitle = title || label || "";
+  const displayTag = tag || badge;
 
   return (
     <div
       onClick={onClick}
-      className={`relative flex flex-col justify-between rounded-xl border p-4 shadow-sm transition-all duration-200 overflow-hidden ${
-        activeDark
-          ? "bg-slate-900/90 border-slate-800 text-slate-100 shadow-slate-950/40"
-          : "bg-white border-slate-200/90 text-slate-900 shadow-slate-100"
-      } ${onClick ? "cursor-pointer hover:border-blue-500 hover:shadow-md" : ""} ${className}`}
+      className={`relative p-5 rounded-2xl border transition-all duration-200 overflow-hidden ${
+        isDark
+          ? "bg-slate-900/90 border-slate-700/80 shadow-lg shadow-black/40 hover:border-slate-600"
+          : "bg-white border-slate-200 shadow-md hover:border-slate-300"
+      } ${onClick ? "cursor-pointer hover:scale-[1.01]" : ""} ${className}`}
     >
-      {/* Top Accent Strip */}
+      {/* Accent Top Border Indicator */}
       <div
-        className="absolute top-0 left-0 right-0 h-1"
-        style={{ backgroundColor: cardColor }}
+        className="absolute top-0 left-0 right-0 h-1 transition-all duration-300"
+        style={{ backgroundColor: accentColor }}
       />
 
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 truncate">
-            {cardTitle}
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <span
+            className={`text-xs font-bold uppercase tracking-wider block ${
+              isDark ? "text-slate-200" : "text-slate-600"
+            }`}
+          >
+            {displayTitle}
           </span>
-          {icon && <span className="text-slate-400 flex-shrink-0">{icon}</span>}
-        </div>
-
-        <div className="flex items-baseline justify-between gap-2 mt-1">
-          <div className="font-mono text-2xl font-black tracking-tight truncate text-slate-900 dark:text-slate-50">
+          <div
+            className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1"
+            style={{ color: accentColor }}
+          >
             {value}
           </div>
         </div>
+
+        {icon && (
+          <div
+            className={`p-2.5 rounded-xl border flex items-center justify-center shrink-0 ${
+              isDark
+                ? "bg-slate-800/80 border-slate-700 text-teal-300"
+                : "bg-slate-100 border-slate-200 text-teal-700"
+            }`}
+          >
+            {icon}
+          </div>
+        )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-2 text-xs">
-        {cardTag && (
+      <div className="mt-4 pt-3 border-t flex flex-wrap items-center justify-between gap-2 border-slate-800/60">
+        {subtitle && (
           <span
-            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase"
-            style={{
-              backgroundColor: `${cardColor}15`,
-              color: cardColor,
-            }}
+            className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-600"}`}
           >
-            {cardTag}
+            {subtitle}
           </span>
         )}
 
-        {trend && (
-          <div
-            className={`flex items-center gap-1 text-[11px] font-semibold ${
-              trend.isPositive ? "text-emerald-600" : "text-red-500"
-            }`}
+        {displayTag && (
+          <span
+            className="text-[11px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-md border"
+            style={{
+              backgroundColor: `${accentColor}18`,
+              borderColor: `${accentColor}50`,
+              color: accentColor,
+            }}
           >
-            <span>{trend.isPositive ? "↑" : "↓"}</span>
-            <span>{trend.value}</span>
-            {trend.label && (
-              <span className="text-slate-400 font-normal ml-0.5">
-                {trend.label}
-              </span>
-            )}
-          </div>
+            {displayTag}
+          </span>
         )}
       </div>
     </div>

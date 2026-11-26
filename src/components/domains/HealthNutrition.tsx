@@ -56,12 +56,10 @@ export const HealthNutrition: React.FC<HealthNutritionProps> = ({
     activeRecord.children_under_5 ??
     Math.round((activeRecord.children_0_17 ?? 57688) * 0.32);
 
-  // MUAC malnutrition counts
   const sam = activeRecord.muac_red_sam ?? Math.round(under5 * 0.048);
   const mam = activeRecord.muac_yellow_mam ?? Math.round(under5 * 0.124);
   const normal = under5 - sam - mam;
 
-  // Chronic Illness & Insurance
   const chronicIll =
     activeRecord.chronic_illness_count ?? Math.round(individuals * 0.086);
   const healthInsured =
@@ -101,7 +99,7 @@ export const HealthNutrition: React.FC<HealthNutritionProps> = ({
         <KpiCard
           title="Health Insurance"
           value={`${((healthInsured / individuals) * 100).toFixed(1)}%`}
-          subtitle="Only minimal NHIS/State scheme coverage"
+          subtitle="NHIS/State health scheme enrolled"
           tag="Safety Net Gap"
           accentColor="#2DD4BF"
           icon={<ShieldCheck className="w-5 h-5" />}
@@ -109,7 +107,7 @@ export const HealthNutrition: React.FC<HealthNutritionProps> = ({
         />
       </div>
 
-      {/* Embedded Vector Drilldown Map */}
+      {/* Embedded Authentic Boundary Drilldown Map */}
       <div className="w-full">
         <DrilldownMap
           record={activeRecord}
@@ -129,49 +127,49 @@ export const HealthNutrition: React.FC<HealthNutritionProps> = ({
       <div
         className={`p-5 rounded-2xl border ${
           isDark
-            ? "bg-slate-900/80 border-slate-800"
+            ? "bg-slate-900/90 border-slate-700/80"
             : "bg-white border-slate-200"
         } shadow-lg`}
       >
-        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2 mb-4">
+        <h3 className="text-base font-bold text-white flex items-center gap-2 mb-4">
           <UtensilsCrossed className="w-4 h-4 text-teal-400" />
           Under-5 MUAC Nutrition Screening Distribution (
           {under5.toLocaleString()} children)
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <div className="text-xs font-semibold text-emerald-400">
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+            <div className="text-xs font-bold text-emerald-400">
               Normal (Green / &gt;125mm)
             </div>
-            <div className="text-2xl font-bold text-white mt-1">
+            <div className="text-2xl font-black text-white mt-1">
               {normal.toLocaleString()}
             </div>
-            <div className="text-xs text-slate-400 mt-1">
+            <div className="text-xs text-slate-300 font-medium mt-1">
               {((normal / under5) * 100).toFixed(1)}% screened normal
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <div className="text-xs font-semibold text-amber-400">
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
+            <div className="text-xs font-bold text-amber-400">
               MAM (Yellow / 115–125mm)
             </div>
-            <div className="text-2xl font-bold text-white mt-1">
+            <div className="text-2xl font-black text-white mt-1">
               {mam.toLocaleString()}
             </div>
-            <div className="text-xs text-slate-400 mt-1">
+            <div className="text-xs text-slate-300 font-medium mt-1">
               {((mam / under5) * 100).toFixed(1)}% moderate risk
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
-            <div className="text-xs font-semibold text-rose-400">
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
+            <div className="text-xs font-bold text-rose-400">
               SAM (Red / &lt;115mm)
             </div>
-            <div className="text-2xl font-bold text-white mt-1">
+            <div className="text-2xl font-black text-white mt-1">
               {sam.toLocaleString()}
             </div>
-            <div className="text-xs text-slate-400 mt-1">
+            <div className="text-xs text-slate-300 font-medium mt-1">
               {((sam / under5) * 100).toFixed(1)}% severe acute
             </div>
           </div>

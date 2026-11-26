@@ -1,4 +1,4 @@
-export type GeoLevel = "national" | "state" | "lga" | "community";
+export type GeoLevel = "national" | "state" | "lga" | "ward" | "community";
 
 export type DomainId =
   | "overview"
@@ -14,6 +14,7 @@ export type DomainId =
 export interface DrilldownPath {
   state: string | null;
   lga: string | null;
+  ward?: string | null;
   community: string | null;
 }
 
@@ -23,6 +24,7 @@ export interface GeoRecord {
   level?: GeoLevel | string;
   state_name?: string;
   lga_name?: string;
+  ward_name?: string;
   community_name?: string;
 
   // Demographics
@@ -72,15 +74,6 @@ export interface GeoRecord {
   zero_productive_assets_pct?: number;
   emergency_coping_pct?: number;
   access_to_credit_pct?: number;
-
-  // Nested Domain Structures (if present in payload)
-  demographics?: Record<string, any>;
-  civil_registration?: Record<string, any>;
-  education?: Record<string, any>;
-  health_nutrition?: Record<string, any>;
-  disabilities?: Record<string, any>;
-  livelihoods_resilience?: Record<string, any>;
-  livelihoods?: Record<string, any>;
 
   [key: string]: any;
 }
