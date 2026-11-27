@@ -1,89 +1,113 @@
 import React from "react";
-import type { LucideIcon } from "lucide-react";
 
 export interface MetricCardItem {
-  id: string;
+  id?: string;
   title: string;
   value: string | number;
-  subtitle: string;
+  subValue?: string;
+  subtitle?: string;
   badge?: string;
-  icon: LucideIcon | React.ComponentType<{ className?: string }>;
-  accentColor?: "emerald" | "teal" | "amber" | "cyan" | "rose" | "indigo";
+  badgeType?: "danger" | "warning" | "success" | "neutral" | "info";
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
-interface SummaryCardsProps {
-  cards: MetricCardItem[];
+export interface SummaryCardsProps {
+  cards?: MetricCardItem[];
+  indicators?: MetricCardItem[];
 }
 
-export const SummaryCards: React.FC<SummaryCardsProps> = ({ cards }) => {
+export const SummaryCards: React.FC<SummaryCardsProps> = ({
+  cards,
+  indicators,
+}) => {
+  const items = cards || indicators || [];
+
+  const getBadgeStyle = (type?: string) => {
+    switch (type) {
+      case "danger":
+        return "bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-900";
+      case "warning":
+        return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-900";
+      case "success":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-900";
+      case "info":
+        return "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/80 dark:text-sky-300 dark:border-sky-900";
+      case "neutral":
+      default:
+        return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700";
+    }
+  };
+
+  const getIconColor = (type?: string) => {
+    switch (type) {
+      case "danger":
+        return "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40";
+      case "warning":
+        return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40";
+      case "success":
+        return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40";
+      case "info":
+        return "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40";
+      default:
+        return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40";
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
-      {cards.map((card) => {
+    <div
+      className={`grid gap-4 ${
+        items.length === 5
+          ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+          : items.length === 4
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+            : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+      }`}
+    >
+      {items.map((card, idx) => {
         const IconComponent = card.icon;
-
-        let badgeStyle =
-          "dark:bg-emerald-950/60 bg-emerald-100/80 dark:text-emerald-300 text-emerald-800 border-emerald-300 dark:border-emerald-800/40";
-        let iconBg =
-          "dark:bg-emerald-900/30 bg-emerald-50 dark:text-emerald-400 text-emerald-600";
-
-        if (card.accentColor === "teal") {
-          badgeStyle =
-            "dark:bg-teal-950/60 bg-teal-100/80 dark:text-teal-300 text-teal-800 border-teal-300 dark:border-teal-800/40";
-          iconBg =
-            "dark:bg-teal-900/30 bg-teal-50 dark:text-teal-400 text-teal-600";
-        } else if (card.accentColor === "amber") {
-          badgeStyle =
-            "dark:bg-amber-950/60 bg-amber-100/80 dark:text-amber-300 text-amber-800 border-amber-300 dark:border-amber-800/40";
-          iconBg =
-            "dark:bg-amber-900/30 bg-amber-50 dark:text-amber-400 text-amber-600";
-        } else if (card.accentColor === "cyan") {
-          badgeStyle =
-            "dark:bg-cyan-950/60 bg-cyan-100/80 dark:text-cyan-300 text-cyan-800 border-cyan-300 dark:border-cyan-800/40";
-          iconBg =
-            "dark:bg-cyan-900/30 bg-cyan-50 dark:text-cyan-400 text-cyan-600";
-        } else if (card.accentColor === "rose") {
-          badgeStyle =
-            "dark:bg-rose-950/60 bg-rose-100/80 dark:text-rose-300 text-rose-800 border-rose-300 dark:border-rose-800/40";
-          iconBg =
-            "dark:bg-rose-900/30 bg-rose-50 dark:text-rose-400 text-rose-600";
-        }
+        const sub = card.subValue || card.subtitle;
 
         return (
           <div
-            key={card.id}
-            className="flex flex-col justify-between p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm hover:shadow transition-all"
+            key={card.id || `${card.title}-${idx}`}
+            className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-xs flex flex-col justify-between transition-all hover:border-emerald-500/50"
           >
-            {/* Card Header: Title & Icon */}
-            <div className="flex items-center justify-between space-x-2 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider dark:text-slate-400 text-slate-600 truncate">
+            <div className="flex items-start justify-between space-x-2">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-400 leading-tight">
                 {card.title}
               </span>
-              <div className={`p-1.5 rounded-lg flex-shrink-0 ${iconBg}`}>
-                <IconComponent className="w-4 h-4" />
-              </div>
-            </div>
-
-            {/* Card Main Metric */}
-            <div className="my-1">
-              <div className="text-2xl font-black dark:text-white text-slate-900 tracking-tight">
-                {typeof card.value === "number"
-                  ? card.value.toLocaleString()
-                  : card.value}
-              </div>
-            </div>
-
-            {/* Card Footer: Badge & Subtitle */}
-            <div className="flex items-center space-x-2 mt-2 pt-2 border-t dark:border-slate-800/80 border-slate-100">
-              {card.badge && (
-                <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${badgeStyle} flex-shrink-0`}
+              {IconComponent && (
+                <div
+                  className={`p-1.5 rounded-lg shrink-0 ${getIconColor(card.badgeType)}`}
                 >
-                  {card.badge}
-                </span>
+                  <IconComponent className="w-4 h-4" />
+                </div>
               )}
-              <span className="text-[11px] font-medium dark:text-slate-400 text-slate-600 truncate">
-                {card.subtitle}
-              </span>
+            </div>
+
+            <div className="mt-3">
+              <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-none">
+                {card.value}
+              </div>
+
+              {(sub || card.badge) && (
+                <div className="mt-2.5 flex items-center flex-wrap gap-1.5">
+                  {card.badge && (
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${getBadgeStyle(
+                        card.badgeType,
+                      )}`}
+                    >
+                      {card.badge}
+                    </span>
+                  )}
+                  {sub && (
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      {sub}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -91,3 +115,5 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({ cards }) => {
     </div>
   );
 };
+
+export default SummaryCards;

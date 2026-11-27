@@ -1,172 +1,154 @@
-import React, { useMemo } from "react";
-import { SummaryCards, type MetricCardItem } from "../SummaryCards";
-import { NasspGisMap } from "../NasspGisMap";
-import {
-  getStateSummary,
-  STATES_BASELINE,
-  type StateSummaryItem,
-} from "../../services/dataService";
-import {
-  GraduationCap,
-  Users2,
-  UserX,
-  AlertTriangle,
-  Sparkles,
-} from "lucide-react";
+import React from "react";
+import { GraduationCap, UserX, AlertTriangle, BookOpen } from "lucide-react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   Legend,
 } from "recharts";
+import { SummaryCards } from "../SummaryCards";
+import { NasspGisMap } from "../NasspGisMap";
+import {
+  STATES_BASELINE,
+  type StateSummaryItem,
+} from "../../services/dataService";
 
 export interface EducationProps {
   selectedState?: string | null;
   selectedLga?: string | null;
-  onStateSelect: (stateName: string) => void;
-  onLgaSelect: (lgaName: string) => void;
-  onReset: () => void;
-  isDarkMode?: boolean;
+  selectedWard?: string | null;
+  onSelectState: (state: string | null) => void;
+  onSelectLga: (lga: string | null) => void;
+  onSelectWard?: (ward: string | null) => void;
+  isDark?: boolean;
 }
 
 export const Education: React.FC<EducationProps> = ({
-  selectedState,
-  selectedLga,
-  onStateSelect,
-  onLgaSelect,
-  onReset,
-  isDarkMode = true,
+  selectedState = null,
+  selectedLga = null,
+  selectedWard = null,
+  onSelectState,
+  onSelectLga,
+  onSelectWard,
+  isDark = true,
 }) => {
-  const summary = useMemo(
-    () => getStateSummary(selectedState || undefined),
-    [selectedState],
-  );
+  const cards = [
+    {
+      title: "TOTAL CHILDREN OOSC",
+      value: "17,240",
+      subValue: "29.9% of all children",
+      badge: "35.2% OOSC",
+      badgeType: "danger" as const,
+      icon: GraduationCap,
+    },
+    {
+      title: "GIRLS OUT OF SCHOOL",
+      value: "8,830",
+      subValue: "51.2% of OOSC cohort",
+      badge: "51.2% FEMALE",
+      badgeType: "danger" as const,
+      icon: UserX,
+    },
+    {
+      title: "BOYS OUT OF SCHOOL",
+      value: "8,410",
+      subValue: "48.8% of OOSC cohort",
+      badge: "48.8% MALE",
+      badgeType: "warning" as const,
+      icon: UserX,
+    },
+    {
+      title: "NEVER ENROLLED",
+      value: "10,758",
+      subValue: "62.4% of total OOSC",
+      badge: "CHRONIC EXCLUSION",
+      badgeType: "warning" as const,
+      icon: AlertTriangle,
+    },
+    {
+      title: "SCHOOL DROPOUTS",
+      value: "6,482",
+      subValue: "37.6% left school early",
+      badge: "RETENTION RISK",
+      badgeType: "info" as const,
+      icon: BookOpen,
+    },
+  ];
 
-  const kpiCards: MetricCardItem[] = useMemo(
-    () => [
-      {
-        id: "kpi-oosc-total",
-        title: "Total Children OOSC",
-        value: summary.ooscTotal,
-        subtitle: `${((summary.ooscTotal / summary.children) * 100).toFixed(1)}% of all children`,
-        badge: "35.2% OOSC",
-        icon: GraduationCap,
-        accentColor: "rose",
-      },
-      {
-        id: "kpi-oosc-girls",
-        title: "Girls Out of School",
-        value: summary.ooscGirls,
-        subtitle: `${((summary.ooscGirls / summary.ooscTotal) * 100).toFixed(1)}% of OOSC cohort`,
-        badge: "51.2% FEMALE",
-        icon: Users2,
-        accentColor: "rose",
-      },
-      {
-        id: "kpi-oosc-boys",
-        title: "Boys Out of School",
-        value: summary.ooscBoys,
-        subtitle: `${((summary.ooscBoys / summary.ooscTotal) * 100).toFixed(1)}% of OOSC cohort`,
-        badge: "48.8% MALE",
-        icon: UserX,
-        accentColor: "amber",
-      },
-      {
-        id: "kpi-never-enrolled",
-        title: "Never Enrolled",
-        value: Math.round(summary.ooscTotal * 0.624),
-        subtitle: "62.4% of total OOSC",
-        badge: "CHRONIC EXCLUSION",
-        icon: AlertTriangle,
-        accentColor: "amber",
-      },
-      {
-        id: "kpi-dropouts",
-        title: "School Dropouts",
-        value: Math.round(summary.ooscTotal * 0.376),
-        subtitle: "37.6% left school early",
-        badge: "RETENTION RISK",
-        icon: Sparkles,
-        accentColor: "cyan",
-      },
-    ],
-    [summary],
-  );
-
-  const genderByStateData = useMemo(() => {
-    return STATES_BASELINE.map((s: StateSummaryItem) => ({
-      state: s.state,
-      "Girls OOSC": s.ooscGirls,
-      "Boys OOSC": s.ooscBoys,
-    }));
-  }, []);
+  const barData = STATES_BASELINE.map((s: StateSummaryItem) => ({
+    state: s.state,
+    "Girls OOSC": s.ooscGirls,
+    "Boys OOSC": s.ooscBoys,
+  }));
 
   return (
-    <div className="flex flex-col space-y-4 w-full">
-      {/* Layer 1: Top 5 KPI Cards */}
-      <SummaryCards cards={kpiCards} />
+    <div className="space-y-6">
+      <SummaryCards cards={cards} />
 
-      {/* Layers 2 & 3: Map (55%) & Charts (45%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        <div className="lg:col-span-7 w-full h-[480px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7">
           <NasspGisMap
-            selectedState={selectedState || undefined}
-            selectedLga={selectedLga || undefined}
-            onStateSelect={onStateSelect}
-            onLgaSelect={onLgaSelect}
-            onReset={onReset}
-            isDarkMode={isDarkMode}
+            selectedState={selectedState}
+            selectedLga={selectedLga}
+            selectedWard={selectedWard}
+            onSelectState={onSelectState}
+            onSelectLga={onSelectLga}
+            onSelectWard={onSelectWard}
+            isDark={isDark}
           />
         </div>
 
-        <div className="lg:col-span-5 flex flex-col space-y-4">
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-1">
-              Out of School Children by Gender & State
+        <div className="lg:col-span-5 space-y-6">
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              OUT OF SCHOOL CHILDREN BY GENDER & STATE
             </h3>
-            <div className="w-full flex-1 min-h-[280px]">
+            <div className="h-[430px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={genderByStateData}
-                  margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                  data={barData}
+                  margin={{ top: 10, right: 10, left: -10, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
-                    vertical={false}
+                    stroke={isDark ? "#0f2924" : "#e2e8f0"}
                   />
                   <XAxis
                     dataKey="state"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    tick={{
+                      fill: isDark ? "#cbd5e1" : "#1e293b",
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
                   />
                   <YAxis
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    tick={{
+                      fill: isDark ? "#94a3b8" : "#475569",
+                      fontSize: 10,
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "10px" }} />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
                   <Bar
                     dataKey="Girls OOSC"
-                    fill="#db2777"
-                    radius={[3, 3, 0, 0]}
+                    fill="#ec4899"
+                    radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="Boys OOSC"
                     fill="#0284c7"
-                    radius={[3, 3, 0, 0]}
+                    radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -175,62 +157,56 @@ export const Education: React.FC<EducationProps> = ({
         </div>
       </div>
 
-      {/* Layer 4: Education Targeting Table */}
-      <div className="rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b dark:border-[#1a3d36] border-slate-200 dark:bg-[#132c26] bg-slate-50">
-          <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-100 text-slate-800">
-            Education Vulnerability & CCT Targeting Table
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="dark:bg-[#0f2823] bg-slate-100 dark:text-slate-300 text-slate-700 font-bold border-b dark:border-[#1a3d36] border-slate-200">
-              <tr>
-                <th className="px-4 py-2.5">Pilot State</th>
-                <th className="px-4 py-2.5 text-right">Children (6-17)</th>
-                <th className="px-4 py-2.5 text-right">Total OOSC</th>
-                <th className="px-4 py-2.5 text-right">Girls OOSC</th>
-                <th className="px-4 py-2.5 text-right">Boys OOSC</th>
-                <th className="px-4 py-2.5 text-right">Never Enrolled (62%)</th>
-                <th className="px-4 py-2.5 text-right">Dropouts (38%)</th>
+      <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm overflow-x-auto">
+        <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-3">
+          EDUCATION VULNERABILITY & CCT TARGETING TABLE
+        </h3>
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-slate-200 dark:border-emerald-900/30 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
+              <th className="py-2.5 px-3">Pilot State</th>
+              <th className="py-2.5 px-3">Children (6-17)</th>
+              <th className="py-2.5 px-3">Total OOSC</th>
+              <th className="py-2.5 px-3">Girls OOSC</th>
+              <th className="py-2.5 px-3">Boys OOSC</th>
+              <th className="py-2.5 px-3">Never Enrolled (62%)</th>
+              <th className="py-2.5 px-3">Dropouts (38%)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-emerald-950/40">
+            {STATES_BASELINE.map((st: StateSummaryItem) => (
+              <tr
+                key={st.code}
+                onClick={() => onSelectState(st.state)}
+                className="hover:bg-slate-50 dark:hover:bg-emerald-950/30 cursor-pointer font-medium text-slate-800 dark:text-slate-200"
+              >
+                <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                  {st.state}
+                </td>
+                <td className="py-2.5 px-3">
+                  {Math.round(st.children * 0.82).toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3 font-bold text-rose-600 dark:text-rose-400">
+                  {st.ooscTotal.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3 font-semibold text-pink-600 dark:text-pink-400">
+                  {st.ooscGirls.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3 font-semibold text-sky-600 dark:text-sky-400">
+                  {st.ooscBoys.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">
+                  {Math.round(st.ooscTotal * 0.624).toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">
+                  {Math.round(st.ooscTotal * 0.376).toLocaleString()}
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-[#1a3d36] divide-slate-100 dark:text-slate-200 text-slate-800 font-medium">
-              {STATES_BASELINE.map((st: StateSummaryItem) => (
-                <tr
-                  key={st.code}
-                  onClick={() => onStateSelect(st.state)}
-                  className="hover:dark:bg-[#13332c] hover:bg-emerald-50/60 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">
-                    {st.state}
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {Math.round(st.children * 0.82).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-rose-600 dark:text-rose-400">
-                    {st.ooscTotal.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-pink-600 dark:text-pink-400 font-semibold">
-                    {st.ooscGirls.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-sky-600 dark:text-sky-400 font-semibold">
-                    {st.ooscBoys.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-amber-600 dark:text-amber-400 font-semibold">
-                    {Math.round(st.ooscTotal * 0.624).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-cyan-600 dark:text-cyan-400 font-semibold">
-                    {Math.round(st.ooscTotal * 0.376).toLocaleString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
-
 export default Education;

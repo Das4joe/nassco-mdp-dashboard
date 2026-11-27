@@ -1,234 +1,397 @@
-import React, { useMemo } from "react";
-import { SummaryCards, type MetricCardItem } from "../SummaryCards";
-import { NasspGisMap } from "../NasspGisMap";
-import {
-  getStateSummary,
-  STATES_BASELINE,
-  COHORTS_BASELINE,
-  type StateSummaryItem,
-} from "../../services/dataService";
-import { Home, Users, Baby, UserCheck, MapPin } from "lucide-react";
+import React from "react";
+import { Users, Home, Baby, UserCheck, Building2 } from "lucide-react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   Legend,
 } from "recharts";
+import { SummaryCards } from "../SummaryCards";
+import { NasspGisMap } from "../NasspGisMap";
+import {
+  STATES_BASELINE,
+  COHORTS_BASELINE,
+  type CohortItem,
+  type StateSummaryItem,
+} from "../../services/dataService";
 
 export interface GlobalOverviewProps {
   selectedState?: string | null;
   selectedLga?: string | null;
-  onStateSelect: (stateName: string) => void;
-  onLgaSelect: (lgaName: string) => void;
-  onReset: () => void;
-  isDarkMode?: boolean;
+  selectedWard?: string | null;
+  onSelectState: (state: string | null) => void;
+  onSelectLga: (lga: string | null) => void;
+  onSelectWard?: (ward: string | null) => void;
+  isDark?: boolean;
 }
 
 export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
-  selectedState,
-  selectedLga,
-  onStateSelect,
-  onLgaSelect,
-  onReset,
-  isDarkMode = true,
+  selectedState = null,
+  selectedLga = null,
+  selectedWard = null,
+  onSelectState,
+  onSelectLga,
+  onSelectWard,
+  isDark = true,
 }) => {
-  const summary = useMemo(
-    () => getStateSummary(selectedState || undefined),
-    [selectedState],
-  );
-
-  const kpiCards: MetricCardItem[] = useMemo(
-    () => [
+  const getCards = () => {
+    if (selectedWard) {
+      return [
+        {
+          title: "TOTAL HOUSEHOLDS",
+          value: "520",
+          badge: "Ward Sample",
+          badgeType: "info" as const,
+          icon: Home,
+        },
+        {
+          title: "TOTAL INDIVIDUALS",
+          value: "1,840",
+          subValue: "48.9% M | 51.1% F",
+          badge: "Active NSR",
+          badgeType: "success" as const,
+          icon: Users,
+        },
+        {
+          title: "CHILDREN (0-17)",
+          value: "740",
+          subValue: "40.2% of ward",
+          badge: "High Vulnerability",
+          badgeType: "warning" as const,
+          icon: Baby,
+        },
+        {
+          title: "YOUTH (18-24)",
+          value: "254",
+          subValue: "13.8% of ward",
+          badge: "Target Cohort",
+          badgeType: "neutral" as const,
+          icon: UserCheck,
+        },
+        {
+          title: "COMMUNITIES",
+          value: "8",
+          badge: "Enumerated",
+          badgeType: "neutral" as const,
+          icon: Building2,
+        },
+      ];
+    }
+    if (selectedLga) {
+      return [
+        {
+          title: "TOTAL HOUSEHOLDS",
+          value: "1,280",
+          badge: "LGA Level",
+          badgeType: "info" as const,
+          icon: Home,
+        },
+        {
+          title: "TOTAL INDIVIDUALS",
+          value: "4,420",
+          subValue: "50.2% M | 49.8% F",
+          badge: "Active NSR",
+          badgeType: "success" as const,
+          icon: Users,
+        },
+        {
+          title: "CHILDREN (0-17)",
+          value: "1,830",
+          subValue: "41.4% of LGA",
+          badge: "High Vulnerability",
+          badgeType: "warning" as const,
+          icon: Baby,
+        },
+        {
+          title: "YOUTH (18-24)",
+          value: "612",
+          subValue: "13.8% of LGA",
+          badge: "Target Cohort",
+          badgeType: "neutral" as const,
+          icon: UserCheck,
+        },
+        {
+          title: "COMMUNITIES",
+          value: "28",
+          badge: "Enumerated",
+          badgeType: "neutral" as const,
+          icon: Building2,
+        },
+      ];
+    }
+    if (selectedState) {
+      const match = STATES_BASELINE.find(
+        (s) => s.state.toLowerCase() === selectedState.toLowerCase(),
+      );
+      if (match) {
+        return [
+          {
+            title: "TOTAL HOUSEHOLDS",
+            value: match.households.toLocaleString(),
+            badge: `${match.lgas} LGAs`,
+            badgeType: "info" as const,
+            icon: Home,
+          },
+          {
+            title: "TOTAL INDIVIDUALS",
+            value: match.individuals.toLocaleString(),
+            subValue: "50.7% M | 49.3% F",
+            badge: "Active NSR",
+            badgeType: "success" as const,
+            icon: Users,
+          },
+          {
+            title: "CHILDREN (0-17)",
+            value: match.children.toLocaleString(),
+            subValue: `${((match.children / match.individuals) * 100).toFixed(1)}% of total`,
+            badge: "Target Cohort",
+            badgeType: "warning" as const,
+            icon: Baby,
+          },
+          {
+            title: "YOUTH (18-24)",
+            value: match.youth.toLocaleString(),
+            subValue: `${((match.youth / match.individuals) * 100).toFixed(1)}% of total`,
+            badge: "Target Cohort",
+            badgeType: "neutral" as const,
+            icon: UserCheck,
+          },
+          {
+            title: "COMMUNITIES",
+            value: match.communities.toLocaleString(),
+            badge: "Enumerated",
+            badgeType: "neutral" as const,
+            icon: Building2,
+          },
+        ];
+      }
+    }
+    return [
       {
-        id: "kpi-hh",
-        title: "Total Households",
-        value: summary.households,
-        subtitle: "Enumerated in Pilot",
-        badge: "NSR COVERAGE",
+        title: "TOTAL HOUSEHOLDS",
+        value: "41,512",
+        badge: "4 Pilot States",
+        badgeType: "info" as const,
         icon: Home,
-        accentColor: "emerald",
       },
       {
-        id: "kpi-ind",
-        title: "Total Individuals",
-        value: summary.individuals,
-        subtitle: `Male: ${summary.male.toLocaleString()} | Female: ${summary.female.toLocaleString()}`,
-        badge: "REGISTRY",
+        title: "TOTAL INDIVIDUALS",
+        value: "138,676",
+        subValue: "50.7% M | 49.3% F",
+        badge: "Active NSR",
+        badgeType: "success" as const,
         icon: Users,
-        accentColor: "teal",
       },
       {
-        id: "kpi-children",
-        title: "Children (0 - 17)",
-        value: summary.children,
-        subtitle: `${((summary.children / summary.individuals) * 100).toFixed(1)}% of registry`,
-        badge: "41.6% POP",
+        title: "CHILDREN (0-17)",
+        value: "57,688",
+        subValue: "41.6% of population",
+        badge: "High Vulnerability",
+        badgeType: "warning" as const,
         icon: Baby,
-        accentColor: "amber",
       },
       {
-        id: "kpi-youth",
-        title: "Youth (18 - 24)",
-        value: summary.youth,
-        subtitle: `${((summary.youth / summary.individuals) * 100).toFixed(1)}% of registry`,
-        badge: "13.7% POP",
+        title: "YOUTH (18-24)",
+        value: "19,012",
+        subValue: "13.7% of population",
+        badge: "Target Cohort",
+        badgeType: "neutral" as const,
         icon: UserCheck,
-        accentColor: "cyan",
       },
       {
-        id: "kpi-comm",
-        title: "Communities Covered",
-        value: summary.communities,
-        subtitle: `Across ${summary.lgas} LGAs`,
-        badge: "864 SETTLEMENTS",
-        icon: MapPin,
-        accentColor: "emerald",
+        title: "COMMUNITIES",
+        value: "864",
+        badge: "31 Pilot LGAs",
+        badgeType: "neutral" as const,
+        icon: Building2,
       },
-    ],
-    [summary],
-  );
+    ];
+  };
 
-  const pyramidData = useMemo(() => {
-    return COHORTS_BASELINE.map((c) => ({
-      age: c.ageGroup,
-      boys: -c.male,
-      girls: c.female,
-      rawBoys: c.male,
-      rawGirls: c.female,
+  const getPyramidData = () => {
+    return COHORTS_BASELINE.map((c: CohortItem) => ({
+      ageGroup: c.ageGroup,
+      male: -c.male,
+      female: c.female,
+      maleDisplay: c.male,
+      femaleDisplay: c.female,
     }));
-  }, []);
+  };
 
-  const ageCohortColumnData = useMemo(() => {
-    return COHORTS_BASELINE.map((c) => ({
-      age: c.ageGroup,
-      Boys: c.male,
-      Girls: c.female,
+  const getAgeRatioData = () => {
+    return COHORTS_BASELINE.map((c: CohortItem) => ({
+      ageGroup: c.ageGroup,
+      "Male Ratio": Number(((c.male / c.total) * 100).toFixed(1)),
+      "Female Ratio": Number(((c.female / c.total) * 100).toFixed(1)),
     }));
-  }, []);
+  };
+
+  const cards = getCards();
+  const pyramidData = getPyramidData();
+  const ageRatioData = getAgeRatioData();
 
   return (
-    <div className="flex flex-col space-y-4 w-full">
-      {/* Layer 1: Top 5 KPI Cards */}
-      <SummaryCards cards={kpiCards} />
+    <div className="space-y-6">
+      {/* Layer 1: Key Indicators */}
+      <SummaryCards cards={cards} />
 
-      {/* Layers 2 & 3: Map (55%) & Charts (45%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        <div className="lg:col-span-7 w-full h-[480px]">
+      {/* Layer 2 & 3: Map (55%) + Charts (45%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7">
           <NasspGisMap
-            selectedState={selectedState || undefined}
-            selectedLga={selectedLga || undefined}
-            onStateSelect={onStateSelect}
-            onLgaSelect={onLgaSelect}
-            onReset={onReset}
-            isDarkMode={isDarkMode}
+            selectedState={selectedState}
+            selectedLga={selectedLga}
+            selectedWard={selectedWard}
+            onSelectState={onSelectState}
+            onSelectLga={onSelectLga}
+            onSelectWard={onSelectWard}
+            isDark={isDark}
           />
         </div>
 
-        <div className="lg:col-span-5 flex flex-col space-y-4">
+        <div className="lg:col-span-5 space-y-6">
           {/* Symmetrical Bilateral Population Pyramid */}
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800">
-                Population Pyramid (0 - 24 Years)
-              </h3>
-              <span className="text-[10px] font-semibold dark:text-slate-400 text-slate-500">
-                Boys: 39,002 | Girls: 37,698
-              </span>
-            </div>
-            <div className="w-full flex-1 min-h-[160px]">
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              POPULATION PYRAMID (CHILDREN & YOUTH 0–24)
+            </h3>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+              Bilateral distribution of enumerated boys vs. girls across pilot
+              cohorts
+            </p>
+            <div className="h-[210px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   layout="vertical"
                   data={pyramidData}
-                  stackOffset="sign"
-                  margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
-                    horizontal={false}
+                    stroke={isDark ? "#0f2924" : "#e2e8f0"}
                   />
                   <XAxis
                     type="number"
-                    tickFormatter={(v) => Math.abs(v).toLocaleString()}
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    tickFormatter={(v) => `${Math.abs(v).toLocaleString()}`}
+                    tick={{
+                      fill: isDark ? "#94a3b8" : "#475569",
+                      fontSize: 10,
+                    }}
                   />
                   <YAxis
+                    dataKey="ageGroup"
                     type="category"
-                    dataKey="age"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
-                    width={50}
+                    tick={{
+                      fill: isDark ? "#cbd5e1" : "#1e293b",
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                    formatter={(_val: any, name: any, item: any) => {
+                      const displayVal =
+                        name === "Boys"
+                          ? item.payload.maleDisplay
+                          : item.payload.femaleDisplay;
+                      return [
+                        `${displayVal.toLocaleString()} individuals`,
+                        name,
+                      ];
                     }}
-                    formatter={(_val: any, name: string, item: any) => [
-                      name.includes("Boys")
-                        ? item.payload.rawBoys.toLocaleString()
-                        : item.payload.rawGirls.toLocaleString(),
-                      name,
-                    ]}
+                    contentStyle={{
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
+                    }}
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }}
+                    wrapperStyle={{ fontSize: 11, paddingTop: 6 }}
+                    formatter={(val) => (
+                      <span className="text-slate-700 dark:text-slate-300 font-semibold">
+                        {val}
+                      </span>
+                    )}
                   />
-                  <Bar dataKey="boys" name="Boys (50.8%)" fill="#0284c7" />
-                  <Bar dataKey="girls" name="Girls (49.2%)" fill="#db2777" />
+                  <Bar
+                    dataKey="male"
+                    name="Boys"
+                    fill="#0284c7"
+                    radius={[4, 0, 0, 4]}
+                  />
+                  <Bar
+                    dataKey="female"
+                    name="Girls"
+                    fill="#ec4899"
+                    radius={[0, 4, 4, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Age Cohort Distribution Column Chart */}
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-2">
-              Age Cohort Distribution (0 - 24 Years)
+          {/* Age Ratio Breakdown */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              COHORT GENDER PROPORTIONS (%)
             </h3>
-            <div className="w-full flex-1 min-h-[140px]">
+            <div className="h-[210px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={ageCohortColumnData}
-                  margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                  data={ageRatioData}
+                  margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
-                    vertical={false}
+                    stroke={isDark ? "#0f2924" : "#e2e8f0"}
                   />
                   <XAxis
-                    dataKey="age"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    dataKey="ageGroup"
+                    tick={{
+                      fill: isDark ? "#cbd5e1" : "#1e293b",
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
                   />
                   <YAxis
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    unit="%"
+                    tick={{
+                      fill: isDark ? "#94a3b8" : "#475569",
+                      fontSize: 10,
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
                     }}
                   />
                   <Legend
-                    wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }}
+                    wrapperStyle={{ fontSize: 11, paddingTop: 6 }}
+                    formatter={(val) => (
+                      <span className="text-slate-700 dark:text-slate-300 font-semibold">
+                        {val}
+                      </span>
+                    )}
                   />
-                  <Bar dataKey="Boys" fill="#0284c7" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="Girls" fill="#db2777" radius={[3, 3, 0, 0]} />
+                  <Bar
+                    dataKey="Male Ratio"
+                    name="Boys %"
+                    fill="#0284c7"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="Female Ratio"
+                    name="Girls %"
+                    fill="#ec4899"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -236,65 +399,53 @@ export const GlobalOverview: React.FC<GlobalOverviewProps> = ({
         </div>
       </div>
 
-      {/* Layer 4: State-Level Pilot Enumeration Summary Table */}
-      <div className="rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b dark:border-[#1a3d36] border-slate-200 dark:bg-[#132c26] bg-slate-50">
-          <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-100 text-slate-800">
-            State-Level Pilot Enumeration Summary
-          </h3>
-          <span className="text-[11px] font-medium dark:text-slate-400 text-slate-500">
-            Source: National Social Safety Nets Project (NASSP-SU) Microdata
-          </span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="dark:bg-[#0f2823] bg-slate-100 dark:text-slate-300 text-slate-700 font-bold border-b dark:border-[#1a3d36] border-slate-200">
-              <tr>
-                <th className="px-4 py-2.5">Pilot State</th>
-                <th className="px-4 py-2.5 text-center">Targeted LGAs</th>
-                <th className="px-4 py-2.5 text-center">Communities</th>
-                <th className="px-4 py-2.5 text-right">Households</th>
-                <th className="px-4 py-2.5 text-right">Individuals</th>
-                <th className="px-4 py-2.5 text-right">Children (0-17)</th>
-                <th className="px-4 py-2.5 text-right">Youth (18-24)</th>
-                <th className="px-4 py-2.5 text-right">Female-Headed HH %</th>
+      {/* Layer 4: State Breakdown Table */}
+      <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm overflow-x-auto">
+        <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-3">
+          PILOT EXPANSION STATE DEMOGRAPHICS & COVERAGE
+        </h3>
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-slate-200 dark:border-emerald-900/30 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
+              <th className="py-2.5 px-3">Pilot State</th>
+              <th className="py-2.5 px-3">Target LGAs</th>
+              <th className="py-2.5 px-3">Communities</th>
+              <th className="py-2.5 px-3">Households</th>
+              <th className="py-2.5 px-3">Individuals</th>
+              <th className="py-2.5 px-3">Children (0-17)</th>
+              <th className="py-2.5 px-3">Youth (18-24)</th>
+              <th className="py-2.5 px-3">Female-Headed HH %</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-emerald-950/40">
+            {STATES_BASELINE.map((st: StateSummaryItem) => (
+              <tr
+                key={st.code}
+                onClick={() => onSelectState(st.state)}
+                className="hover:bg-slate-50 dark:hover:bg-emerald-950/30 cursor-pointer font-medium text-slate-800 dark:text-slate-200"
+              >
+                <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                  {st.state}
+                </td>
+                <td className="py-2.5 px-3">{st.lgas}</td>
+                <td className="py-2.5 px-3">{st.communities}</td>
+                <td className="py-2.5 px-3">
+                  {st.households.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">
+                  {st.individuals.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">{st.children.toLocaleString()}</td>
+                <td className="py-2.5 px-3">{st.youth.toLocaleString()}</td>
+                <td className="py-2.5 px-3 font-semibold">
+                  {st.femaleHeadedHhPct}%
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-[#1a3d36] divide-slate-100 dark:text-slate-200 text-slate-800 font-medium">
-              {STATES_BASELINE.map((st: StateSummaryItem) => (
-                <tr
-                  key={st.code}
-                  onClick={() => onStateSelect(st.state)}
-                  className="hover:dark:bg-[#13332c] hover:bg-emerald-50/60 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">
-                    {st.state}
-                  </td>
-                  <td className="px-4 py-2.5 text-center">{st.lgas}</td>
-                  <td className="px-4 py-2.5 text-center">{st.communities}</td>
-                  <td className="px-4 py-2.5 text-right">
-                    {st.households.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {st.individuals.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {st.children.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {st.youth.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-teal-700 dark:text-teal-400">
-                    {st.femaleHeadedHhPct}%
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
-
 export default GlobalOverview;

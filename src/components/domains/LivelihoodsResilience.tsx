@@ -1,174 +1,154 @@
-import React, { useMemo } from "react";
-import { SummaryCards, type MetricCardItem } from "../SummaryCards";
-import { NasspGisMap } from "../NasspGisMap";
-import {
-  getStateSummary,
-  STATES_BASELINE,
-  type StateSummaryItem,
-} from "../../services/dataService";
-import {
-  UserCheck,
-  Briefcase,
-  Zap,
-  ShieldAlert,
-  AlertTriangle,
-} from "lucide-react";
+import React from "react";
+import { TrendingUp, ShieldAlert, Users, Zap, Briefcase } from "lucide-react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
-  Legend,
 } from "recharts";
+import { SummaryCards } from "../SummaryCards";
+import { NasspGisMap } from "../NasspGisMap";
+import {
+  STATES_BASELINE,
+  type StateSummaryItem,
+} from "../../services/dataService";
 
 export interface LivelihoodsResilienceProps {
   selectedState?: string | null;
   selectedLga?: string | null;
-  onStateSelect: (stateName: string) => void;
-  onLgaSelect: (lgaName: string) => void;
-  onReset: () => void;
-  isDarkMode?: boolean;
+  selectedWard?: string | null;
+  onSelectState: (state: string | null) => void;
+  onSelectLga: (lga: string | null) => void;
+  onSelectWard?: (ward: string | null) => void;
+  isDark?: boolean;
 }
 
 export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
-  selectedState,
-  selectedLga,
-  onStateSelect,
-  onLgaSelect,
-  onReset,
-  isDarkMode = true,
+  selectedState = null,
+  selectedLga = null,
+  selectedWard = null,
+  onSelectState,
+  onSelectLga,
+  onSelectWard,
+  isDark = true,
 }) => {
-  const summary = useMemo(
-    () => getStateSummary(selectedState || undefined),
-    [selectedState],
-  );
+  const cards = [
+    {
+      title: "FEMALE-HEADED HH (%)",
+      value: "18.4%",
+      subValue: "7,638 vulnerable households",
+      badge: "Gender Priority",
+      badgeType: "warning" as const,
+      icon: Users,
+    },
+    {
+      title: "MAIN LIVELIHOOD (AGRICULTURE)",
+      value: "62.8%",
+      subValue: "26,069 agrarian HHs",
+      badge: "Primary Sector",
+      badgeType: "info" as const,
+      icon: Briefcase,
+    },
+    {
+      title: "YOUTH ECONOMIC ACTIVITY",
+      value: "44.6%",
+      subValue: "55.4% youth NEET gap",
+      badge: "Labor Inclusion",
+      badgeType: "info" as const,
+      icon: TrendingUp,
+    },
+    {
+      title: "NEGATIVE COPING MECHANISMS",
+      value: "38.2%",
+      subValue: "Asset sale & food reduction",
+      badge: "Severe Vulnerability",
+      badgeType: "danger" as const,
+      icon: ShieldAlert,
+    },
+    {
+      title: "CHILD-RELATED COPING",
+      value: "14.8%",
+      subValue: "Child labor & school removal",
+      badge: "Critical Protection",
+      badgeType: "danger" as const,
+      icon: Zap,
+    },
+  ];
 
-  const kpiCards: MetricCardItem[] = useMemo(
-    () => [
-      {
-        id: "kpi-female-hh",
-        title: "Female-Headed HH",
-        value: `${summary.femaleHeadedHhPct}%`,
-        subtitle: `${Math.round(summary.households * (summary.femaleHeadedHhPct / 100)).toLocaleString()} households`,
-        badge: "18.4% REGISTRY AVG",
-        icon: UserCheck,
-        accentColor: "rose",
-      },
-      {
-        id: "kpi-main-livelihood",
-        title: "Main Livelihood Source",
-        value: "Agriculture",
-        subtitle: summary.mainLivelihood,
-        badge: "62.8% DOMINANCE",
-        icon: Briefcase,
-        accentColor: "emerald",
-      },
-      {
-        id: "kpi-youth-econ",
-        title: "Youth Economic Activity",
-        value: `${summary.youthEconActivityPct}%`,
-        subtitle: "Employed, Farming or Trade",
-        badge: "44.6% REGISTRY AVG",
-        icon: Zap,
-        accentColor: "cyan",
-      },
-      {
-        id: "kpi-neg-coping",
-        title: "Negative Coping Strategy",
-        value: `${summary.negativeCopingPct}%`,
-        subtitle: "Asset Sale & Meal Reduction",
-        badge: "38.2% SHOCK RATE",
-        icon: ShieldAlert,
-        accentColor: "amber",
-      },
-      {
-        id: "kpi-child-coping",
-        title: "Child-Related Coping",
-        value: `${summary.childCopingPct}%`,
-        subtitle: "Child Labor / School Withdrawal",
-        badge: "14.8% ACUTE RISK",
-        icon: AlertTriangle,
-        accentColor: "rose",
-      },
-    ],
-    [summary],
-  );
-
-  const livelihoodDistributionData = [
-    { source: "Crop Farming", share: 51.4 },
-    { source: "Petty Trade & Retail", share: 21.4 },
-    { source: "Livestock / Pastoralism", share: 11.4 },
-    { source: "Daily Wage Labor", share: 9.2 },
-    { source: "Artisanal & Services", share: 6.6 },
+  const livelihoodsData = [
+    { activity: "Crop Farming", percentage: 51.4 },
+    { activity: "Petty Trading", percentage: 21.4 },
+    { activity: "Livestock / Pastoral", percentage: 11.4 },
+    { activity: "Artisanal / Wage Labor", percentage: 9.8 },
+    { activity: "Other / Remittances", percentage: 6.0 },
   ];
 
   return (
-    <div className="flex flex-col space-y-4 w-full">
-      {/* Layer 1: Top 5 KPI Cards */}
-      <SummaryCards cards={kpiCards} />
+    <div className="space-y-6">
+      <SummaryCards cards={cards} />
 
-      {/* Layers 2 & 3: Map (55%) & Charts (45%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        <div className="lg:col-span-7 w-full h-[480px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7">
           <NasspGisMap
-            selectedState={selectedState || undefined}
-            selectedLga={selectedLga || undefined}
-            onStateSelect={onStateSelect}
-            onLgaSelect={onLgaSelect}
-            onReset={onReset}
-            isDarkMode={isDarkMode}
+            selectedState={selectedState}
+            selectedLga={selectedLga}
+            selectedWard={selectedWard}
+            onSelectState={onSelectState}
+            onSelectLga={onSelectLga}
+            onSelectWard={onSelectWard}
+            isDark={isDark}
           />
         </div>
 
-        <div className="lg:col-span-5 flex flex-col space-y-4">
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-2">
-              Livelihood Activity Breakdown (%)
+        <div className="lg:col-span-5 space-y-6">
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              PRIMARY HOUSEHOLD LIVELIHOOD ACTIVITIES (%)
             </h3>
-            <div className="w-full flex-1 min-h-[280px]">
+            <div className="h-[430px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   layout="vertical"
-                  data={livelihoodDistributionData}
-                  margin={{ top: 5, right: 10, left: 20, bottom: 5 }}
+                  data={livelihoodsData}
+                  margin={{ top: 10, right: 20, left: 40, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
-                    horizontal={false}
+                    stroke={isDark ? "#0f2924" : "#e2e8f0"}
                   />
                   <XAxis
                     type="number"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
                     unit="%"
+                    tick={{
+                      fill: isDark ? "#94a3b8" : "#475569",
+                      fontSize: 10,
+                    }}
                   />
                   <YAxis
+                    dataKey="activity"
                     type="category"
-                    dataKey="source"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
-                    width={90}
+                    tick={{
+                      fill: isDark ? "#cbd5e1" : "#1e293b",
+                      fontSize: 10,
+                      fontWeight: 700,
+                    }}
                   />
                   <Tooltip
+                    formatter={(val) => [`${val}%`, "Households"]}
                     contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
                     }}
-                    formatter={(val: any) => [`${val}%`, "Share of Households"]}
                   />
-                  <Legend wrapperStyle={{ fontSize: "10px" }} />
                   <Bar
-                    dataKey="share"
-                    name="Share of Households"
-                    fill="#10b981"
-                    radius={[0, 3, 3, 0]}
+                    dataKey="percentage"
+                    fill="#059669"
+                    radius={[0, 4, 4, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -177,58 +157,50 @@ export const LivelihoodsResilience: React.FC<LivelihoodsResilienceProps> = ({
         </div>
       </div>
 
-      {/* Layer 4: Livelihood Table */}
-      <div className="rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b dark:border-[#1a3d36] border-slate-200 dark:bg-[#132c26] bg-slate-50">
-          <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-100 text-slate-800">
-            Household Economic Profile & Coping Strategies by State
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="dark:bg-[#0f2823] bg-slate-100 dark:text-slate-300 text-slate-700 font-bold border-b dark:border-[#1a3d36] border-slate-200">
-              <tr>
-                <th className="px-4 py-2.5">Pilot State</th>
-                <th className="px-4 py-2.5 text-right">Female-Headed HH %</th>
-                <th className="px-4 py-2.5 text-left">Primary Livelihood</th>
-                <th className="px-4 py-2.5 text-right">Youth Econ %</th>
-                <th className="px-4 py-2.5 text-right">Negative Coping %</th>
-                <th className="px-4 py-2.5 text-right">Child Coping %</th>
+      <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm overflow-x-auto">
+        <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-3">
+          LIVELIHOOD DIVERSITY & SHOCK RESILIENCE TABLE
+        </h3>
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-slate-200 dark:border-emerald-900/30 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
+              <th className="py-2.5 px-3">Pilot State</th>
+              <th className="py-2.5 px-3">Female-Headed HH %</th>
+              <th className="py-2.5 px-3">Main Livelihood</th>
+              <th className="py-2.5 px-3">Youth Econ Activity %</th>
+              <th className="py-2.5 px-3">Negative Coping %</th>
+              <th className="py-2.5 px-3">Child Coping %</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-emerald-950/40">
+            {STATES_BASELINE.map((st: StateSummaryItem) => (
+              <tr
+                key={st.code}
+                onClick={() => onSelectState(st.state)}
+                className="hover:bg-slate-50 dark:hover:bg-emerald-950/30 cursor-pointer font-medium text-slate-800 dark:text-slate-200"
+              >
+                <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                  {st.state}
+                </td>
+                <td className="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400">
+                  {st.femaleHeadedHhPct}%
+                </td>
+                <td className="py-2.5 px-3">{st.mainLivelihood}</td>
+                <td className="py-2.5 px-3 font-semibold">
+                  {st.youthEconActivityPct}%
+                </td>
+                <td className="py-2.5 px-3 font-bold text-rose-600 dark:text-rose-400">
+                  {st.negativeCopingPct}%
+                </td>
+                <td className="py-2.5 px-3 font-bold text-red-600 dark:text-red-400">
+                  {st.childCopingPct}%
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-[#1a3d36] divide-slate-100 dark:text-slate-200 text-slate-800 font-medium">
-              {STATES_BASELINE.map((st: StateSummaryItem) => (
-                <tr
-                  key={st.code}
-                  onClick={() => onStateSelect(st.state)}
-                  className="hover:dark:bg-[#13332c] hover:bg-emerald-50/60 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">
-                    {st.state}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-rose-600 dark:text-rose-400">
-                    {st.femaleHeadedHhPct}%
-                  </td>
-                  <td className="px-4 py-2.5 text-left font-medium">
-                    {st.mainLivelihood}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold text-cyan-600 dark:text-cyan-400">
-                    {st.youthEconActivityPct}%
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold text-amber-600 dark:text-amber-400">
-                    {st.negativeCopingPct}%
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-rose-600 dark:text-rose-400">
-                    {st.childCopingPct}%
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
-
 export default LivelihoodsResilience;

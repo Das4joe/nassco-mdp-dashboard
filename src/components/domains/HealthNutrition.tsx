@@ -1,217 +1,198 @@
-import React, { useMemo } from "react";
-import { SummaryCards, type MetricCardItem } from "../SummaryCards";
-import { NasspGisMap } from "../NasspGisMap";
-import {
-  getStateSummary,
-  STATES_BASELINE,
-  type StateSummaryItem,
-} from "../../services/dataService";
-import {
-  HeartPulse,
-  Stethoscope,
-  ShieldCheck,
-  AlertOctagon,
-  Activity,
-} from "lucide-react";
+import React from "react";
+import { HeartPulse, Baby, ShieldAlert, ShieldCheck } from "lucide-react";
 import {
   PieChart,
   Pie,
   Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
+import { SummaryCards } from "../SummaryCards";
+import { NasspGisMap } from "../NasspGisMap";
+import {
+  STATES_BASELINE,
+  type StateSummaryItem,
+} from "../../services/dataService";
 
 export interface HealthNutritionProps {
   selectedState?: string | null;
   selectedLga?: string | null;
-  onStateSelect: (stateName: string) => void;
-  onLgaSelect: (lgaName: string) => void;
-  onReset: () => void;
-  isDarkMode?: boolean;
+  selectedWard?: string | null;
+  onSelectState: (state: string | null) => void;
+  onSelectLga: (lga: string | null) => void;
+  onSelectWard?: (ward: string | null) => void;
+  isDark?: boolean;
 }
 
 export const HealthNutrition: React.FC<HealthNutritionProps> = ({
-  selectedState,
-  selectedLga,
-  onStateSelect,
-  onLgaSelect,
-  onReset,
-  isDarkMode = true,
+  selectedState = null,
+  selectedLga = null,
+  selectedWard = null,
+  onSelectState,
+  onSelectLga,
+  onSelectWard,
+  isDark = true,
 }) => {
-  const summary = useMemo(
-    () => getStateSummary(selectedState || undefined),
-    [selectedState],
-  );
-
-  const kpiCards: MetricCardItem[] = useMemo(
-    () => [
-      {
-        id: "kpi-pregnant",
-        title: "Pregnant Women",
-        value: summary.pregnantWomen,
-        subtitle: "Targeted for ANC & CCT",
-        badge: "MATERNAL CARE",
-        icon: HeartPulse,
-        accentColor: "rose",
-      },
-      {
-        id: "kpi-lactating",
-        title: "Lactating Mothers",
-        value: summary.lactatingMothers,
-        subtitle: "Targeted for IYCF & Nutrition",
-        badge: "INFANT HEALTH",
-        icon: Stethoscope,
-        accentColor: "teal",
-      },
-      {
-        id: "kpi-sam",
-        title: "Severe Acute Malnutrition",
-        value: summary.muacSam,
-        subtitle: "SAM Cases Requiring RUTF",
-        badge: "3.1% SAM RATE",
-        icon: AlertOctagon,
-        accentColor: "rose",
-      },
-      {
-        id: "kpi-insurance",
-        title: "Health Insurance Access",
-        value: `${summary.healthInsurancePct}%`,
-        subtitle: "Formal or Community Scheme",
-        badge: "4.2% REGISTRY AVG",
-        icon: ShieldCheck,
-        accentColor: "cyan",
-      },
-      {
-        id: "kpi-nutr-serv",
-        title: "Nutrition Services Access",
-        value: `${summary.nutritionAccessPct}%`,
-        subtitle: "Supplements & Screening",
-        badge: "26.8% REGISTRY AVG",
-        icon: Activity,
-        accentColor: "emerald",
-      },
-    ],
-    [summary],
-  );
-
-  const muacPieData = [
-    { name: "Normal (Green)", value: summary.muacNormal, color: "#10b981" },
-    { name: "MAM (Yellow)", value: summary.muacMam, color: "#f59e0b" },
-    { name: "SAM (Red)", value: summary.muacSam, color: "#ef4444" },
+  const cards = [
+    {
+      title: "PREGNANT WOMEN",
+      value: "2,483",
+      subValue: "Target maternal care",
+      badge: "High Priority",
+      badgeType: "danger" as const,
+      icon: HeartPulse,
+    },
+    {
+      title: "LACTATING MOTHERS",
+      value: "7,180",
+      subValue: "Infant feeding support",
+      badge: "Active Cohort",
+      badgeType: "warning" as const,
+      icon: Baby,
+    },
+    {
+      title: "MUAC SAM CASES",
+      value: "1,190",
+      subValue: "3.1% acute malnutrition",
+      badge: "Emergency Care",
+      badgeType: "danger" as const,
+      icon: ShieldAlert,
+    },
+    {
+      title: "HEALTH INSURANCE ACCESS",
+      value: "4.2%",
+      subValue: "95.8% out-of-pocket gap",
+      badge: "Critical Need",
+      badgeType: "danger" as const,
+      icon: ShieldAlert,
+    },
+    {
+      title: "NUTRITION SERVICES ACCESS",
+      value: "26.8%",
+      subValue: "73.2% unserved",
+      badge: "Coverage Target",
+      badgeType: "info" as const,
+      icon: ShieldCheck,
+    },
   ];
 
-  const stateSamComparison = useMemo(() => {
-    return STATES_BASELINE.map((s: StateSummaryItem) => ({
-      state: s.state,
-      "SAM Cases": s.muacSam,
-      "MAM Cases": s.muacMam,
-    }));
-  }, []);
+  const muacPie = [
+    { name: "Normal (≥ 12.5 cm)", value: 32800, color: "#10b981" },
+    { name: "MAM (11.5 - 12.4 cm)", value: 4620, color: "#f59e0b" },
+    { name: "SAM (< 11.5 cm)", value: 1190, color: "#ef4444" },
+  ];
+
+  const stateBar = STATES_BASELINE.map((s: StateSummaryItem) => ({
+    state: s.state,
+    "SAM Cases": s.muacSam,
+    "MAM Cases": s.muacMam,
+  }));
 
   return (
-    <div className="flex flex-col space-y-4 w-full">
-      {/* Layer 1: Top 5 KPI Cards */}
-      <SummaryCards cards={kpiCards} />
+    <div className="space-y-6">
+      <SummaryCards cards={cards} />
 
-      {/* Layers 2 & 3: Map (55%) & Charts (45%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        <div className="lg:col-span-7 w-full h-[480px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7">
           <NasspGisMap
-            selectedState={selectedState || undefined}
-            selectedLga={selectedLga || undefined}
-            onStateSelect={onStateSelect}
-            onLgaSelect={onLgaSelect}
-            onReset={onReset}
-            isDarkMode={isDarkMode}
+            selectedState={selectedState}
+            selectedLga={selectedLga}
+            selectedWard={selectedWard}
+            onSelectState={onSelectState}
+            onSelectLga={onSelectLga}
+            onSelectWard={onSelectWard}
+            isDark={isDark}
           />
         </div>
 
-        <div className="lg:col-span-5 flex flex-col space-y-4">
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-1">
-              Child MUAC Nutritional Status
+        <div className="lg:col-span-5 space-y-6">
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              MUAC NUTRITION STATUS (CHILDREN 6–59 MONTHS)
             </h3>
-            <div className="w-full flex-1 min-h-[160px]">
+            <div className="h-[210px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={muacPieData}
+                    data={muacPie}
                     dataKey="value"
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    outerRadius={55}
-                    innerRadius={28}
-                    paddingAngle={4}
+                    innerRadius={48}
+                    outerRadius={78}
+                    paddingAngle={2}
                   >
-                    {muacPieData.map((entry, index) => (
+                    {muacPie.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "10px" }} />
+                  <Legend wrapperStyle={{ fontSize: 10, paddingTop: 6 }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
-            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-1">
-              Malnutrition Cases (MAM & SAM) by State
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-2">
+              ACUTE MALNUTRITION CASES (SAM & MAM) BY STATE
             </h3>
-            <div className="w-full flex-1 min-h-[140px]">
+            <div className="h-[210px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={stateSamComparison}
-                  margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                  data={stateBar}
+                  margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
-                    vertical={false}
+                    stroke={isDark ? "#0f2924" : "#e2e8f0"}
                   />
                   <XAxis
                     dataKey="state"
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    tick={{
+                      fill: isDark ? "#cbd5e1" : "#1e293b",
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
                   />
                   <YAxis
-                    stroke={isDarkMode ? "#64748b" : "#475569"}
-                    fontSize={10}
+                    tick={{
+                      fill: isDark ? "#94a3b8" : "#475569",
+                      fontSize: 10,
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
-                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
-                      color: isDarkMode ? "#ffffff" : "#0f172a",
-                      borderRadius: "8px",
-                      fontSize: "11px",
+                      backgroundColor: isDark ? "#071715" : "#ffffff",
+                      borderColor: isDark ? "#065f46" : "#cbd5e1",
+                      borderRadius: 8,
+                      fontSize: 11,
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "10px" }} />
-                  <Bar
-                    dataKey="MAM Cases"
-                    fill="#f59e0b"
-                    radius={[2, 2, 0, 0]}
-                  />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
                   <Bar
                     dataKey="SAM Cases"
                     fill="#ef4444"
-                    radius={[2, 2, 0, 0]}
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="MAM Cases"
+                    fill="#f59e0b"
+                    radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -220,62 +201,54 @@ export const HealthNutrition: React.FC<HealthNutritionProps> = ({
         </div>
       </div>
 
-      {/* Layer 4: Priority Matrix */}
-      <div className="rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b dark:border-[#1a3d36] border-slate-200 dark:bg-[#132c26] bg-slate-50">
-          <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-100 text-slate-800">
-            Health & Nutrition Intervention Priority by State
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="dark:bg-[#0f2823] bg-slate-100 dark:text-slate-300 text-slate-700 font-bold border-b dark:border-[#1a3d36] border-slate-200">
-              <tr>
-                <th className="px-4 py-2.5">Pilot State</th>
-                <th className="px-4 py-2.5 text-right">Pregnant Women</th>
-                <th className="px-4 py-2.5 text-right">Lactating Mothers</th>
-                <th className="px-4 py-2.5 text-right">MUAC SAM Cases</th>
-                <th className="px-4 py-2.5 text-right">MUAC MAM Cases</th>
-                <th className="px-4 py-2.5 text-right">Insurance %</th>
-                <th className="px-4 py-2.5 text-right">Nutrition Access %</th>
+      <div className="p-4 rounded-xl border border-slate-200 dark:border-emerald-900/40 bg-white dark:bg-[#071715] shadow-sm overflow-x-auto">
+        <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider mb-3">
+          MATERNAL & CHILD HEALTH PRIORITY TARGETING TABLE
+        </h3>
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-slate-200 dark:border-emerald-900/30 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px]">
+              <th className="py-2.5 px-3">Pilot State</th>
+              <th className="py-2.5 px-3">Pregnant Women</th>
+              <th className="py-2.5 px-3">Lactating Mothers</th>
+              <th className="py-2.5 px-3">SAM Cases</th>
+              <th className="py-2.5 px-3">MAM Cases</th>
+              <th className="py-2.5 px-3">Health Insurance %</th>
+              <th className="py-2.5 px-3">Nutrition Access %</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-emerald-950/40">
+            {STATES_BASELINE.map((st: StateSummaryItem) => (
+              <tr
+                key={st.code}
+                onClick={() => onSelectState(st.state)}
+                className="hover:bg-slate-50 dark:hover:bg-emerald-950/30 cursor-pointer font-medium text-slate-800 dark:text-slate-200"
+              >
+                <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                  {st.state}
+                </td>
+                <td className="py-2.5 px-3 font-semibold text-rose-600 dark:text-rose-400">
+                  {st.pregnantWomen.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">
+                  {st.lactatingMothers.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3 font-bold text-red-600 dark:text-red-400">
+                  {st.muacSam.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3 font-semibold text-amber-600 dark:text-amber-400">
+                  {st.muacMam.toLocaleString()}
+                </td>
+                <td className="py-2.5 px-3">{st.healthInsurancePct}%</td>
+                <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                  {st.nutritionAccessPct}%
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-[#1a3d36] divide-slate-100 dark:text-slate-200 text-slate-800 font-medium">
-              {STATES_BASELINE.map((st: StateSummaryItem) => (
-                <tr
-                  key={st.code}
-                  onClick={() => onStateSelect(st.state)}
-                  className="hover:dark:bg-[#13332c] hover:bg-emerald-50/60 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">
-                    {st.state}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold text-rose-600 dark:text-rose-400">
-                    {st.pregnantWomen.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold text-teal-600 dark:text-teal-400">
-                    {st.lactatingMothers.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-red-600 dark:text-red-400">
-                    {st.muacSam.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold text-amber-600 dark:text-amber-400">
-                    {st.muacMam.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-semibold">
-                    {st.healthInsurancePct}%
-                  </td>
-                  <td className="px-4 py-2.5 text-right font-bold text-emerald-600 dark:text-emerald-400">
-                    {st.nutritionAccessPct}%
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
-
 export default HealthNutrition;
