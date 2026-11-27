@@ -1,4 +1,3 @@
-// ============================================================================
-// FILE: src/components/maps/DrilldownMap.tsx
-// ============================================================================
-export { DrilldownMap, default } from "../DrilldownMap";
+import { DrilldownMap } from "../DrilldownMap";
+export { DrilldownMap };
+export default DrilldownMap;

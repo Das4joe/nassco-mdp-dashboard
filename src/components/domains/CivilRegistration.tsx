@@ -1,470 +1,205 @@
-import type React from "react";
-import { useState } from "react";
+import React, { useMemo } from "react";
+import { SummaryCards, type MetricCardItem } from "../SummaryCards";
+import { NasspGisMap } from "../NasspGisMap";
 import {
-  FileText,
-  CreditCard,
-  AlertTriangle,
-  CheckCircle2,
-  ShieldAlert,
-  Award,
-  Layers,
-} from "lucide-react";
+  getStateSummary,
+  STATES_BASELINE,
+  type StateSummaryItem,
+} from "../../services/dataService";
+import { FileX, ShieldAlert, Award, FileCheck2 } from "lucide-react";
 import {
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
   Tooltip,
+  Legend,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
 } from "recharts";
-import { KpiCard } from "../KpiCard";
-import { DrilldownMap } from "../DrilldownMap";
-import type { GeoRecord, GeoLevel } from "../../types";
 
-interface CivilRegistrationProps {
-  record?: GeoRecord;
-  isDark?: boolean;
+export interface CivilRegistrationProps {
+  selectedState?: string | null;
+  selectedLga?: string | null;
+  onStateSelect: (stateName: string) => void;
+  onLgaSelect: (lgaName: string) => void;
+  onReset: () => void;
+  isDarkMode?: boolean;
 }
 
-// Age cohorts without birth certificate data
-const NO_BIRTH_CERT_DATA = [
-  { name: "0-4 yrs", value: 7014, percent: 62.0, color: "#2DD4BF" },
-  { name: "5-9 yrs", value: 11185, percent: 58.0, color: "#0EA5E9" },
-  { name: "10-14 yrs", value: 9493, percent: 56.0, color: "#F59E0B" },
-  { name: "15-17 yrs", value: 5421, percent: 55.0, color: "#EF4444" },
-];
-
-// Age cohorts without National Identification Number (NIN) data
-const NO_NIN_DATA = [
-  { name: "0-4 yrs", value: 9616, percent: 85.0, color: "#2DD4BF" },
-  { name: "5-9 yrs", value: 14463, percent: 75.0, color: "#0EA5E9" },
-  { name: "10-14 yrs", value: 11019, percent: 65.0, color: "#F59E0B" },
-  { name: "15-17 yrs", value: 5399, percent: 54.8, color: "#EF4444" },
-];
-
-// Age cohort overlap comparison bar chart
-const COHORT_COMPARISON_DATA = [
-  {
-    cohort: "0-4 yrs",
-    noBirthCert: 7014,
-    noNin: 9616,
-    noBoth: 6280,
-    bothPresent: 954,
-  },
-  {
-    cohort: "5-9 yrs",
-    noBirthCert: 11185,
-    noNin: 14463,
-    noBoth: 9840,
-    bothPresent: 3496,
-  },
-  {
-    cohort: "10-14 yrs",
-    noBirthCert: 9493,
-    noNin: 11019,
-    noBoth: 7620,
-    bothPresent: 4050,
-  },
-  {
-    cohort: "15-17 yrs",
-    noBirthCert: 5421,
-    noNin: 5399,
-    noBoth: 4642,
-    bothPresent: 2980,
-  },
-];
-
-// Detailed bottom breakdown table
-const DETAILED_COHORT_TABLE = [
-  {
-    ageGroup: "0 - 4 yrs",
-    totalInd: 11313,
-    noBirthCertCount: 7014,
-    noBirthCertPct: "62.0%",
-    noNinCount: 9616,
-    noNinPct: "85.0%",
-    noBothCount: 6280,
-    noBothPct: "55.5%",
-    bothCount: 954,
-    bothPct: "8.4%",
-    priority: "Critical (Early Stage)",
-  },
-  {
-    ageGroup: "5 - 9 yrs",
-    totalInd: 19284,
-    noBirthCertCount: 11185,
-    noBirthCertPct: "58.0%",
-    noNinCount: 14463,
-    noNinPct: "75.0%",
-    noBothCount: 9840,
-    noBothPct: "51.0%",
-    bothCount: 3496,
-    bothPct: "18.1%",
-    priority: "High (Primary Age)",
-  },
-  {
-    ageGroup: "10 - 14 yrs",
-    totalInd: 16952,
-    noBirthCertCount: 9493,
-    noBirthCertPct: "56.0%",
-    noNinCount: 11019,
-    noNinPct: "65.0%",
-    noBothCount: 7620,
-    noBothPct: "45.0%",
-    bothCount: 4050,
-    bothPct: "23.9%",
-    priority: "High (Transition)",
-  },
-  {
-    ageGroup: "15 - 17 yrs",
-    totalInd: 10139,
-    noBirthCertCount: 5421,
-    noBirthCertPct: "55.0%",
-    noNinCount: 5399,
-    noNinPct: "54.8%",
-    noBothCount: 4642,
-    noBothPct: "45.8%",
-    bothCount: 2980,
-    bothPct: "29.4%",
-    priority: "Medium (Youth Entry)",
-  },
-  {
-    ageGroup: "18 - 24 yrs",
-    totalInd: 19012,
-    noBirthCertCount: 8936,
-    noBirthCertPct: "47.0%",
-    noNinCount: 8555,
-    noNinPct: "45.0%",
-    noBothCount: 6464,
-    noBothPct: "34.0%",
-    bothCount: 7985,
-    bothPct: "42.0%",
-    priority: "Adult Transition",
-  },
-  {
-    ageGroup: "25+ yrs",
-    totalInd: 61976,
-    noBirthCertCount: 26030,
-    noBirthCertPct: "42.0%",
-    noNinCount: 22311,
-    noNinPct: "36.0%",
-    noBothCount: 15494,
-    noBothPct: "25.0%",
-    bothCount: 18948,
-    bothPct: "30.6%",
-    priority: "Standard",
-  },
-];
-
 export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
-  record,
-  isDark = true,
+  selectedState,
+  selectedLga,
+  onStateSelect,
+  onLgaSelect,
+  onReset,
+  isDarkMode = true,
 }) => {
-  const [geoLevel, setGeoLevel] = useState<GeoLevel>("national");
-  const [selectedState, setSelectedState] = useState<string | null>(null);
-  const [selectedLga, setSelectedLga] = useState<string | null>(null);
-  const [selectedWard, setSelectedWard] = useState<string | null>(null);
+  const summary = useMemo(
+    () => getStateSummary(selectedState || undefined),
+    [selectedState],
+  );
 
-  // Scaler multiplier for drilldown
-  const multiplier =
-    geoLevel === "ward"
-      ? 0.01
-      : geoLevel === "lga"
-        ? 0.035
-        : geoLevel === "state"
-          ? 0.25
-          : 1;
+  const kpiCards: MetricCardItem[] = useMemo(
+    () => [
+      {
+        id: "kpi-nobirth",
+        title: "Children w/o Birth Cert",
+        value: summary.birthCertMissing,
+        subtitle: `${((summary.birthCertMissing / summary.children) * 100).toFixed(1)}% of all children`,
+        badge: "57.4% GAP",
+        icon: FileX,
+        accentColor: "rose",
+      },
+      {
+        id: "kpi-nonin",
+        title: "Children w/o NIN",
+        value: summary.ninMissing,
+        subtitle: `${((summary.ninMissing / summary.children) * 100).toFixed(1)}% of all children`,
+        badge: "70.2% GAP",
+        icon: ShieldAlert,
+        accentColor: "amber",
+      },
+      {
+        id: "kpi-noboth",
+        title: "Children w/o Both",
+        value: summary.bothMissing,
+        subtitle: `${((summary.bothMissing / summary.children) * 100).toFixed(1)}% unregistered`,
+        badge: "49.2% EXCLUDED",
+        icon: Award,
+        accentColor: "rose",
+      },
+      {
+        id: "kpi-both",
+        title: "Individuals with Both",
+        value: summary.bothPresent,
+        subtitle: `${((summary.bothPresent / summary.individuals) * 100).toFixed(1)}% fully documented`,
+        badge: "27.7% DOCUMENTED",
+        icon: FileCheck2,
+        accentColor: "emerald",
+      },
+    ],
+    [summary],
+  );
 
-  const noBirthCertTotal = Math.round(33113 * multiplier);
-  const noNinTotal = Math.round(40497 * multiplier);
-  const noBothTotal = Math.round(28382 * multiplier);
-  const bothPresentTotal = Math.round(38413 * multiplier);
+  const birthCertAgeData = [
+    { name: "0 - 4 yrs", value: 7420, color: "#f43f5e" },
+    { name: "5 - 9 yrs", value: 11240, color: "#fb923c" },
+    { name: "10 - 14 yrs", value: 8940, color: "#fbbf24" },
+    { name: "15 - 17 yrs", value: 5513, color: "#a855f7" },
+  ];
+
+  const stateComparisonData = useMemo(() => {
+    return STATES_BASELINE.map((s: StateSummaryItem) => ({
+      state: s.state,
+      "No Birth Cert": s.birthCertMissing,
+      "No NIN": s.ninMissing,
+      "Missing Both": s.bothMissing,
+    }));
+  }, []);
 
   return (
-    <div className="space-y-4">
-      {/* LAYER 1: Top KPI Indicators */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <KpiCard
-          title="Children w/o Birth Cert (0-17)"
-          value={noBirthCertTotal.toLocaleString()}
-          subtitle="57.4% of total child population"
-          tag="57.4% GAP"
-          isDark={isDark}
-          icon={FileText}
-          accentColor="amber"
-        />
-        <KpiCard
-          title="Children w/o NIN (0-17)"
-          value={noNinTotal.toLocaleString()}
-          subtitle="70.2% unregistered with NIMC"
-          tag="70.2% GAP"
-          isDark={isDark}
-          icon={CreditCard}
-          accentColor="rose"
-        />
-        <KpiCard
-          title="Children w/o Both ID Docs"
-          value={noBothTotal.toLocaleString()}
-          subtitle="49.2% zero institutional visibility"
-          tag="49.2% CRITICAL"
-          isDark={isDark}
-          icon={AlertTriangle}
-          accentColor="rose"
-        />
-        <KpiCard
-          title="Individuals with Both IDs"
-          value={bothPresentTotal.toLocaleString()}
-          subtitle="27.7% fully documented in NSR"
-          tag="27.7% VERIFIED"
-          isDark={isDark}
-          icon={CheckCircle2}
-          accentColor="teal"
-        />
-      </div>
+    <div className="flex flex-col space-y-4 w-full">
+      {/* Layer 1: Top 4 KPI Cards */}
+      <SummaryCards cards={kpiCards} />
 
-      {/* 2-COLUMN LAYER (55% Map + 45% Domain Charts) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* LAYER 2 (Left, 55% width / 7 cols): Leaflet Vector GIS Map */}
-        <div className="lg:col-span-7 flex flex-col rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-500/15 text-teal-300">
-                <ShieldAlert className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-white">
-                  Civil Registration Spatial Matrix
-                </h3>
-                <p className="text-[11px] text-slate-400">
-                  Targeted States &gt; LGAs &gt; Wards Registration Gaps
-                </p>
-              </div>
-            </div>
-            <span className="rounded bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-300 border border-teal-500/30 uppercase">
-              {geoLevel} Level
-            </span>
-          </div>
-
-          <div className="h-[490px] w-full rounded-lg overflow-hidden border border-[#134e4a]/30">
-            <DrilldownMap
-              level={geoLevel}
-              selectedState={selectedState}
-              selectedLga={selectedLga}
-              selectedWard={selectedWard}
-              onSelectState={(st) => {
-                setSelectedState(st);
-                setGeoLevel("state");
-              }}
-              onSelectLga={(lg) => {
-                setSelectedLga(lg);
-                setGeoLevel("lga");
-              }}
-              onSelectWard={(wd) => {
-                setSelectedWard(wd);
-                setGeoLevel("ward");
-              }}
-              onReset={() => {
-                setSelectedState(null);
-                setSelectedLga(null);
-                setSelectedWard(null);
-                setGeoLevel("national");
-              }}
-              isDark={isDark}
-              activeDomain="civil-registration"
-              record={record}
-            />
-          </div>
+      {/* Layers 2 & 3: Map (55%) & Charts (45%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div className="lg:col-span-7 w-full h-[480px]">
+          <NasspGisMap
+            selectedState={selectedState || undefined}
+            selectedLga={selectedLga || undefined}
+            onStateSelect={onStateSelect}
+            onLgaSelect={onLgaSelect}
+            onReset={onReset}
+            isDarkMode={isDarkMode}
+          />
         </div>
 
-        {/* LAYER 3 (Right, 45% width / 5 cols): Civil Registration Analytical Charts */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
-          {/* Dual Donut/Pie Charts */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Lack of Birth Certificate Pie */}
-            <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur">
-              <h4 className="text-xs font-semibold text-teal-300 truncate mb-1">
-                No Birth Cert by Age (0-17)
-              </h4>
-              <p className="text-[10px] text-slate-400 mb-2">
-                Total: 33,113 Children
-              </p>
-              <div className="h-40 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={NO_BIRTH_CERT_DATA}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={36}
-                      outerRadius={58}
-                      paddingAngle={3}
-                    >
-                      {NO_BIRTH_CERT_DATA.map((entry, idx) => (
-                        <Cell key={`cell-bc-${idx}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#071c1a",
-                        borderColor: "#134e4a",
-                        borderRadius: "8px",
-                        fontSize: "11px",
-                        color: "#fff",
-                      }}
-                      formatter={(val: number, name: string) => [
-                        `${val.toLocaleString()} children`,
-                        name,
-                      ]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-300 mt-1">
-                {NO_BIRTH_CERT_DATA.map((d, i) => (
-                  <div key={i} className="flex items-center gap-1.5 truncate">
-                    <span
-                      className="h-2 w-2 rounded-full shrink-0"
-                      style={{ backgroundColor: d.color }}
-                    />
-                    <span className="truncate">
-                      {d.name}:{" "}
-                      <strong className="text-white">{d.percent}%</strong>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Lack of NIN Pie */}
-            <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur">
-              <h4 className="text-xs font-semibold text-teal-300 truncate mb-1">
-                No NIN by Age Cohort (0-17)
-              </h4>
-              <p className="text-[10px] text-slate-400 mb-2">
-                Total: 40,497 Children
-              </p>
-              <div className="h-40 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={NO_NIN_DATA}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={36}
-                      outerRadius={58}
-                      paddingAngle={3}
-                    >
-                      {NO_NIN_DATA.map((entry, idx) => (
-                        <Cell key={`cell-nin-${idx}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#071c1a",
-                        borderColor: "#134e4a",
-                        borderRadius: "8px",
-                        fontSize: "11px",
-                        color: "#fff",
-                      }}
-                      formatter={(val: number, name: string) => [
-                        `${val.toLocaleString()} children`,
-                        name,
-                      ]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-300 mt-1">
-                {NO_NIN_DATA.map((d, i) => (
-                  <div key={i} className="flex items-center gap-1.5 truncate">
-                    <span
-                      className="h-2 w-2 rounded-full shrink-0"
-                      style={{ backgroundColor: d.color }}
-                    />
-                    <span className="truncate">
-                      {d.name}:{" "}
-                      <strong className="text-white">{d.percent}%</strong>
-                    </span>
-                  </div>
-                ))}
-              </div>
+        <div className="lg:col-span-5 flex flex-col space-y-4">
+          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
+            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-1">
+              Lack of Birth Certificate by Age Cohort
+            </h3>
+            <div className="w-full flex-1 min-h-[160px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={birthCertAgeData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={55}
+                    innerRadius={28}
+                    paddingAngle={4}
+                  >
+                    {birthCertAgeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
+                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
+                      color: isDarkMode ? "#ffffff" : "#0f172a",
+                      borderRadius: "8px",
+                      fontSize: "11px",
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: "10px" }} />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Grouped Bar Chart: Documentation Gaps Overlap */}
-          <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-3 shadow-md backdrop-blur flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Layers className="h-4 w-4 text-teal-400" />
-                <h4 className="text-xs font-semibold text-white">
-                  Registration Gap Overlap by Child Cohort
-                </h4>
-              </div>
-              <span className="text-[10px] text-slate-400">
-                UNICEF/NPopC/NIMC
-              </span>
-            </div>
-            <div className="h-52 w-full">
+          <div className="p-3.5 rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm flex-1 flex flex-col">
+            <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-200 text-slate-800 mb-1">
+              Documentation Gaps by Pilot State
+            </h3>
+            <div className="w-full flex-1 min-h-[140px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={COHORT_COMPARISON_DATA}
-                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  data={stateComparisonData}
+                  margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="#134e4a"
-                    opacity={0.3}
+                    stroke={isDarkMode ? "#1a3d36" : "#e2e8f0"}
+                    vertical={false}
                   />
                   <XAxis
-                    dataKey="cohort"
-                    stroke="#94a3b8"
-                    tick={{ fontSize: 11 }}
+                    dataKey="state"
+                    stroke={isDarkMode ? "#64748b" : "#475569"}
+                    fontSize={10}
                   />
-                  <YAxis stroke="#94a3b8" tick={{ fontSize: 10 }} />
+                  <YAxis
+                    stroke={isDarkMode ? "#64748b" : "#475569"}
+                    fontSize={10}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#071c1a",
-                      borderColor: "#134e4a",
+                      backgroundColor: isDarkMode ? "#0c221e" : "#ffffff",
+                      borderColor: isDarkMode ? "#1a3d36" : "#cbd5e1",
+                      color: isDarkMode ? "#ffffff" : "#0f172a",
                       borderRadius: "8px",
                       fontSize: "11px",
-                      color: "#fff",
                     }}
                   />
-                  <Legend
-                    wrapperStyle={{ fontSize: "11px", paddingTop: "6px" }}
-                  />
+                  <Legend wrapperStyle={{ fontSize: "10px" }} />
                   <Bar
-                    dataKey="noBirthCert"
-                    name="No Birth Cert"
-                    fill="#F59E0B"
-                    radius={[3, 3, 0, 0]}
+                    dataKey="No Birth Cert"
+                    fill="#f43f5e"
+                    radius={[2, 2, 0, 0]}
                   />
+                  <Bar dataKey="No NIN" fill="#fb923c" radius={[2, 2, 0, 0]} />
                   <Bar
-                    dataKey="noNin"
-                    name="No NIN"
-                    fill="#EF4444"
-                    radius={[3, 3, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="noBoth"
-                    name="No ID At All"
-                    fill="#881337"
-                    radius={[3, 3, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="bothPresent"
-                    name="Both Verified"
-                    fill="#2DD4BF"
-                    radius={[3, 3, 0, 0]}
+                    dataKey="Missing Both"
+                    fill="#a855f7"
+                    radius={[2, 2, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -473,102 +208,53 @@ export const CivilRegistration: React.FC<CivilRegistrationProps> = ({
         </div>
       </div>
 
-      {/* LAYER 4: Bottom Detailed Demographic Overlap Matrix Table */}
-      <div className="rounded-xl border border-[#134e4a]/40 bg-[#0b2422]/90 p-4 shadow-md backdrop-blur">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Award className="h-4 w-4 text-teal-400" />
-            <h3 className="text-sm font-semibold text-white">
-              Age Cohort Civil Registration & Identity Overlap Matrix
-            </h3>
-          </div>
-          <span className="text-xs text-slate-400">
-            Microdata Source: NASSCO MDP Survey & Baseline Registry
-          </span>
+      {/* Layer 4: State-Level Matrix */}
+      <div className="rounded-xl border dark:border-[#1a3d36] border-slate-200 dark:bg-[#0c221e] bg-white shadow-sm overflow-hidden">
+        <div className="px-4 py-3 border-b dark:border-[#1a3d36] border-slate-200 dark:bg-[#132c26] bg-slate-50">
+          <h3 className="text-xs font-bold uppercase tracking-wider dark:text-slate-100 text-slate-800">
+            Legal Identity Coverage & Gap Matrix by State
+          </h3>
         </div>
-
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-[#134e4a]/60 bg-[#071c1a]/80 text-teal-300">
-                <th className="py-2.5 px-3 font-semibold">Age Cohort</th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  Population
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  No Birth Cert (N)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  No Birth Cert (%)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  No NIN (N)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  No NIN (%)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  Missing Both (N)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  Missing Both (%)
-                </th>
-                <th className="py-2.5 px-3 font-semibold text-right">
-                  Both Verified
-                </th>
-                <th className="py-2.5 px-3 font-semibold">
-                  Intervention Priority
-                </th>
+            <thead className="dark:bg-[#0f2823] bg-slate-100 dark:text-slate-300 text-slate-700 font-bold border-b dark:border-[#1a3d36] border-slate-200">
+              <tr>
+                <th className="px-4 py-2.5">Pilot State</th>
+                <th className="px-4 py-2.5 text-right">Total Children</th>
+                <th className="px-4 py-2.5 text-right">w/o Birth Cert</th>
+                <th className="px-4 py-2.5 text-right">w/o NIN</th>
+                <th className="px-4 py-2.5 text-right">Missing Both</th>
+                <th className="px-4 py-2.5 text-right">Both Present</th>
+                <th className="px-4 py-2.5 text-right">Documentation Rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#134e4a]/30 text-slate-200">
-              {DETAILED_COHORT_TABLE.map((row, idx) => (
+            <tbody className="divide-y dark:divide-[#1a3d36] divide-slate-100 dark:text-slate-200 text-slate-800 font-medium">
+              {STATES_BASELINE.map((st: StateSummaryItem) => (
                 <tr
-                  key={idx}
-                  className="hover:bg-[#134e4a]/20 transition-colors duration-150"
+                  key={st.code}
+                  onClick={() => onStateSelect(st.state)}
+                  className="hover:dark:bg-[#13332c] hover:bg-emerald-50/60 cursor-pointer transition-colors"
                 >
-                  <td className="py-2.5 px-3 font-medium text-white">
-                    {row.ageGroup}
+                  <td className="px-4 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">
+                    {st.state}
                   </td>
-                  <td className="py-2.5 px-3 text-right">
-                    {Math.round(row.totalInd * multiplier).toLocaleString()}
+                  <td className="px-4 py-2.5 text-right">
+                    {st.children.toLocaleString()}
                   </td>
-                  <td className="py-2.5 px-3 text-right text-amber-300 font-mono">
-                    {Math.round(
-                      row.noBirthCertCount * multiplier,
-                    ).toLocaleString()}
+                  <td className="px-4 py-2.5 text-right text-rose-600 dark:text-rose-400 font-semibold">
+                    {st.birthCertMissing.toLocaleString()}
                   </td>
-                  <td className="py-2.5 px-3 text-right text-amber-400 font-semibold">
-                    {row.noBirthCertPct}
+                  <td className="px-4 py-2.5 text-right text-amber-600 dark:text-amber-400 font-semibold">
+                    {st.ninMissing.toLocaleString()}
                   </td>
-                  <td className="py-2.5 px-3 text-right text-rose-300 font-mono">
-                    {Math.round(row.noNinCount * multiplier).toLocaleString()}
+                  <td className="px-4 py-2.5 text-right text-purple-600 dark:text-purple-400 font-semibold">
+                    {st.bothMissing.toLocaleString()}
                   </td>
-                  <td className="py-2.5 px-3 text-right text-rose-400 font-semibold">
-                    {row.noNinPct}
+                  <td className="px-4 py-2.5 text-right text-emerald-600 dark:text-emerald-400 font-semibold">
+                    {st.bothPresent.toLocaleString()}
                   </td>
-                  <td className="py-2.5 px-3 text-right text-red-300 font-mono font-bold">
-                    {Math.round(row.noBothCount * multiplier).toLocaleString()}
-                  </td>
-                  <td className="py-2.5 px-3 text-right text-red-400 font-bold">
-                    {row.noBothPct}
-                  </td>
-                  <td className="py-2.5 px-3 text-right text-teal-300 font-mono">
-                    {Math.round(row.bothCount * multiplier).toLocaleString()} (
-                    {row.bothPct})
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <span
-                      className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${
-                        row.priority.includes("Critical")
-                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                          : row.priority.includes("High")
-                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                            : "bg-teal-500/20 text-teal-300 border border-teal-500/30"
-                      }`}
-                    >
-                      {row.priority}
-                    </span>
+                  <td className="px-4 py-2.5 text-right font-bold text-teal-600 dark:text-teal-400">
+                    {((st.bothPresent / st.individuals) * 100).toFixed(1)}%
                   </td>
                 </tr>
               ))}
